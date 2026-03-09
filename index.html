@@ -212,7 +212,7 @@ const LABEL_MAP={
   valorVendido:'VALOR VENDIDO',cac:'CAC',roas:'ROAS',
 };
 
-let cache={}, availableMonths=[], activeMonth=null, activeWeek='TOTAL', 
+let cache={}, availableMonths=[], activeMonth=null, activeWeek='TOTAL';
 
 function norm(s){return String(s||'').trim().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[-]/g,' ')}
 function parseBR(v){
@@ -628,7 +628,7 @@ async function runAIDiagnosis(){
     const v=d[m.key];
     if(v&&v.real!==null){
       const pct=v.proj?((v.real/v.proj-1)*100).toFixed(1):null;
-      lines.push(`${m.label}: Real=${fmt(v.real,m.fmt)}${v.proj?' | Meta='+fmt(v.proj,m.fmt)+(pct?' | '+(pct>0?'+':'')+pct+'%'):'':''}`)
+      const pctStr=pct?' | '+(pct>0?'+':'')+pct+'%':''; lines.push(m.label+': Real='+fmt(v.real,m.fmt)+(v.proj?' | Meta='+fmt(v.proj,m.fmt)+pctStr:''));
     }
   });
   const prompt=`Você é um especialista em análise de vendas e marketing para empresas de buffet e eventos. Analise os seguintes KPIs do mês ${activeMonth} (${activeWeek==='TOTAL'?'Total do Mês':'Semana '+activeWeek.replace('S','')}) e forneça:
