@@ -114,26 +114,6 @@ body{background:var(--bg);color:var(--text);font-family:'Montserrat',sans-serif;
 .delta-badge{font-size:.75rem;font-weight:700;padding:3px 8px;border-radius:999px;display:inline-block}
 .delta-badge.up{background:#4ade8018;color:var(--good)}.delta-badge.down{background:#f8717118;color:var(--bad)}.delta-badge.eq{background:#facc1518;color:var(--warn)}
 
-/* ── FUNNEL ── */
-
-.funnel-step-wrap{position:relative;width:100%;display:flex;justify-content:center;align-items:center}
-
-.funnel-block{
-  position:relative;
-  min-width:260px;
-  max-width:100%;
-  background:var(--surface);
-  border:2px solid;
-  border-radius:10px;
-  padding:14px 20px;
-  display:flex;
-  align-items:center;
-  gap:14px;
-  transition:transform .15s, box-shadow .15s;
-  cursor:default;
-  margin:0 auto;
-}
-.funnel-block:hover{transform:scale(1.02);box-shadow:0 0 20px #60a5fa18}
 
 .fb-icon{font-size:1.4rem;flex-shrink:0}
 .fb-main{flex:1}
@@ -141,44 +121,14 @@ body{background:var(--bg);color:var(--text);font-family:'Montserrat',sans-serif;
 .fb-value{font-size:1.5rem;font-weight:800;line-height:1}
 .fb-meta{font-size:.7rem;color:var(--muted);flex-shrink:0;text-align:right}
 
-.funnel-rate{
-  display:flex;align-items:center;gap:8px;
-  padding:8px 0;color:var(--muted);font-size:.75rem;
-}
-.funnel-arrow{font-size:.9rem;color:var(--muted)}
-.funnel-rate-label{font-weight:700}
-.funnel-rate-meta{color:var(--muted);font-size:.68rem}
-
 /* Side info panels */
-.funnel-side{
-  position:absolute;left:-220px;top:50%;transform:translateY(-50%);
-  background:var(--surface2);border:1px solid var(--border);
-  border-radius:8px;padding:10px 14px;min-width:180px;
-}
-.funnel-side.right{left:auto;right:-220px}
+
 .fs-item{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:5px}
 .fs-item:last-child{margin-bottom:0}
 .fs-l{font-size:.68rem;color:var(--muted);font-weight:600}
 .fs-v{font-size:.8rem;font-weight:700}
 
 @media(max-width:900px){
-  .funnel-side,.funnel-side.right{display:none}
-}
-
-/* ── FUNNEL ── */
-
-.funnel-step{
-  width:var(--fw);min-width:240px;max-width:100%;
-  background:var(--surface);
-  border:2px solid var(--fc);
-  border-radius:10px;
-  padding:14px 20px;
-  position:relative;
-  display:flex;justify-content:space-between;align-items:center;
-  transition:transform .15s,box-shadow .15s;
-  box-shadow:0 0 0 0 var(--fc);
-}
-.funnel-step:hover{transform:scaleX(1.01);box-shadow:0 0 18px -4px var(--fc);}
 .fs-left{flex:1}
 .fs-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-bottom:4px}
 .fs-val{font-size:1.4rem;font-weight:800;line-height:1.1;margin-bottom:4px}
@@ -189,18 +139,13 @@ body{background:var(--bg);color:var(--text);font-family:'Montserrat',sans-serif;
   background:#f8717118;border:1px solid #f8717130;
   border-radius:999px;padding:4px 10px;white-space:nowrap;flex-shrink:0;margin-left:12px;
 }
-.funnel-connector{
-  width:2px;height:16px;
-  background:linear-gradient(to bottom,var(--border),transparent);
-  flex-shrink:0;
-}
 
 @media(max-width:600px){
   .cmp-cols,.cmp-row{grid-template-columns:1.5fr 1fr 1fr}
   .cc:nth-child(2),.cr-meta{display:none}
   .bar-label{width:70px}
   .sel-row{grid-template-columns:1fr auto 1fr}
-  .funnel-block{min-width:unset;width:95%!important}
+  
 }
 </style>
 </head>
@@ -473,41 +418,6 @@ function renderGeral(month,color){
   const el=document.getElementById('geral-content');
   let html='';
 
-  // ── VISUAL FUNNEL ──
-  const funnelSteps=[
-    {key:'leads',          label:'Leads',               sub:'Topo do Funil',    fmt:'num'},
-    {key:'reunAgendadas',  label:'Reuniões Agendadas',  sub:'Taxa de Agendamento: ', fmt:'num', rate:'taxaAgendamento'},
-    {key:'reunRealizadas', label:'Reuniões Realizadas', sub:'Comparecimento: ', fmt:'num', rate:'taxaComparec'},
-    {key:'vendas',         label:'Vendas Realizadas',   sub:'Conversão: ',      fmt:'num', rate:'taxaConversao'},
-    {key:'valorVendido',   label:'Valor Vendido',       sub:'Resultado Final',  fmt:'brl'},
-  ];
-  const topVal=data[funnelSteps[0].key]?.real||1;
-
-  html+=`<div class="sec-label" style="margin-bottom:20px">🔻 FUNIL DE VENDAS — ${name}</div>`;
-  html+=`<div class="funnel-wrap">`;
-  funnelSteps.forEach((step,i)=>{
-    const d=data[step.key]||{};
-    const val=d.real;
-    const proj=d.proj;
-    const widthPct=Math.max(((val||0)/topVal)*100,14);
-    const st=getStatus(step.key,val,proj,false);
-    const barColor=st==='good'?'var(--good)':st==='warn'?'var(--warn)':st==='bad'?'var(--bad)':color;
-    const rateVal=step.rate?data[step.rate]?.real:null;
-    const prevVal=i>0?(data[funnelSteps[i-1].key]?.real||0):null;
-    const dropPct=(prevVal&&val!==null&&prevVal>0)?((1-(val/prevVal))*100).toFixed(0):null;
-    html+=`<div class="funnel-step" style="--fw:${widthPct.toFixed(1)}%;--fc:${barColor}">
-      <div class="fs-left">
-        <div class="fs-label">${step.label}</div>
-        <div class="fs-val" style="color:${barColor}">${fmt(val,step.fmt)}</div>
-        <div class="fs-sub">${step.rate?step.sub+fmt(rateVal,'pct'):step.sub}</div>
-        ${proj!==null?`<div class="fs-meta">Meta: ${fmt(proj,step.fmt)}</div>`:''}
-      </div>
-      ${dropPct!==null&&parseFloat(dropPct)>0?`<div class="fs-drop">▼ ${dropPct}% perda</div>`:''}
-    </div>`;
-    if(i<funnelSteps.length-1) html+=`<div class="funnel-connector"></div>`;
-  });
-  html+=`</div>`;
-
   // ── COMPARISON TABLE ──
   html+=`<div class="sec-label" style="margin-top:36px">📊 Comparativo Todos os Meses</div>`;
   html+=`<div class="ov-table-wrap"><table class="ov-table"><thead><tr><th>Métrica</th><th>Meta</th>`;
@@ -557,7 +467,6 @@ function renderGeral(month,color){
 
   el.innerHTML=html;
 }
-
 
 // ── PANEL 2: COMPARATIVO ──
 function populateSelects(){
