@@ -45,6 +45,15 @@ body{background:var(--bg);color:var(--text);font-family:'Montserrat',sans-serif;
 .month-tabs{display:flex;justify-content:center;gap:6px;margin-bottom:24px;flex-wrap:wrap}
 .mtab{padding:7px 18px;border-radius:999px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-family:'Montserrat',sans-serif;font-size:.75rem;font-weight:700;cursor:pointer;transition:all .2s}
 .mtab:hover{border-color:var(--accent);color:var(--text)}
+.wtab{background:transparent;border:1.5px solid var(--border);border-radius:20px;color:var(--muted);font-size:.72rem;font-weight:700;padding:5px 14px;cursor:pointer;transition:all .2s;letter-spacing:.04em}
+.wtab.active,.wtab:hover{opacity:1}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-top:10px}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.kc-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:6px}
+.kc-val{font-size:1.4rem;font-weight:800;margin-bottom:4px}
+.kc-meta{font-size:.68rem;color:var(--muted);margin-bottom:4px}
+.kc-delta{font-size:.65rem;font-weight:700}
+.delta-up{color:var(--good)}.delta-down{color:var(--bad)}.delta-eq{color:var(--muted)}
 .mtab.active{color:#fff}
 
 /* Cards grid */
@@ -179,11 +188,11 @@ body{background:var(--bg);color:var(--text);font-family:'Montserrat',sans-serif;
     <div class="selector-card">
       <h2>🗓 Selecione os meses para comparar</h2>
       <div class="sel-row">
-        <div class="sel-col"><label>Mês A</label><select id="sel-a" class="msel msel-a"></select></div>
+        <div class="sel-col"><label>Mês A</label><select id="cmp-mon-a" onchange="updateWeekSelects('a')" class="msel msel-a"></select><select id="cmp-week-a" class="msel msel-a" style="margin-top:6px"></select></div>
         <div class="vs-dot">VS</div>
-        <div class="sel-col"><label>Mês B</label><select id="sel-b" class="msel msel-b"></select></div>
+        <div class="sel-col"><label>Mês B</label><select id="cmp-mon-b" onchange="updateWeekSelects('b')" class="msel msel-b"></select><select id="cmp-week-b" class="msel msel-b" style="margin-top:6px"></select></div>
       </div>
-      <button class="btn-cmp" id="btn-cmp" onclick="runComparison()">Comparar Meses →</button>
+      <button class="btn-cmp" id="btn-cmp" onclick="runComparison()">Comparar →</button>
     </div>
     <div id="cmp-result">
       <div class="cmp-header-row">
@@ -203,11 +212,13 @@ body{background:var(--bg);color:var(--text);font-family:'Montserrat',sans-serif;
   </div>
 </div>
 
-<script>
-const SHEET_ID='18Qn__4Wq6s094QyFnDLoPs_c9PAdeNNsKW5JV6DW060';
+<script>const SHEET_ID='18Qn__4Wq6s094QyFnDLoPs_c9PAdeNNsKW5JV6DW060';
 const MONTH_ORDER=['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
 const MONTH_NAMES={JAN:'Janeiro',FEV:'Fevereiro',MAR:'Março',ABR:'Abril',MAI:'Maio',JUN:'Junho',JUL:'Julho',AGO:'Agosto',SET:'Setembro',OUT:'Outubro',NOV:'Novembro',DEZ:'Dezembro'};
-const MONTH_COLORS=['#60a5fa','#facc15','#f87171','#4ade80','#fb923c','#a78bfa','#34d399','#f472b6','#38bdf8','#fbbf24','#86efac','#c084fc'];
+const MONTH_COLORS=['#60a5fa','#facc15','#f87171','#4ade80','#fb923c','#a78bfa'];
+const WEEK_LABELS={S1:'Semana 1',S2:'Semana 2',S3:'Semana 3',S4:'Semana 4',TOTAL:'Total do Mês'};
+// gviz col indices (0-based): A=0,B=1,C=2,(D=3 sep),E=4,F=5,(G=6 sep),H=7,I=8,(J=9 sep),K=10,L=11,M=12,N=13
+const WEEK_COLS={S1:{p:1,r:2},S2:{p:4,r:5},S3:{p:7,r:8},S4:{p:10,r:11},TOTAL:{p:12,r:13}};
 
 const METRICS=[
   {key:'investimento',   label:'Investimento',           fmt:'brl',group:'topo'},
@@ -236,23 +247,24 @@ const LABEL_MAP={
   valorVendido:'VALOR VENDIDO',cac:'CAC',roas:'ROAS',
 };
 
-let cache={}, availableMonths=[], activeMonth=null;
+let cache={}, availableMonths=[], activeMonth=null, activeWeek='TOTAL';
 
 function norm(s){return String(s||'').trim().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[-]/g,' ')}
 function parseBR(v){
   if(v===null||v===undefined||v==='')return null;
-  if(typeof v==='number')return v;
+  if(typeof v==='number')return isNaN(v)?null:v;
   const s=String(v).trim();
-  if(!s||s==='#DIV/0!'||s==='#N/A')return null;
+  if(!s||s==='#DIV/0!'||s==='#N/A'||s==='#REF!'||s==='—')return null;
   if(s.includes('%'))return parseFloat(s.replace('%','').replace(',','.'));
   if(s.includes('R$'))return parseFloat(s.replace(/R\$\s?/g,'').replace(/\./g,'').replace(',','.').trim());
-  return parseFloat(s.replace(/\./g,'').replace(',','.'));
+  const n=parseFloat(s.replace(/\./g,'').replace(',','.'));
+  return isNaN(n)?null:n;
 }
 function fmt(v,t){
   if(v===null||v===undefined||isNaN(v))return'—';
   if(t==='brl')return'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-  if(t==='pct')return v.toFixed(2).replace('.',',')+' %';
-  return Number.isInteger(v)?v.toLocaleString('pt-BR'):v.toLocaleString('pt-BR',{maximumFractionDigits:1});
+  if(t==='pct')return v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+' %';
+  return v.toLocaleString('pt-BR',{maximumFractionDigits:1});
 }
 function getStatus(key,real,proj,lb){
   if(real===null||proj===null||isNaN(real)||isNaN(proj)||proj===0)return'neutral';
@@ -266,117 +278,71 @@ function getDelta(key,real,proj,lb){
   return{t:(d>=0?'▲':'▼')+' '+(d>=0?'+':'')+d.toFixed(1)+'% vs meta',c:good?'up':'down'};
 }
 
-async function fetchSheetByName(name){
-  if(cache[name])return cache[name];
-  const url=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(name)}&tq=select%20A%2CM%2CN`;
+// ── Fetch all 14 columns (A,B,C,E,F,H,I,K,L,M,N) for weekly data ──
+async function fetchMonthAllWeeks(monthName){
+  if(cache[monthName])return cache[monthName];
+  // select A,B,C,E,F,H,I,K,L,M,N = cols 1,2,3,5,6,8,9,11,12,13,14 (1-indexed in gviz SQL)
+  const q='select A,B,C,E,F,H,I,K,L,M,N';
+  const url=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(monthName)}&tq=${encodeURIComponent(q)}`;
   const res=await fetch(url);
-  if(!res.ok)throw new Error('Falha: '+name);
+  if(!res.ok)throw new Error('Falha: '+monthName);
   const text=await res.text();
-  const js=text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/)[1];
-  const json=JSON.parse(js);
+  const js=text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/);
+  if(!js)return null;
+  const json=JSON.parse(js[1]);
   if(!json.table||!json.table.rows)return null;
+  // rows: col0=A, col1=B, col2=C, col3=E, col4=F, col5=H, col6=I, col7=K, col8=L, col9=M, col10=N
+  const RAW_WEEK_COLS={S1:{p:1,r:2},S2:{p:3,r:4},S3:{p:5,r:6},S4:{p:7,r:8},TOTAL:{p:9,r:10}};
   const rows=json.table.rows.map(r=>(r.c||[]).map(c=>(!c||c.v===null||c.v===undefined)?'':(typeof c.v==='number'?c.v:String(c.v))));
   const map={};
   for(let i=0;i<rows.length;i++){const n=norm(rows[i][0]);if(n)map[n]=i;}
-  const data={};
-  for(const m of METRICS){
-    const ri=map[LABEL_MAP[m.key]]??-1;
-    let proj=null,real=null;
-    if(ri>=0){
-      proj=parseBR(rows[ri][1]);real=parseBR(rows[ri][2]);
-      if(m.fmt==='pct'){
-        if(proj!==null&&typeof rows[ri][1]==='number'&&Math.abs(proj)<=1.5)proj*=100;
-        if(real!==null&&typeof rows[ri][2]==='number'&&Math.abs(real)<=1.5)real*=100;
+  // Build cache per week
+  const monthCache={};
+  for(const [wk,cols] of Object.entries(RAW_WEEK_COLS)){
+    const wData={};
+    for(const m of METRICS){
+      const ri=map[LABEL_MAP[m.key]]??-1;
+      let proj=null,real=null;
+      if(ri>=0){
+        proj=parseBR(rows[ri][cols.p]);
+        real=parseBR(rows[ri][cols.r]);
+        if(m.fmt==='pct'){
+          if(proj!==null&&typeof rows[ri][cols.p]==='number'&&Math.abs(proj)<=1.5)proj*=100;
+          if(real!==null&&typeof rows[ri][cols.r]==='number'&&Math.abs(real)<=1.5)real*=100;
+        }
       }
+      wData[m.key]={proj,real};
     }
-    data[m.key]={proj,real};
+    monthCache[wk]=wData;
   }
-  cache[name]=data;return data;
-}
-
-async function fetchRaw(sheetName){
-  // Fetch raw gviz response — returns full text so we can inspect it
-  const url=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}&tq=select%20A%2CM%2CN`;
-  const res=await fetch(url);
-  if(!res.ok) return null;
-  return await res.text();
+  cache[monthName]=monthCache;
+  return monthCache;
 }
 
 async function detectMonths(){
   const found=[];
-
-  // First fetch JAN as reference — we'll use its row-A fingerprint
-  // to detect when gviz silently falls back to the default (first) sheet
-  const janRaw=await fetchRaw('JAN');
-  if(!janRaw) return [];
-
-  // Extract a fingerprint from JAN: the metric names in col A joined
-  const janFingerprint=extractFingerprint(janRaw);
-
+  // Fetch JAN as reference fingerprint
+  let janFp=null;
   for(const m of MONTH_ORDER){
     try{
       delete cache[m];
-      const raw= m==='JAN' ? janRaw : await fetchRaw(m);
-      if(!raw) break;
-
-      // If gviz falls back to default sheet (JAN), fingerprint will match JAN
-      // That means this sheet tab does NOT exist
-      if(m!=='JAN'){
-        const fp=extractFingerprint(raw);
-        if(fp===janFingerprint) break; // same as JAN = tab doesn't exist
-        if(!fp) break; // no data at all
+      const mc=await fetchMonthAllWeeks(m);
+      if(!mc)break;
+      // Check TOTAL has at least some real data
+      const tot=mc['TOTAL'];
+      const hasData=METRICS.some(met=>tot[met.key]?.real!==null);
+      if(m==='JAN'){
+        janFp=JSON.stringify(tot);
+        if(!hasData)break;
+      } else {
+        const fp=JSON.stringify(tot);
+        if(fp===janFp)break; // gviz fallback = sheet doesn't exist
+        if(!hasData)break;
       }
-
-      // Check for gviz error markers
-      if(raw.includes('"errors":[{')) break;
-
-      const js=raw.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/);
-      if(!js) break;
-      const json=JSON.parse(js[1]);
-      if(!json.table||!json.table.rows||json.table.rows.length<3) break;
-
-      // Must have at least one real numeric value in col N (Realizado)
-      const hasRealData=json.table.rows.some(r=>{
-        const colN=r.c&&r.c[2];
-        return colN&&colN.v!==null&&colN.v!==undefined&&colN.v!==''&&colN.v!==0;
-      });
-      if(!hasRealData) break;
-
-      // Parse and cache
-      const rows=json.table.rows.map(r=>(r.c||[]).map(c=>(!c||c.v===null||c.v===undefined)?'':(typeof c.v==='number'?c.v:String(c.v))));
-      const map={};
-      for(let i=0;i<rows.length;i++){const n=norm(rows[i][0]);if(n)map[n]=i;}
-      const data={};
-      for(const metric of METRICS){
-        const ri=map[LABEL_MAP[metric.key]]??-1;
-        let proj=null,real=null;
-        if(ri>=0){
-          proj=parseBR(rows[ri][1]);real=parseBR(rows[ri][2]);
-          if(metric.fmt==='pct'){
-            if(proj!==null&&typeof rows[ri][1]==='number'&&Math.abs(proj)<=1.5)proj*=100;
-            if(real!==null&&typeof rows[ri][2]==='number'&&Math.abs(real)<=1.5)real*=100;
-          }
-        }
-        data[metric.key]={proj,real};
-      }
-      cache[m]=data;
       found.push(m);
-    }catch(e){ break; }
+    }catch(e){break;}
   }
   return found;
-}
-
-function extractFingerprint(rawText){
-  // Extract col A values as a string fingerprint to detect sheet identity
-  try{
-    const js=rawText.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/);
-    if(!js) return null;
-    const json=JSON.parse(js[1]);
-    if(!json.table||!json.table.rows) return null;
-    return json.table.rows
-      .map(r=>r.c&&r.c[0]&&r.c[0].v?String(r.c[0].v):'')
-      .filter(Boolean).join('|');
-  }catch(e){return null;}
 }
 
 // ── PANEL SWITCH ──
@@ -403,31 +369,82 @@ function buildMonthTabs(){
   });
 }
 
+function buildWeekTabs(month,color){
+  const el=document.getElementById('week-tabs');
+  el.innerHTML='';
+  const mc=cache[month];if(!mc)return;
+  // Show "Total" first, then only weeks with real data
+  const weeks=['TOTAL','S1','S2','S3','S4'];
+  weeks.forEach(wk=>{
+    if(wk!=='TOTAL'){
+      const wd=mc[wk];
+      if(!wd||!METRICS.some(m=>wd[m.key]?.real!==null))return;
+    }
+    const btn=document.createElement('button');
+    btn.className='wtab'+(wk===activeWeek?' active':'');
+    btn.textContent=WEEK_LABELS[wk];
+    btn.style.setProperty('--wc',color);
+    if(wk===activeWeek){btn.style.borderColor=color;btn.style.color=color;btn.style.background=color+'14';}
+    btn.onclick=()=>selectWeek(wk,btn,color);
+    el.appendChild(btn);
+  });
+}
+
 function selectMonth(m,btn,color){
   document.querySelectorAll('.mtab').forEach(t=>{t.classList.remove('active');t.style.borderColor='';t.style.color='';t.style.background='';});
   btn.classList.add('active');
   btn.style.borderColor=color;btn.style.color=color;btn.style.background=color+'18';
-  activeMonth=m;
-  renderGeral(m,color);
+  activeMonth=m;activeWeek='TOTAL';
+  fetchMonthAllWeeks(m).then(()=>{buildWeekTabs(m,color);renderGeral(m,'TOTAL',color);});
 }
 
-function renderGeral(month,color){
-  const data=cache[month];
-  if(!data){fetchSheetByName(month).then(()=>renderGeral(month,color));return;}
+function selectWeek(wk,btn,color){
+  document.querySelectorAll('.wtab').forEach(t=>{t.classList.remove('active');t.style.borderColor='';t.style.color='';t.style.background='';});
+  btn.classList.add('active');
+  btn.style.borderColor=color;btn.style.color=color;btn.style.background=color+'14';
+  activeWeek=wk;
+  renderGeral(activeMonth,wk,color);
+}
+
+function renderGeral(month,week,color){
+  const mc=cache[month];
+  if(!mc){fetchMonthAllWeeks(month).then(()=>renderGeral(month,week,color));return;}
+  const data=mc[week]||mc['TOTAL'];
   const name=MONTH_NAMES[month]||month;
+  const wLabel=WEEK_LABELS[week]||week;
   const el=document.getElementById('geral-content');
   let html='';
 
-  // ── COMPARISON TABLE ──
-  html+=`<div class="sec-label" style="margin-top:36px">📊 Comparativo Todos os Meses</div>`;
+  // ── KPI CARDS for selected week ──
+  const groups=[{id:'topo',label:'📈 Topo do Funil'},{id:'sdr',label:'📞 SDR / Pré-Venda'},{id:'result',label:'💰 Resultado'}];
+  groups.forEach(g=>{
+    html+=`<div class="sec-label" style="margin-top:20px">${g.label}</div>`;
+    html+=`<div class="kpi-grid">`;
+    METRICS.filter(m=>m.group===g.id).forEach(m=>{
+      const v=data[m.key]?.real,p=data[m.key]?.proj;
+      const st=getStatus(m.key,v,p,m.lb);
+      const c=st==='good'?'var(--good)':st==='warn'?'var(--warn)':st==='bad'?'var(--bad)':'var(--muted)';
+      const dlt=getDelta(m.key,v,p,m.lb);
+      html+=`<div class="kpi-card">
+        <div class="kc-label">${m.label}</div>
+        <div class="kc-val" style="color:${c}">${fmt(v,m.fmt)}</div>
+        <div class="kc-meta">Meta: ${fmt(p,m.fmt)}</div>
+        <div class="kc-delta delta-${dlt.c}">${dlt.t}</div>
+      </div>`;
+    });
+    html+=`</div>`;
+  });
+
+  // ── Comparison table all months (TOTAL only) ──
+  html+=`<div class="sec-label" style="margin-top:36px">📊 Comparativo Mensal (Total)</div>`;
   html+=`<div class="ov-table-wrap"><table class="ov-table"><thead><tr><th>Métrica</th><th>Meta</th>`;
   availableMonths.forEach((m,i)=>html+=`<th style="color:${MONTH_COLORS[i%MONTH_COLORS.length]}">${MONTH_NAMES[m]||m}</th>`);
   html+=`</tr></thead><tbody>`;
   for(const m of METRICS){
-    html+=`<tr><td>${m.label}</td><td style="color:var(--muted)">${fmt(cache[availableMonths[0]]?.[m.key]?.proj,m.fmt)}</td>`;
+    html+=`<tr><td>${m.label}</td><td style="color:var(--muted)">${fmt(cache[availableMonths[0]]?.TOTAL?.[m.key]?.proj,m.fmt)}</td>`;
     availableMonths.forEach((mo,i)=>{
-      const v=cache[mo]?.[m.key]?.real;
-      const p=cache[mo]?.[m.key]?.proj;
+      const v=cache[mo]?.TOTAL?.[m.key]?.real;
+      const p=cache[mo]?.TOTAL?.[m.key]?.proj;
       const st=getStatus(m.key,v,p,m.lb);
       const c=st==='good'?'var(--good)':st==='warn'?'var(--warn)':st==='bad'?'var(--bad)':'var(--muted)';
       html+=`<td style="color:${c};font-weight:${mo===month?'800':'500'};${mo===month?'background:#ffffff08;':''}border-radius:4px">${fmt(v,m.fmt)}</td>`;
@@ -436,62 +453,93 @@ function renderGeral(month,color){
   }
   html+=`</tbody></table></div>`;
 
-  // ── BARS ──
-  html+=`<div class="bar-chart-box"><h2>📊 Reuniões & Vendas — Todos os Meses</h2>`;
-  [{label:'Reuniões Realizadas',key:'reunRealizadas',fmt:'num'},{label:'Vendas Realizadas',key:'vendas',fmt:'num'},{label:'Valor Vendido',key:'valorVendido',fmt:'brl'}].forEach(b=>{
-    const vals=availableMonths.map(m=>cache[m]?.[b.key]?.real||0);
-    const maxV=Math.max(...vals,1);
-    html+=`<div style="margin-bottom:18px"><div style="font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">${b.label}</div>`;
-    availableMonths.forEach((m,i)=>{
-      const v=cache[m]?.[b.key]?.real||0;
-      const pct=(v/maxV*100).toFixed(1);
-      html+=`<div class="bar-row"><div class="bar-label" style="color:${MONTH_COLORS[i%MONTH_COLORS.length]}">${MONTH_NAMES[m]||m}</div><div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${MONTH_COLORS[i%MONTH_COLORS.length]}">${fmt(v,b.fmt)}</div></div></div>`;
-    });
-    html+=`</div>`;
-  });
-  html+=`</div>`;
+  // ── Weekly comparison table for this month ──
+  const semList=['S1','S2','S3','S4'].filter(w=>{const d=mc[w];return d&&METRICS.some(m=>d[m.key]?.real!==null);});
+  if(semList.length>0){
+    html+=`<div class="sec-label" style="margin-top:36px">📅 Semanas de ${name}</div>`;
+    html+=`<div class="ov-table-wrap"><table class="ov-table"><thead><tr><th>Métrica</th><th>Meta</th>`;
+    semList.forEach(w=>html+=`<th style="color:${color}">${WEEK_LABELS[w]}</th>`);
+    html+=`<th style="color:${color};font-weight:800">Total</th></tr></thead><tbody>`;
+    for(const m of METRICS){
+      html+=`<tr><td>${m.label}</td><td style="color:var(--muted)">${fmt(mc.TOTAL?.[m.key]?.proj,m.fmt)}</td>`;
+      semList.forEach(w=>{
+        const v=mc[w]?.[m.key]?.real;
+        const p=mc[w]?.[m.key]?.proj;
+        const st=getStatus(m.key,v,p,m.lb);
+        const c=st==='good'?'var(--good)':st==='warn'?'var(--warn)':st==='bad'?'var(--bad)':'var(--muted)';
+        const bold=w===week&&week!=='TOTAL'?'font-weight:800;background:#ffffff08;border-radius:4px':'';
+        html+=`<td style="color:${c};${bold}">${fmt(v,m.fmt)}</td>`;
+      });
+      const tv=mc.TOTAL?.[m.key]?.real;
+      const tp=mc.TOTAL?.[m.key]?.proj;
+      const tst=getStatus(m.key,tv,tp,m.lb);
+      const tc=tst==='good'?'var(--good)':tst==='warn'?'var(--warn)':tst==='bad'?'var(--bad)':'var(--muted)';
+      html+=`<td style="color:${tc};font-weight:${week==='TOTAL'?'800':'500'};${week==='TOTAL'?'background:#ffffff08;border-radius:4px':''}">${fmt(tv,m.fmt)}</td></tr>`;
+    }
+    html+=`</tbody></table></div>`;
+  }
 
-  // ── INSIGHTS ──
-  html+=`<div class="insights-box"><h2>🔍 Diagnóstico — ${name}</h2>`;
+  // ── Insights ──
+  html+=`<div class="insights-box"><h2>🔍 Diagnóstico — ${name} ${week!=='TOTAL'?'('+wLabel+')':''}</h2>`;
   if(data.reunRealizadas?.real!==null&&data.reunRealizadas?.proj){
     const gap=data.reunRealizadas.proj-data.reunRealizadas.real;
-    if(gap>0) html+=`<div class="insight" style="border-color:#f87171"><strong>Gargalo: Reuniões Realizadas</strong>Faltaram ${gap} reuniões para bater a meta (${data.reunRealizadas.real} de ${data.reunRealizadas.proj}). ${gap>50?'Situação crítica — checar equipe de SDR.':'Próximo da meta, manter ritmo.'}</div>`;
+    if(gap>0)html+=`<div class="insight" style="border-color:#f87171"><strong>Gargalo: Reuniões Realizadas</strong>Faltaram ${gap.toFixed(0)} reuniões para bater a meta (${fmt(data.reunRealizadas.real,'num')} de ${fmt(data.reunRealizadas.proj,'num')}).</div>`;
   }
   if(data.taxaAgendamento?.real!==null&&data.taxaAgendamento?.proj){
     const gap=data.taxaAgendamento.proj-data.taxaAgendamento.real;
-    if(gap>2) html+=`<div class="insight" style="border-color:#facc15"><strong>Taxa de Agendamento abaixo</strong>${fmt(data.taxaAgendamento.real,'pct')} realizado vs meta de ${fmt(data.taxaAgendamento.proj,'pct')}. Cada ponto percentual a mais equivale a ~${Math.round((data.leads?.real||0)*0.01)} reuniões extras.</div>`;
+    if(gap>2)html+=`<div class="insight" style="border-color:#facc15"><strong>Taxa de Agendamento abaixo</strong>${fmt(data.taxaAgendamento.real,'pct')} vs meta ${fmt(data.taxaAgendamento.proj,'pct')}.</div>`;
   }
-  if(data.taxaConversao?.real>=data.taxaConversao?.proj) html+=`<div class="insight" style="border-color:#4ade80"><strong>✅ Closer performando bem</strong>Taxa de conversão de ${fmt(data.taxaConversao.real,'pct')} — acima da meta de ${fmt(data.taxaConversao.proj,'pct')}. O problema não está no fechamento.</div>`;
-  if(data.roas?.real!==null&&data.roas?.real<1) html+=`<div class="insight" style="border-color:#f87171"><strong>⚠️ ROAS negativo</strong>Cada R$1 investido retornou apenas ${fmt(data.roas.real,'pct')}. Operação deficitária neste mês.</div>`;
+  if(data.taxaConversao?.real>=data.taxaConversao?.proj)html+=`<div class="insight" style="border-color:#4ade80"><strong>✅ Closer performando bem</strong>Conversão ${fmt(data.taxaConversao.real,'pct')} — acima da meta.</div>`;
+  if(data.roas?.real!==null&&data.roas?.real<1)html+=`<div class="insight" style="border-color:#f87171"><strong>⚠️ ROAS negativo</strong>Cada R$1 investido retornou ${fmt(data.roas.real,'pct')}.</div>`;
   html+=`</div>`;
 
   el.innerHTML=html;
 }
 
-// ── PANEL 2: COMPARATIVO ──
-function populateSelects(){
-  ['sel-a','sel-b'].forEach((id,i)=>{
+// ── PANEL 2: COMPARAR SEMANAS ──
+function populateCompareSelects(){
+  ['cmp-mon-a','cmp-mon-b'].forEach((id,side)=>{
     const sel=document.getElementById(id);
-    sel.innerHTML=availableMonths.map((m,idx)=>`<option value="${m}" ${idx===(i===0?availableMonths.length-2:availableMonths.length-1)?'selected':''}>${MONTH_NAMES[m]||m}</option>`).join('');
+    sel.innerHTML=availableMonths.map((m,i)=>`<option value="${m}" ${i===(side===0&&availableMonths.length>1?availableMonths.length-2:availableMonths.length-1)?'selected':''}>${MONTH_NAMES[m]||m}</option>`).join('');
+    updateWeekSelects(side===0?'a':'b');
   });
+}
+
+function updateWeekSelects(ab){
+  const mon=document.getElementById('cmp-mon-'+ab).value;
+  const sel=document.getElementById('cmp-week-'+ab);
+  if(!sel)return;
+  const mc=cache[mon];
+  const weeks=['TOTAL','S1','S2','S3','S4'];
+  sel.innerHTML=weeks.filter(w=>{
+    if(w==='TOTAL')return true;
+    if(!mc)return true;
+    const d=mc[w];return d&&METRICS.some(m=>d[m.key]?.real!==null);
+  }).map(w=>`<option value="${w}">${WEEK_LABELS[w]}</option>`).join('');
 }
 
 async function runComparison(){
   const btn=document.getElementById('btn-cmp');
   btn.disabled=true;btn.textContent='Carregando...';
-  const mA=document.getElementById('sel-a').value;
-  const mB=document.getElementById('sel-b').value;
+  const mA=document.getElementById('cmp-mon-a').value;
+  const wA=document.getElementById('cmp-week-a').value;
+  const mB=document.getElementById('cmp-mon-b').value;
+  const wB=document.getElementById('cmp-week-b').value;
   try{
-    const[dA,dB]=await Promise.all([fetchSheetByName(mA),fetchSheetByName(mB)]);
-    renderComparison(mA,mB,dA,dB);
+    await Promise.all([fetchMonthAllWeeks(mA),fetchMonthAllWeeks(mB)]);
+    const dA=cache[mA]?.[wA];
+    const dB=cache[mB]?.[wB];
+    if(!dA||!dB)throw new Error('Dados não encontrados');
+    renderComparison(mA,wA,mB,wB,dA,dB);
     document.getElementById('cmp-result').style.display='block';
   }catch(e){alert('Erro: '+e.message);}
-  btn.disabled=false;btn.textContent='Comparar Meses →';
+  btn.disabled=false;btn.textContent='Comparar →';
 }
 function resetComparison(){document.getElementById('cmp-result').style.display='none';}
 
-function renderComparison(mA,mB,dA,dB){
-  const nA=MONTH_NAMES[mA]||mA,nB=MONTH_NAMES[mB]||mB;
+function renderComparison(mA,wA,mB,wB,dA,dB){
+  const nA=(MONTH_NAMES[mA]||mA)+' '+WEEK_LABELS[wA];
+  const nB=(MONTH_NAMES[mB]||mB)+' '+WEEK_LABELS[wB];
   const iA=availableMonths.indexOf(mA),iB=availableMonths.indexOf(mB);
   const cA=MONTH_COLORS[iA%MONTH_COLORS.length],cB=MONTH_COLORS[iB%MONTH_COLORS.length];
 
@@ -499,7 +547,8 @@ function renderComparison(mA,mB,dA,dB){
   document.getElementById('cmp-col-ab').innerHTML=`<span style="color:${cA}">${nA}</span> / <span style="color:${cB}">${nB}</span>`;
 
   ['topo','sdr','result'].forEach(g=>{
-    const el=document.getElementById('cmp-'+g+(g==='result'?'-rows':''));
+    const elId='cmp-'+g+(g==='result'?'-rows':'');
+    const el=document.getElementById(elId);
     if(!el)return;
     el.innerHTML='';
     METRICS.filter(m=>m.group===g).forEach(m=>{
@@ -537,13 +586,12 @@ function renderComparison(mA,mB,dA,dB){
   // Insights
   const ins=[];
   const dd=(k)=>{const a=dA[k]?.real,b=dB[k]?.real;return(a&&b&&a!==0)?((b-a)/Math.abs(a)*100):null;};
-  const dV=dd('vendas');if(dV!==null)ins.push({c:dV>=0?'#4ade80':'#f87171',t:`Vendas: ${dV>=0?'▲':'▼'} ${Math.abs(dV).toFixed(1)}%`,x:`${nA}: ${fmt(dA.vendas?.real,'num')} → ${nB}: ${fmt(dB.vendas?.real,'num')} vendas.`});
+  const dV=dd('vendas');if(dV!==null)ins.push({c:dV>=0?'#4ade80':'#f87171',t:`Vendas: ${dV>=0?'▲':'▼'} ${Math.abs(dV).toFixed(1)}%`,x:`${nA}: ${fmt(dA.vendas?.real,'num')} → ${nB}: ${fmt(dB.vendas?.real,'num')}.`});
   const dR=dd('reunRealizadas');if(dR!==null)ins.push({c:dR>=0?'#60a5fa':'#facc15',t:`Reuniões: ${dR>=0?'▲':'▼'} ${Math.abs(dR).toFixed(1)}%`,x:`${nA}: ${fmt(dA.reunRealizadas?.real,'num')} → ${nB}: ${fmt(dB.reunRealizadas?.real,'num')}.`});
   const dA2=dd('taxaAgendamento');if(dA2!==null)ins.push({c:dA2>=0?'#4ade80':'#f87171',t:`Taxa de Agendamento: ${dA2>=0?'Melhorou':'Piorou'}`,x:`${fmt(dA.taxaAgendamento?.real,'pct')} → ${fmt(dB.taxaAgendamento?.real,'pct')}.`});
-  const dC=dd('taxaConversao');if(dC!==null)ins.push({c:Math.abs(dC)<5?'#60a5fa':dC>=0?'#4ade80':'#f87171',t:Math.abs(dC)<5?'Taxa de Conversão estável':`Conversão: ${dC>=0?'▲':'▼'} ${Math.abs(dC).toFixed(1)}%`,x:`${fmt(dA.taxaConversao?.real,'pct')} → ${fmt(dB.taxaConversao?.real,'pct')}. CAC: ${fmt(dA.cac?.real,'brl')} → ${fmt(dB.cac?.real,'brl')}.`});
-  const dRoas=dd('roas');if(dRoas!==null)ins.push({c:dRoas>=0?'#4ade80':'#f87171',t:`ROAS: ${dRoas>=0?'Melhorou':'Piorou'} ${Math.abs(dRoas).toFixed(1)}%`,x:`${fmt(dA.roas?.real,'pct')} → ${fmt(dB.roas?.real,'pct')}.`});
-
-  document.getElementById('cmp-insights').innerHTML=`<h2>🔍 Diagnóstico ${nA} vs ${nB}</h2>${ins.map(i=>`<div class="insight" style="border-color:${i.c}"><strong>${i.t}</strong>${i.x}</div>`).join('')}`;
+  const dC=dd('taxaConversao');if(dC!==null)ins.push({c:Math.abs(dC)<5?'#60a5fa':dC>=0?'#4ade80':'#f87171',t:`Conversão: ${dC>=0?'▲':'▼'} ${Math.abs(dC).toFixed(1)}%`,x:`${fmt(dA.taxaConversao?.real,'pct')} → ${fmt(dB.taxaConversao?.real,'pct')}.`});
+  const dRoas=dd('roas');if(dRoas!==null)ins.push({c:dRoas>=0?'#4ade80':'#f87171',t:`ROAS: ${dRoas>=0?'Melhorou':'Piorou'}`,x:`${fmt(dA.roas?.real,'pct')} → ${fmt(dB.roas?.real,'pct')}.`});
+  document.getElementById('cmp-insights').innerHTML=`<h2>🔍 ${nA} vs ${nB}</h2>${ins.map(i=>`<div class="insight" style="border-color:${i.c}"><strong>${i.t}</strong>${i.x}</div>`).join('')}`;
 }
 
 // ── INIT ──
@@ -552,10 +600,12 @@ async function init(){
     availableMonths=await detectMonths();
     if(!availableMonths.length)throw new Error('Nenhum mês encontrado');
     buildMonthTabs();
-    populateSelects();
-    // Render first month
+    populateCompareSelects();
     const firstBtn=document.querySelector('.mtab');
-    selectMonth(availableMonths[0],firstBtn,MONTH_COLORS[0]);
+    const firstColor=MONTH_COLORS[0];
+    activeMonth=availableMonths[0];
+    buildWeekTabs(availableMonths[0],firstColor);
+    renderGeral(availableMonths[0],'TOTAL',firstColor);
     document.getElementById('loading').style.display='none';
     document.getElementById('app').style.display='block';
     document.getElementById('last-update').textContent='Atualizado: '+new Date().toLocaleString('pt-BR');
