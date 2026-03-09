@@ -580,7 +580,7 @@ function renderComparison(mA,wA,mB,wB,dA,dB){
     });
   });
 
-  // ── SINGLE NAVIGABLE LINE CHART ──
+  // ── CHART SECTION ──
   const CHART_METRICS=[
     {key:'leads',         label:'Leads',              f:'num', icon:'👥'},
     {key:'reunAgendadas', label:'Reuniões Agendadas', f:'num', icon:'📅'},
@@ -593,38 +593,115 @@ function renderComparison(mA,wA,mB,wB,dA,dB){
   ];
   const CMP_WEEK_KEYS=['S1','S2','S3','S4','TOTAL'];
   const mcA=cache[mA], mcB=cache[mB];
+  // -1 = visão geral (radar/barras normalizadas), 0..n = métrica individual
+  const OVERVIEW_IDX=-1;
 
   // Destroy old chart
   if(window._singleChart){window._singleChart.destroy();window._singleChart=null;}
 
-  // Build wrapper
+  // Build wrapper HTML
   const wrap=document.getElementById('cmp-chart-wrap');
   wrap.innerHTML=`
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px 24px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
         <div style="display:flex;align-items:center;gap:10px">
-          <button id="chart-prev" onclick="chartNav(-1)" style="background:var(--surface2);border:1px solid var(--border);color:var(--accent);width:34px;height:34px;border-radius:50%;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center">‹</button>
+          <button id="chart-prev" onclick="chartNav(-1)" style="background:var(--surface2);border:1px solid var(--border);color:var(--accent);width:34px;height:34px;border-radius:50%;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">‹</button>
           <div>
             <div id="chart-icon-label" style="font-size:1rem;font-weight:800;color:var(--text)"></div>
-            <div style="font-size:.65rem;color:var(--muted);margin-top:2px" id="chart-counter"></div>
+            <div id="chart-counter" style="font-size:.62rem;color:var(--muted);margin-top:2px"></div>
           </div>
-          <button id="chart-next" onclick="chartNav(1)" style="background:var(--surface2);border:1px solid var(--border);color:var(--accent);width:34px;height:34px;border-radius:50%;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center">›</button>
+          <button id="chart-next" onclick="chartNav(1)" style="background:var(--surface2);border:1px solid var(--border);color:var(--accent);width:34px;height:34px;border-radius:50%;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">›</button>
         </div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap" id="chart-pills"></div>
+        <div id="chart-pills" style="display:flex;gap:5px;flex-wrap:wrap"></div>
       </div>
-      <div style="position:relative;height:260px">
+      <div style="position:relative;height:280px">
         <canvas id="single-chart"></canvas>
       </div>
     </div>`;
 
-  window._chartState={idx:0,mA,mB,nA,nB,cA,cB,mcA,mcB};
+  window._chartState={idx:OVERVIEW_IDX,mA,mB,nA,nB,cA,cB,mcA,mcB};
+
+  // Normalize a value 0-100 relative to max across both periods
+  function normalizePct(vA,vB){
+    const max=Math.max(Math.abs(vA||0),Math.abs(vB||0),0.001);
+    return{a:vA!=null?(vA/max*100):null, b:vB!=null?(vB/max*100):null, max};
+  }
 
   function buildChartPills(){
     const el=document.getElementById('chart-pills');
     if(!el)return;
-    el.innerHTML=CHART_METRICS.map((m,i)=>
-      `<button onclick="chartNav(${i}-window._chartState.idx)" style="background:${i===window._chartState.idx?'var(--accent)':'var(--surface2)'};border:1px solid ${i===window._chartState.idx?'var(--accent)':'var(--border)'};color:${i===window._chartState.idx?'#001830':'var(--muted)'};border-radius:999px;padding:4px 12px;font-size:.65rem;font-weight:700;cursor:pointer;font-family:Montserrat,sans-serif;white-space:nowrap">${m.icon} ${m.label}</button>`
-    ).join('');
+    const cur=window._chartState.idx;
+    // "Visão Geral" pill first, then individual metrics
+    const allPills=[{icon:'📊',label:'Visão Geral',idx:OVERVIEW_IDX},...CHART_METRICS.map((m,i)=>({...m,idx:i}))];
+    el.innerHTML=allPills.map(p=>{
+      const active=p.idx===cur;
+      return `<button onclick="chartGoTo(${p.idx})" style="background:${active?'var(--accent)':'var(--surface2)'};border:1px solid ${active?'var(--accent)':'var(--border)'};color:${active?'#001830':'var(--muted)'};border-radius:999px;padding:4px 11px;font-size:.62rem;font-weight:700;cursor:pointer;font-family:Montserrat,sans-serif;white-space:nowrap;transition:all .15s">${p.icon} ${p.label}</button>`;
+    }).join('');
+  }
+
+  function renderOverviewChart(){
+    const {mA,mB,nA,nB,cA,cB,mcA,mcB}=window._chartState;
+    document.getElementById('chart-icon-label').textContent='📊 Visão Geral — Todas as Métricas';
+    document.getElementById('chart-counter').textContent='Total do Mês • valores normalizados (% do maior)';
+    buildChartPills();
+
+    // Use TOTAL week for overview, normalize each metric so they're comparable
+    const labels=CHART_METRICS.map(m=>m.icon+' '+m.label);
+    const rawA=CHART_METRICS.map(m=>mcA?.TOTAL?.[m.key]?.real??null);
+    const rawB=CHART_METRICS.map(m=>mcB?.TOTAL?.[m.key]?.real??null);
+    // Normalize per-metric (0–100)
+    const normA=[],normB=[];
+    CHART_METRICS.forEach((_,i)=>{
+      const n=normalizePct(rawA[i],rawB[i]);
+      normA.push(n.a); normB.push(n.b);
+    });
+
+    const metaA=CHART_METRICS.map(m=>mcA?.TOTAL?.[m.key]?.proj??null);
+    const normMeta=CHART_METRICS.map((_,i)=>{
+      const max=Math.max(Math.abs(rawA[i]||0),Math.abs(rawB[i]||0),0.001);
+      return metaA[i]!=null?(metaA[i]/max*100):null;
+    });
+
+    const datasets=[
+      {label:nA,data:normA,borderColor:cA,backgroundColor:cA+'22',pointBackgroundColor:cA,pointBorderColor:'#001830',pointRadius:6,pointHoverRadius:8,borderWidth:2.5,tension:.3,fill:false},
+      {label:nB,data:normB,borderColor:cB,backgroundColor:cB+'22',pointBackgroundColor:cB,pointBorderColor:'#001830',pointRadius:6,pointHoverRadius:8,borderWidth:2.5,tension:.3,fill:false},
+      {label:'Meta',data:normMeta,borderColor:'#ffffff25',backgroundColor:'transparent',borderWidth:1.5,borderDash:[6,4],pointRadius:0,tension:0,fill:false},
+    ];
+
+    const tooltipFmt=(ctx)=>{
+      const i=ctx.dataIndex;
+      const m=CHART_METRICS[i];
+      // show real value in tooltip
+      const raw=ctx.datasetIndex===0?rawA[i]:ctx.datasetIndex===1?rawB[i]:metaA[i];
+      return ctx.dataset.label+': '+(raw!=null?fmt(raw,m.f):'—');
+    };
+
+    if(window._singleChart){
+      window._singleChart.config.type='line';
+      window._singleChart.data={labels,datasets};
+      window._singleChart.options.scales.x.ticks.maxRotation=30;
+      window._singleChart.options.scales.y.ticks.callback=(v)=>v.toFixed(0)+'%';
+      window._singleChart.options.plugins.tooltip.callbacks.label=tooltipFmt;
+      window._singleChart.update('active');
+    } else {
+      const ctx2=document.getElementById('single-chart').getContext('2d');
+      window._singleChart=new Chart(ctx2,{
+        type:'line',
+        data:{labels,datasets},
+        options:{
+          responsive:true,maintainAspectRatio:false,
+          animation:{duration:400,easing:'easeOutQuart'},
+          plugins:{
+            legend:{display:true,position:'top',labels:{color:'#5a8ab0',font:{size:10,family:'Montserrat',weight:'700'},boxWidth:10,padding:14}},
+            tooltip:{backgroundColor:'#002654',borderColor:'#0a4080',borderWidth:1,titleColor:'#e8f4ff',bodyColor:'#5a8ab0',padding:12,callbacks:{label:tooltipFmt}}
+          },
+          scales:{
+            x:{grid:{color:'#0a408028'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat',weight:'600'},maxRotation:30,minRotation:20}},
+            y:{grid:{color:'#0a408028'},min:0,max:110,ticks:{color:'#5a8ab0',font:{size:9,family:'Montserrat'},callback:(v)=>v.toFixed(0)+'%'}}
+          }
+        }
+      });
+    }
   }
 
   function renderSingleChart(idx){
@@ -633,9 +710,8 @@ function renderComparison(mA,wA,mB,wB,dA,dB){
     const cd=CHART_METRICS[idx];
     if(!cd)return;
     window._chartState.idx=idx;
-
     document.getElementById('chart-icon-label').textContent=cd.icon+' '+cd.label;
-    document.getElementById('chart-counter').textContent=(idx+1)+' de '+CHART_METRICS.length;
+    document.getElementById('chart-counter').textContent=(idx+1)+' de '+CHART_METRICS.length+' métricas';
     buildChartPills();
 
     const weekLabels=CMP_WEEK_KEYS.map(w=>WEEK_LABELS[w]);
@@ -644,51 +720,30 @@ function renderComparison(mA,wA,mB,wB,dA,dB){
     const projA=CMP_WEEK_KEYS.map(w=>mcA?.[w]?.[cd.key]?.proj??null);
 
     const datasets=[];
-    if(valsA.some(v=>v!==null)) datasets.push({
-      label:nA, data:valsA,
-      borderColor:cA, backgroundColor:cA+'18',
-      pointBackgroundColor:cA, pointBorderColor:'#001830',
-      pointRadius:6, pointHoverRadius:8,
-      borderWidth:2.5, tension:.35, fill:true
-    });
-    if(valsB.some(v=>v!==null)) datasets.push({
-      label:nB, data:valsB,
-      borderColor:cB, backgroundColor:cB+'18',
-      pointBackgroundColor:cB, pointBorderColor:'#001830',
-      pointRadius:6, pointHoverRadius:8,
-      borderWidth:2.5, tension:.35, fill:true
-    });
-    if(projA.some(v=>v!==null)) datasets.push({
-      label:'Meta', data:projA,
-      borderColor:'#ffffff25', backgroundColor:'transparent',
-      borderWidth:1.5, borderDash:[6,4],
-      pointRadius:0, tension:0, fill:false
-    });
+    if(valsA.some(v=>v!==null)) datasets.push({label:nA,data:valsA,borderColor:cA,backgroundColor:cA+'18',pointBackgroundColor:cA,pointBorderColor:'#001830',pointRadius:6,pointHoverRadius:8,borderWidth:2.5,tension:.35,fill:true});
+    if(valsB.some(v=>v!==null)) datasets.push({label:nB,data:valsB,borderColor:cB,backgroundColor:cB+'18',pointBackgroundColor:cB,pointBorderColor:'#001830',pointRadius:6,pointHoverRadius:8,borderWidth:2.5,tension:.35,fill:true});
+    if(projA.some(v=>v!==null)) datasets.push({label:'Meta',data:projA,borderColor:'#ffffff25',backgroundColor:'transparent',borderWidth:1.5,borderDash:[6,4],pointRadius:0,tension:0,fill:false});
 
+    const ttFmt=(ctx)=>{const v=ctx.parsed.y;return ctx.dataset.label+': '+(v===null||isNaN(v)?'—':fmt(v,cd.f));};
     if(window._singleChart){
       window._singleChart.data.labels=weekLabels;
       window._singleChart.data.datasets=datasets;
+      window._singleChart.options.scales.x.ticks.maxRotation=0;
+      window._singleChart.options.scales.y.min=undefined;
+      window._singleChart.options.scales.y.max=undefined;
       window._singleChart.options.scales.y.ticks.callback=(v)=>fmt(v,cd.f);
-      window._singleChart.options.plugins.tooltip.callbacks.label=(ctx)=>{
-        const v=ctx.parsed.y;
-        return ctx.dataset.label+': '+(v===null||isNaN(v)?'—':fmt(v,cd.f));
-      };
+      window._singleChart.options.plugins.tooltip.callbacks.label=ttFmt;
       window._singleChart.update('active');
     } else {
       const ctx2=document.getElementById('single-chart').getContext('2d');
       window._singleChart=new Chart(ctx2,{
-        type:'line',
-        data:{labels:weekLabels, datasets},
+        type:'line',data:{labels:weekLabels,datasets},
         options:{
-          responsive:true, maintainAspectRatio:false,
+          responsive:true,maintainAspectRatio:false,
           animation:{duration:400,easing:'easeOutQuart'},
           plugins:{
             legend:{display:true,position:'top',labels:{color:'#5a8ab0',font:{size:10,family:'Montserrat',weight:'700'},boxWidth:10,padding:14}},
-            tooltip:{
-              backgroundColor:'#002654',borderColor:'#0a4080',borderWidth:1,
-              titleColor:'#e8f4ff',bodyColor:'#5a8ab0',padding:12,
-              callbacks:{label:(ctx)=>{const v=ctx.parsed.y;return ctx.dataset.label+': '+(v===null||isNaN(v)?'—':fmt(v,cd.f));}}
-            }
+            tooltip:{backgroundColor:'#002654',borderColor:'#0a4080',borderWidth:1,titleColor:'#e8f4ff',bodyColor:'#5a8ab0',padding:12,callbacks:{label:ttFmt}}
           },
           scales:{
             x:{grid:{color:'#0a408028'},ticks:{color:'#5a8ab0',font:{size:9,family:'Montserrat',weight:'600'}}},
@@ -699,13 +754,23 @@ function renderComparison(mA,wA,mB,wB,dA,dB){
     }
   }
 
-  window.chartNav=function(delta){
-    const n=CHART_METRICS.length;
-    const next=((window._chartState.idx+delta)%n+n)%n;
-    renderSingleChart(next);
+  window.chartGoTo=function(idx){
+    window._chartState.idx=idx;
+    if(idx===OVERVIEW_IDX) renderOverviewChart();
+    else renderSingleChart(idx);
   };
 
-  renderSingleChart(0);
+  window.chartNav=function(delta){
+    const total=CHART_METRICS.length; // indices 0..total-1, plus -1 for overview
+    const cur=window._chartState.idx;
+    let next;
+    if(delta===1)  next = cur>=total-1 ? OVERVIEW_IDX : cur+1;
+    else           next = cur<=OVERVIEW_IDX ? total-1  : cur-1;
+    window.chartGoTo(next);
+  };
+
+  // Start on Visão Geral
+  renderOverviewChart();
 
   // Insights
   const ins=[];
