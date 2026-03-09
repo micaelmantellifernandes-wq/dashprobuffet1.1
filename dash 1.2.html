@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KPI's Pro Buffet — Live Dashboard</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+:root {
+  --bg:#0a0d14;--surface:#111520;--surface2:#161c2d;--border:#1e2535;
+  --accent:#60a5fa;--purple:#a78bfa;--text:#e2e8f0;--muted:#64748b;
+  --good:#4ade80;--warn:#facc15;--bad:#f87171;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Montserrat',sans-serif;min-height:100vh;padding:24px 16px 60px}
+.header{text-align:center;margin-bottom:28px}
+.header h1{font-size:clamp(1.2rem,3vw,1.8rem);font-weight:800;letter-spacing:-.03em;background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+.live-badge{display:inline-flex;align-items:center;gap:6px;background:#0f2310;border:1px solid #4ade8040;border-radius:999px;padding:4px 14px;font-size:.7rem;font-weight:700;color:var(--good);letter-spacing:.06em;text-transform:uppercase}
+.live-dot{width:7px;height:7px;background:var(--good);border-radius:50%;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.4)}}
+.last-update{margin-top:6px;font-size:.7rem;color:var(--muted)}
+#loading{text-align:center;padding:60px 20px;color:var(--muted)}
+.spinner{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+#error-msg{text-align:center;padding:40px;color:var(--bad);display:none}
+.main-tabs{display:flex;justify-content:center;gap:6px;margin-bottom:28px;flex-wrap:wrap}
+.main-tab{padding:9px 24px;border-radius:999px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-family:'Montserrat',sans-serif;font-size:.8rem;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.02em}
+.main-tab:hover{border-color:var(--accent);color:var(--text)}
+.main-tab.active{border-color:var(--accent);color:var(--accent);background:#60a5fa12}
+.panel{display:none}.panel.visible{display:block}
+#p-geral{max-width:1060px;margin:0 auto}
+.month-tabs{display:flex;justify-content:center;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.week-tabs{display:flex;justify-content:center;gap:5px;margin-bottom:20px;flex-wrap:wrap}
+.mtab,.wtab{padding:7px 18px;border-radius:999px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-family:'Montserrat',sans-serif;font-size:.75rem;font-weight:700;cursor:pointer;transition:all .2s}
+.wtab{padding:5px 14px;font-size:.7rem}
+.mtab:hover,.wtab:hover{border-color:var(--accent);color:var(--text)}
+.sec-label{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);padding:16px 0 10px;border-bottom:1px solid var(--border);margin-bottom:12px}
+.ov-table-wrap{overflow-x:auto;margin-bottom:28px}
+.ov-table{width:100%;border-collapse:collapse;font-size:.8rem}
+.ov-table th{font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;padding:9px 12px;text-align:left;border-bottom:1px solid var(--border);color:var(--muted);font-weight:700;white-space:nowrap}
+.ov-table td{padding:9px 12px;border-bottom:1px solid #13192a;white-space:nowrap}
+.ov-table tr:hover td{background:#0d1220}
+.insights-box{margin-bottom:28px}
+.insights-box h2{font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:14px}
+.insight{border-left:3px solid;padding:12px 15px;background:var(--surface);border-radius:0 8px 8px 0;margin-bottom:9px;font-size:.82rem;line-height:1.65}
+.insight strong{display:block;margin-bottom:3px;font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;font-weight:800}
+.bar-chart-box{margin-bottom:28px}
+.bar-chart-box h2{font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:14px}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.bar-label{width:120px;font-size:.72rem;text-align:right;flex-shrink:0;font-weight:600}
+.bar-track{flex:1;height:24px;background:var(--surface);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:8px;font-size:.72rem;font-weight:700;min-width:32px}
+
+#p-compare{max-width:1000px;margin:0 auto}
+.selector-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 26px;margin-bottom:28px}
+.selector-card h2{font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:18px}
+.sel-row{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:start;margin-bottom:16px}
+.sel-col label{display:block;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:7px}
+.msel{width:100%;padding:9px 34px 9px 12px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-family:'Montserrat',sans-serif;font-size:.86rem;font-weight:600;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;transition:border-color .2s;margin-bottom:8px}
+.msel:focus{outline:none;border-color:var(--accent)}
+.msel-a{border-color:#60a5fa50}.msel-b{border-color:#a78bfa50}
+.vs-dot{width:34px;height:34px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800;color:var(--muted);flex-shrink:0;margin-top:22px}
+.btn-cmp{width:100%;padding:11px;background:linear-gradient(135deg,#3b82f6,#7c3aed);border:none;border-radius:8px;color:#fff;font-family:'Montserrat',sans-serif;font-size:.86rem;font-weight:700;cursor:pointer;transition:opacity .2s}
+.btn-cmp:hover{opacity:.85}.btn-cmp:disabled{opacity:.4;cursor:not-allowed}
+#cmp-result{display:none}
+.cmp-header-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:10px}
+.cmp-title{font-size:1.05rem;font-weight:800;letter-spacing:-.02em}
+.btn-back{padding:7px 16px;background:transparent;border:1.5px solid var(--border);border-radius:999px;color:var(--muted);font-family:'Montserrat',sans-serif;font-size:.75rem;font-weight:700;cursor:pointer}
+.cmp-sec{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);padding:18px 0 10px;border-bottom:1px solid var(--border)}
+.cmp-cols{display:grid;grid-template-columns:2fr 1fr 1.2fr 1fr;gap:0;margin-top:10px;margin-bottom:4px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.cc{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+.cmp-row{display:grid;grid-template-columns:2fr 1fr 1.2fr 1fr;gap:0;padding:11px 0;border-bottom:1px solid #13192a;align-items:center}
+.cmp-row:hover{background:#0d1220;border-radius:6px}
+.cr-name{font-size:.82rem;font-weight:500}
+.cr-meta{font-size:.8rem;color:var(--muted)}
+.cr-vals{font-size:.86rem;font-weight:700}
+.cr-delta{text-align:right}
+.delta-badge{font-size:.75rem;font-weight:700;padding:3px 8px;border-radius:999px;display:inline-block}
+.delta-badge.up{background:#4ade8018;color:var(--good)}.delta-badge.down{background:#f8717118;color:var(--bad)}.delta-badge.eq{background:#facc1518;color:var(--warn)}
+#p-pitch{max-width:1060px;margin:0 auto}
+.pitch-table-wrap{overflow-x:auto;margin-bottom:28px}
+.pitch-table{width:100%;border-collapse:collapse;font-size:.8rem}
+.pitch-table th{font-size:.67rem;text-transform:uppercase;letter-spacing:.07em;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);color:var(--muted);font-weight:700;white-space:nowrap;background:var(--surface)}
+.pitch-table td{padding:10px 14px;border-bottom:1px solid #13192a;vertical-align:top}
+.pitch-table tr:hover td{background:#0d1220}
+.pbadge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.68rem;font-weight:700}
+.pbadge.won{background:#4ade8020;color:var(--good);border:1px solid #4ade8040}
+.pbadge.lost{background:#f8717120;color:var(--bad);border:1px solid #f8717140}
+.pbadge.pend{background:#facc1520;color:var(--warn);border:1px solid #facc1540}
+.week-hint{font-size:.67rem;color:var(--muted);font-style:italic;margin-top:4px}
+@media(max-width:600px){
+  .cmp-cols,.cmp-row{grid-template-columns:1.5fr 1fr 1fr}
+  .cc:nth-child(2),.cr-meta{display:none}
+  .bar-label{width:80px}
+  .sel-row{grid-template-columns:1fr auto 1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📊 KPI's Pro Buffet 2026</h1>
+  <div class="live-badge"><span class="live-dot"></span> Dados em tempo real</div>
+  <div class="last-update" id="last-update">Carregando...</div>
+</div>
+
+<div id="loading"><div class="spinner"></div>Buscando dados...</div>
+<div id="error-msg"></div>
+
+<div id="app" style="display:none">
+  <div class="main-tabs">
+    <button class="main-tab active" onclick="switchPanel('geral',this)">📅 Visão Geral</button>
+    <button class="main-tab" onclick="switchPanel('compare',this)">⚖️ Comparar Períodos</button>
+    <button class="main-tab" onclick="switchPanel('pitch',this)">🎯 Pitch Feito</button>
+  </div>
+
+  <!-- PANEL 1: GERAL -->
+  <div id="p-geral" class="panel visible">
+    <div class="month-tabs" id="month-tabs"></div>
+    <div class="week-tabs" id="week-tabs"></div>
+    <div id="geral-content"></div>
+  </div>
+
+  <!-- PANEL 2: COMPARATIVO -->
+  <div id="p-compare" class="panel">
+    <div class="selector-card">
+      <h2>🗓 Selecione os períodos para comparar</h2>
+      <div class="sel-row">
+        <div class="sel-col">
+          <label>Período A</label>
+          <select id="sel-a-mes" class="msel msel-a" onchange="updateWeekSelects('a')"></select>
+          <select id="sel-a-sem" class="msel msel-a"></select>
+          <div class="week-hint">Escolha o mês e depois a semana ou total</div>
+        </div>
+        <div class="vs-dot">VS</div>
+        <div class="sel-col">
+          <label>Período B</label>
+          <select id="sel-b-mes" class="msel msel-b" onchange="updateWeekSelects('b')"></select>
+          <select id="sel-b-sem" class="msel msel-b"></select>
+          <div class="week-hint">Escolha o mês e depois a semana ou total</div>
+        </div>
+      </div>
+      <button class="btn-cmp" id="btn-cmp" onclick="runComparison()">Comparar Períodos →</button>
+    </div>
+    <div id="cmp-result">
+      <div class="cmp-header-row">
+        <div class="cmp-title" id="cmp-title"></div>
+        <button class="btn-back" onclick="resetComparison()">← Trocar períodos</button>
+      </div>
+      <div class="cmp-sec">📈 Topo do Funil</div>
+      <div class="cmp-cols"><div class="cc">Métrica</div><div class="cc">Meta</div><div class="cc" id="cmp-col-ab">A / B</div><div class="cc" style="text-align:right">Variação A→B</div></div>
+      <div id="cmp-topo"></div>
+      <div class="cmp-sec" style="margin-top:6px">📞 Funil de SDR</div>
+      <div id="cmp-sdr"></div>
+      <div class="cmp-sec" style="margin-top:6px">💰 Resultados</div>
+      <div id="cmp-result-rows"></div>
+      <div class="bar-chart-box" style="margin-top:36px"><h2>📊 Comparativo Visual</h2><div id="cmp-bars"></div></div>
+      <div class="insights-box" id="cmp-insights"></div>
+    </div>
+  </div>
+
+  <!-- PANEL 3: PITCH FEITO -->
+  <div id="p-pitch" class="panel">
+    <div id="pitch-content">
+      <div id="pitch-loading" style="text-align:center;padding:60px;color:var(--muted)"><div class="spinner"></div>Carregando Pitch Feito...</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SHEET_ID='18Qn__4Wq6s094QyFnDLoPs_c9PAdeNNsKW5JV6DW060';
+const MONTH_ORDER=['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
+const MONTH_NAMES={JAN:'Janeiro',FEV:'Fevereiro',MAR:'Março',ABR:'Abril',MAI:'Maio',JUN:'Junho',JUL:'Julho',AGO:'Agosto',SET:'Setembro',OUT:'Outubro',NOV:'Novembro',DEZ:'Dezembro'};
+const MONTH_COLORS=['#60a5fa','#facc15','#f87171','#4ade80','#fb923c','#a78bfa','#34d399','#f472b6','#38bdf8','#fbbf24','#86efac','#c084fc'];
+const WEEK_COLORS=['#60a5fa','#4ade80','#facc15','#f87171'];
+
+// Colunas nas abas mensais (0-based):
+// Row layout: A(0)=métrica | B(1)=S1proj C(2)=S1real | D(3)=sep | E(4)=S2proj F(5)=S2real | G(6)=sep | H(7)=S3proj I(8)=S3real | J(9)=sep | K(10)=S4proj L(11)=S4real | M(12)=Totproj N(13)=Totreal
+const WEEK_COLS={
+  S1:{p:1,r:2,label:'Semana 1'},
+  S2:{p:4,r:5,label:'Semana 2'},
+  S3:{p:7,r:8,label:'Semana 3'},
+  S4:{p:10,r:11,label:'Semana 4'},
+  TOTAL:{p:12,r:13,label:'Total do Mês'},
+};
+
+const METRICS=[
+  {key:'investimento',   label:'Investimento',           fmt:'brl',group:'topo'},
+  {key:'cpl',            label:'CPL',                    fmt:'brl',group:'topo',lb:true},
+  {key:'leads',          label:'Leads',                  fmt:'num',group:'topo'},
+  {key:'reunAgendadas',  label:'Reuniões Agendadas',     fmt:'num',group:'sdr'},
+  {key:'taxaAgendamento',label:'Taxa de Agendamento',    fmt:'pct',group:'sdr'},
+  {key:'reunRealizadas', label:'Reuniões Realizadas',    fmt:'num',group:'sdr'},
+  {key:'taxaComparec',   label:'Taxa de Comparecimento', fmt:'pct',group:'sdr'},
+  {key:'noShow',         label:'No-Show',                fmt:'pct',group:'sdr',lb:true},
+  {key:'cpr',            label:'CPR',                    fmt:'brl',group:'sdr',lb:true},
+  {key:'vendas',         label:'Vendas Realizadas',      fmt:'num',group:'result'},
+  {key:'taxaConversao',  label:'Taxa de Conversão',      fmt:'pct',group:'result'},
+  {key:'ticketMedio',    label:'Ticket Médio',           fmt:'brl',group:'result'},
+  {key:'valorVendido',   label:'Valor Vendido',          fmt:'brl',group:'result'},
+  {key:'cac',            label:'CAC',                    fmt:'brl',group:'result',lb:true},
+  {key:'roas',           label:'ROAS',                   fmt:'pct',group:'result'},
+];
+const LABEL_MAP={
+  investimento:'INVESTIMENTO',cpl:'CPL',leads:'LEADS',
+  reunAgendadas:'REUNIOES AGENDADAS',taxaAgendamento:'TAXA DE AGENDAMENTO',
+  reunRealizadas:'REUNIOES REALIZADAS',taxaComparec:'TAXA DE COMPARECIMENTO',
+  noShow:'NO SHOW',cpr:'CPR',vendas:'VENDAS REALIZADAS',
+  taxaConversao:'TAXA DE CONVERSAO',ticketMedio:'TICKET MEDIO',
+  valorVendido:'VALOR VENDIDO',cac:'CAC',roas:'ROAS',
+};
+
+let cache={}, availableMonths=[], activeMonth=null, activeWeek='TOTAL', pitchLoaded=false;
+
+function norm(s){return String(s||'').trim().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[-]/g,' ')}
+function parseBR(v){
+  if(v===null||v===undefined||v==='')return null;
+  if(typeof v==='number')return isNaN(v)?null:v;
+  const s=String(v).trim();
+  if(!s||s==='#DIV/0!'||s==='#N/A'||s==='#REF!'||s==='—')return null;
+  if(s.includes('%'))return parseFloat(s.replace('%','').replace(',','.'));
+  if(s.includes('R$'))return parseFloat(s.replace(/R\$\s?/g,'').replace(/\./g,'').replace(',','.').trim());
+  const n=parseFloat(s.replace(/\./g,'').replace(',','.'));
+  return isNaN(n)?null:n;
+}
+function fmt(v,t){
+  if(v===null||v===undefined||isNaN(v))return'—';
+  if(t==='brl')return'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  if(t==='pct')return v.toFixed(2).replace('.',',')+' %';
+  return Number.isInteger(v)?v.toLocaleString('pt-BR'):v.toLocaleString('pt-BR',{maximumFractionDigits:1});
+}
+function getStatus(key,real,proj,lb){
+  if(real===null||proj===null||isNaN(real)||isNaN(proj)||proj===0)return'neutral';
+  const r=real/proj;
+  return lb?(r<=1.05?'good':r<=1.3?'warn':'bad'):(r>=0.95?'good':r>=0.7?'warn':'bad');
+}
+
+// Busca todas as colunas (A até N) para pegar todas as semanas
+async function fetchMonthAllWeeks(monthName){
+  if(cache[monthName])return cache[monthName];
+  const cols='A,B,C,D,E,F,G,H,I,J,K,L,M,N';
+  const url=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(monthName)}&tq=select%20${encodeURIComponent(cols)}`;
+  const res=await fetch(url);
+  if(!res.ok)throw new Error('Falha: '+monthName);
+  const text=await res.text();
+  const js=text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/);
+  if(!js)return null;
+  const json=JSON.parse(js[1]);
+  if(!json.table||!json.table.rows)return null;
+
+  const rows=json.table.rows.map(r=>(r.c||[]).map(c=>(!c||c.v===null||c.v===undefined)?'':(typeof c.v==='number'?c.v:String(c.v))));
+  const rowMap={};
+  for(let i=0;i<rows.length;i++){const n=norm(rows[i][0]);if(n)rowMap[n]=i;}
+
+  const monthCache={};
+  for(const [wk,cols] of Object.entries(WEEK_COLS)){
+    const data={};
+    for(const m of METRICS){
+      const ri=rowMap[LABEL_MAP[m.key]]??-1;
+      let proj=null,real=null;
+      if(ri>=0&&rows[ri]){
+        proj=parseBR(rows[ri][cols.p]);
+        real=parseBR(rows[ri][cols.r]);
+        if(m.fmt==='pct'){
+          if(proj!==null&&typeof rows[ri][cols.p]==='number'&&Math.abs(proj)<=1.5)proj*=100;
+          if(real!==null&&typeof rows[ri][cols.r]==='number'&&Math.abs(real)<=1.5)real*=100;
+        }
+      }
+      data[m.key]={proj,real};
+    }
+    monthCache[wk]=data;
+  }
+
+  // Verificar que há dados reais no total
+  const tot=monthCache['TOTAL'];
+  const hasData=METRICS.some(m=>tot[m.key]?.real!==null);
+  if(!hasData)return null;
+
+  cache[monthName]=monthCache;
+  return monthCache;
+}
+
+async function fetchRaw(sheetName){
+  const url=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}&tq=select%20A%2CM%2CN`;
+  const res=await fetch(url);
+  if(!res.ok)return null;
+  return await res.text();
+}
+function extractFingerprint(rawText){
+  try{
+    const js=rawText.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/);
+    if(!js)return null;
+    const json=JSON.parse(js[1]);
+    if(!json.table||!json.table.rows)return null;
+    return json.table.rows.map(r=>r.c&&r.c[0]&&r.c[0].v?String(r.c[0].v):'').filter(Boolean).join('|');
+  }catch(e){return null;}
+}
+async function detectMonths(){
+  const found=[];
+  const janRaw=await fetchRaw('JAN');
+  if(!janRaw)return[];
+  const janFP=extractFingerprint(janRaw);
+  for(const m of MONTH_ORDER){
+    try{
+      const raw=m==='JAN'?janRaw:await fetchRaw(m);
+      if(!raw)break;
+      if(m!=='JAN'){const fp=extractFingerprint(raw);if(fp===janFP||!fp)break;}
+      if(raw.includes('"errors":[{'))break;
+      const js=raw.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/);
+      if(!js)break;
+      const json=JSON.parse(js[1]);
+      if(!json.table||!json.table.rows||json.table.rows.length<3)break;
+      const hasData=json.table.rows.some(r=>{const c=r.c&&r.c[2];return c&&c.v!==null&&c.v!==undefined&&c.v!==''&&c.v!==0;});
+      if(!hasData)break;
+      found.push(m);
+    }catch(e){break;}
+  }
+  return found;
+}
+
+function switchPanel(id,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('visible'));
+  document.querySelectorAll('.main-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('p-'+id).classList.add('visible');
+  btn.classList.add('active');
+  if(id==='pitch'&&!pitchLoaded)loadPitch();
+}
+
+// ── PANEL 1 ──
+function buildMonthTabs(){
+  const el=document.getElementById('month-tabs');el.innerHTML='';
+  availableMonths.forEach((m,i)=>{
+    const color=MONTH_COLORS[i%MONTH_COLORS.length];
+    const btn=document.createElement('button');
+    btn.className='mtab'+(i===0?' active':'');
+    btn.textContent=MONTH_NAMES[m]||m;
+    btn.onclick=()=>selectMonth(m,btn,color);
+    if(i===0){btn.style.cssText=`border-color:${color};color:${color};background:${color}18`;}
+    el.appendChild(btn);
+  });
+}
+
+function buildWeekTabs(month,monthColor){
+  const el=document.getElementById('week-tabs');el.innerHTML='';
+  const mc=cache[month];if(!mc)return;
+
+  const btn0=document.createElement('button');
+  btn0.className='wtab'+(activeWeek==='TOTAL'?' active':'');
+  btn0.textContent='📊 Total do Mês';
+  if(activeWeek==='TOTAL')btn0.style.cssText=`border-color:#a78bfa;color:#a78bfa;background:#a78bfa18`;
+  btn0.onclick=()=>selectWeek('TOTAL',btn0,'#a78bfa');
+  el.appendChild(btn0);
+
+  ['S1','S2','S3','S4'].forEach((w,i)=>{
+    const wd=mc[w];
+    const hasW=wd&&METRICS.some(m=>wd[m.key]?.real!==null);
+    if(!hasW)return;
+    const c=WEEK_COLORS[i];
+    const btn=document.createElement('button');
+    btn.className='wtab'+(activeWeek===w?' active':'');
+    btn.textContent=`Semana ${i+1}`;
+    if(activeWeek===w)btn.style.cssText=`border-color:${c};color:${c};background:${c}18`;
+    btn.onclick=()=>selectWeek(w,btn,c);
+    el.appendChild(btn);
+  });
+}
+
+function selectMonth(m,btn,color){
+  document.querySelectorAll('.mtab').forEach(t=>{t.classList.remove('active');t.style.cssText='';});
+  btn.classList.add('active');btn.style.cssText=`border-color:${color};color:${color};background:${color}18`;
+  activeMonth=m;activeWeek='TOTAL';
+  fetchMonthAllWeeks(m).then(()=>{buildWeekTabs(m,color);renderGeral(m,'TOTAL',color);});
+}
+
+function selectWeek(w,btn,color){
+  document.querySelectorAll('.wtab').forEach(t=>{t.classList.remove('active');t.style.cssText='';});
+  btn.classList.add('active');btn.style.cssText=`border-color:${color};color:${color};background:${color}18`;
+  activeWeek=w;
+  renderGeral(activeMonth,w,color);
+}
+
+function renderGeral(month,week,color){
+  const mc=cache[month];
+  if(!mc){fetchMonthAllWeeks(month).then(()=>renderGeral(month,week,color));return;}
+  const data=mc[week];if(!data)return;
+
+  const monthName=MONTH_NAMES[month]||month;
+  const wLabel=WEEK_COLS[week]?.label||'Total';
+  const periodLabel=week==='TOTAL'?monthName:`${monthName} — ${wLabel}`;
+  let html='';
+
+  // Tabela comparativa
+  if(week==='TOTAL'){
+    html+=`<div class="sec-label" style="margin-top:36px">📊 Comparativo Todos os Meses</div>`;
+    html+=`<div class="ov-table-wrap"><table class="ov-table"><thead><tr><th>Métrica</th><th>Meta</th>`;
+    availableMonths.forEach((m,i)=>html+=`<th style="color:${MONTH_COLORS[i%MONTH_COLORS.length]}">${MONTH_NAMES[m]||m}</th>`);
+    html+=`</tr></thead><tbody>`;
+    for(const m of METRICS){
+      html+=`<tr><td>${m.label}</td><td style="color:var(--muted)">${fmt(cache[availableMonths[0]]?.TOTAL?.[m.key]?.proj,m.fmt)}</td>`;
+      availableMonths.forEach((mo,i)=>{
+        const v=cache[mo]?.TOTAL?.[m.key]?.real,p=cache[mo]?.TOTAL?.[m.key]?.proj;
+        const st=getStatus(m.key,v,p,m.lb);
+        const c=st==='good'?'var(--good)':st==='warn'?'var(--warn)':st==='bad'?'var(--bad)':'var(--muted)';
+        html+=`<td style="color:${c};font-weight:${mo===month?'800':'500'};${mo===month?'background:#ffffff08;':''}border-radius:4px">${fmt(v,m.fmt)}</td>`;
+      });
+      html+=`</tr>`;
+    }
+    html+=`</tbody></table></div>`;
+  } else {
+    html+=`<div class="sec-label" style="margin-top:36px">📊 Semanas de ${monthName}</div>`;
+    const semList=['S1','S2','S3','S4'].filter(w=>{const d=mc[w];return d&&METRICS.some(m=>d[m.key]?.real!==null);});
+    html+=`<div class="ov-table-wrap"><table class="ov-table"><thead><tr><th>Métrica</th><th>Meta</th>`;
+    semList.forEach((w,i)=>html+=`<th style="color:${WEEK_COLORS[parseInt(w[1])-1]}">Sem. ${w[1]}</th>`);
+    html+=`<th style="color:#a78bfa">Total</th></tr></thead><tbody>`;
+    for(const m of METRICS){
+      html+=`<tr><td>${m.label}</td><td style="color:var(--muted)">${fmt(mc.TOTAL?.[m.key]?.proj,m.fmt)}</td>`;
+      semList.forEach(w=>{
+        const v=mc[w]?.[m.key]?.real,p=mc[w]?.[m.key]?.proj;
+        const st=getStatus(m.key,v,p,m.lb);
+        const c=st==='good'?'var(--good)':st==='warn'?'var(--warn)':st==='bad'?'var(--bad)':'var(--muted)';
+        html+=`<td style="color:${c};font-weight:${w===week?'800':'500'};${w===week?'background:#ffffff08;':''}border-radius:4px">${fmt(v,m.fmt)}</td>`;
+      });
+      html+=`<td style="color:var(--muted)">${fmt(mc.TOTAL?.[m.key]?.real,m.fmt)}</td></tr>`;
+    }
+    html+=`</tbody></table></div>`;
+  }
+
+  // Barras
+  html+=`<div class="bar-chart-box"><h2>${week==='TOTAL'?'📊 Reuniões & Vendas — Todos os Meses':'📊 Reuniões & Vendas — Semanas de '+monthName}</h2>`;
+  [{label:'Reuniões Realizadas',key:'reunRealizadas',fmt:'num'},{label:'Vendas Realizadas',key:'vendas',fmt:'num'},{label:'Valor Vendido',key:'valorVendido',fmt:'brl'}].forEach(b=>{
+    html+=`<div style="margin-bottom:18px"><div style="font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">${b.label}</div>`;
+    if(week==='TOTAL'){
+      const vals=availableMonths.map(m=>cache[m]?.TOTAL?.[b.key]?.real||0);
+      const maxV=Math.max(...vals,1);
+      availableMonths.forEach((m,i)=>{
+        const v=cache[m]?.TOTAL?.[b.key]?.real||0;
+        html+=`<div class="bar-row"><div class="bar-label" style="color:${MONTH_COLORS[i%MONTH_COLORS.length]}">${MONTH_NAMES[m]||m}</div><div class="bar-track"><div class="bar-fill" style="width:${(v/maxV*100).toFixed(1)}%;background:${MONTH_COLORS[i%MONTH_COLORS.length]}">${fmt(v,b.fmt)}</div></div></div>`;
+      });
+    } else {
+      const sems=['S1','S2','S3','S4'].filter(w=>{const d=mc[w];return d&&METRICS.some(m=>d[m.key]?.real!==null);});
+      const vals=sems.map(w=>mc[w]?.[b.key]?.real||0);
+      const maxV=Math.max(...vals,1);
+      sems.forEach(w=>{
+        const idx=parseInt(w[1])-1;const v=mc[w]?.[b.key]?.real||0;
+        html+=`<div class="bar-row"><div class="bar-label" style="color:${WEEK_COLORS[idx]}">Sem. ${idx+1}</div><div class="bar-track"><div class="bar-fill" style="width:${(v/maxV*100).toFixed(1)}%;background:${WEEK_COLORS[idx]}">${fmt(v,b.fmt)}</div></div></div>`;
+      });
+    }
+    html+=`</div>`;
+  });
+  html+=`</div>`;
+
+  // Diagnóstico
+  html+=renderDiag(data,periodLabel);
+  document.getElementById('geral-content').innerHTML=html;
+}
+
+function renderDiag(data,label){
+  const crit=[],attn=[],pos=[];
+  const push=(arr,c,t,d,a)=>arr.push({c,t,d,a});
+
+  if(data.investimento?.real!=null&&data.investimento?.proj){
+    const p=(data.investimento.real/data.investimento.proj*100);
+    if(p<80)push(attn,'#facc15','💰 Investimento abaixo',`${fmt(data.investimento.real,'brl')} de ${fmt(data.investimento.proj,'brl')} (${p.toFixed(0)}%).`,'Verifique campanhas pausadas ou verba represada.');
+    else if(p>110)push(attn,'#facc15','💰 Investimento acima',`Gasto superou o planejado em ${(p-100).toFixed(0)}%.`,'Avalie se o retorno justifica o excesso.');
+    else push(pos,'#4ade80','✅ Investimento no alvo',`${fmt(data.investimento.real,'brl')} (${p.toFixed(0)}% do budget).`,'Mantenha o ritmo e avalie escalas em campanhas com alto ROAS.');
+  }
+  if(data.cpl?.real!=null&&data.cpl?.proj){
+    if(data.cpl.real>data.cpl.proj)push(crit,'#f87171','📈 CPL elevado',`${fmt(data.cpl.real,'brl')} vs meta ${fmt(data.cpl.proj,'brl')}.`,'Revise segmentação, criativos e página de destino.');
+    else push(pos,'#4ade80','✅ CPL abaixo da meta',`${fmt(data.cpl.real,'brl')} — eficiente na geração de leads.`,'Escale o budget nas campanhas com CPL baixo.');
+  }
+  if(data.leads?.real!=null&&data.leads?.proj){
+    const p=(data.leads.real/data.leads.proj*100);
+    if(p<70)push(crit,'#f87171','🚨 Volume de leads crítico',`${fmt(data.leads.real,'num')} de ${Math.round(data.leads.proj)} (${p.toFixed(0)}%).`,'Aumente investimento em mídia paga e revise criativos.');
+    else if(p<90)push(attn,'#facc15','⚠️ Leads abaixo da meta',`${fmt(data.leads.real,'num')} de ${Math.round(data.leads.proj)} (${p.toFixed(0)}%).`,'Revise campanhas e considere reativar públicos anteriores.');
+    else push(pos,'#4ade80','✅ Boa geração de leads',`${fmt(data.leads.real,'num')} leads — ${p.toFixed(0)}% da meta.`,'Garanta follow-up rápido em todos os leads.');
+  }
+  if(data.taxaAgendamento?.real!=null&&data.taxaAgendamento?.proj){
+    const g=data.taxaAgendamento.proj-data.taxaAgendamento.real;
+    if(g>5)push(crit,'#f87171','🚨 Taxa de Agendamento crítica',`${fmt(data.taxaAgendamento.real,'pct')} vs meta ${fmt(data.taxaAgendamento.proj,'pct')}.`,'Treine SDR, revise script e reduza tempo de resposta ao lead.');
+    else if(g>2)push(attn,'#facc15','⚠️ Taxa de Agendamento abaixo',`${fmt(data.taxaAgendamento.real,'pct')} vs meta ${fmt(data.taxaAgendamento.proj,'pct')}.`,'Revise qualidade dos leads e o processo de primeiro contato.');
+    else push(pos,'#4ade80','✅ Taxa de Agendamento no alvo',`${fmt(data.taxaAgendamento.real,'pct')} — SDR performando bem.`,'Documente o processo e replique em novos SDRs.');
+  }
+  if(data.noShow?.real!=null&&data.noShow?.proj){
+    if(data.noShow.real>data.noShow.proj&&data.noShow.real>20)push(crit,'#f87171','🚨 No-Show alto',`${fmt(data.noShow.real,'pct')} vs meta ${fmt(data.noShow.proj,'pct')}.`,'Confirmação dupla 24h e 1h antes da reunião.');
+    else if(data.noShow.real>data.noShow.proj)push(attn,'#facc15','⚠️ No-Show acima do esperado',`${fmt(data.noShow.real,'pct')} vs meta ${fmt(data.noShow.proj,'pct')}.`,'Reforce a confirmação das reuniões.');
+    else push(pos,'#4ade80','✅ No-Show controlado',`${fmt(data.noShow.real,'pct')} — abaixo da meta.`,'Mantenha o processo de confirmação atual.');
+  }
+  if(data.vendas?.real!=null&&data.vendas?.proj){
+    const p=(data.vendas.real/data.vendas.proj*100);
+    if(p<70)push(crit,'#f87171','🚨 Vendas muito abaixo da meta',`${fmt(data.vendas.real,'num')} de ${Math.round(data.vendas.proj)} (${p.toFixed(0)}%).`,'Identifique o gargalo principal do funil e corrija imediatamente.');
+    else if(p<90)push(attn,'#facc15','⚠️ Vendas abaixo da meta',`${fmt(data.vendas.real,'num')} de ${Math.round(data.vendas.proj)} (${p.toFixed(0)}%).`,'Revise objeções mais comuns no fechamento.');
+    else push(pos,'#4ade80','✅ Vendas no alvo',`${fmt(data.vendas.real,'num')} — ${p.toFixed(0)}% da meta.`,'Documente o que funcionou e replique.');
+  }
+  if(data.taxaConversao?.real!=null&&data.taxaConversao?.proj){
+    if(data.taxaConversao.real>=data.taxaConversao.proj)push(pos,'#4ade80','✅ Closer performando bem',`Conversão de ${fmt(data.taxaConversao.real,'pct')} — acima da meta.`,'Foque em aumentar o volume de reuniões.');
+    else if(data.taxaConversao.real<data.taxaConversao.proj*0.7)push(crit,'#f87171','🚨 Taxa de Conversão crítica',`${fmt(data.taxaConversao.real,'pct')} vs meta ${fmt(data.taxaConversao.proj,'pct')}.`,'Analise reuniões gravadas e treine técnicas de fechamento.');
+    else push(attn,'#facc15','⚠️ Conversão abaixo da meta',`${fmt(data.taxaConversao.real,'pct')} vs meta ${fmt(data.taxaConversao.proj,'pct')}.`,'Mapeie objeções frequentes e prepare respostas.');
+  }
+  if(data.roas?.real!=null&&data.roas?.proj){
+    if(data.roas.real<1)push(crit,'#f87171','🚨 ROAS negativo',`ROAS de ${fmt(data.roas.real,'pct')} — operação deficitária.`,'Pause anúncios com pior desempenho urgentemente.');
+    else if(data.roas.real<data.roas.proj)push(attn,'#facc15','⚠️ ROAS abaixo da meta',`${fmt(data.roas.real,'pct')} vs meta ${fmt(data.roas.proj,'pct')}.`,'Redirecione budget para campanhas com melhor ROAS.');
+    else push(pos,'#4ade80','✅ ROAS saudável',`ROAS de ${fmt(data.roas.real,'pct')} — acima da meta.`,'Escale gradualmente nos canais com maior ROAS.');
+  }
+
+  const sc=crit.length>2?'#f87171':attn.length>3?'#facc15':'#4ade80';
+  const sl=crit.length>2?'Período crítico 🚨':attn.length>3?'Pontos de atenção ⚠️':'Período positivo 💪';
+  let h=`<div class="insights-box"><h2>🔍 Diagnóstico — ${label}</h2>
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 22px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+    <div><div style="font-size:.68rem;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Saúde Geral</div><div style="font-size:1.1rem;font-weight:800;color:${sc}">${sl}</div></div>
+    <div style="display:flex;gap:16px">
+      <div style="text-align:center"><div style="font-size:1.4rem;font-weight:800;color:#f87171">${crit.length}</div><div style="font-size:.65rem;color:var(--muted);text-transform:uppercase">Críticos</div></div>
+      <div style="text-align:center"><div style="font-size:1.4rem;font-weight:800;color:#facc15">${attn.length}</div><div style="font-size:.65rem;color:var(--muted);text-transform:uppercase">Atenção</div></div>
+      <div style="text-align:center"><div style="font-size:1.4rem;font-weight:800;color:#4ade80">${pos.length}</div><div style="font-size:.65rem;color:var(--muted);text-transform:uppercase">Positivos</div></div>
+    </div>
+  </div>`;
+  const renderItems=(arr,lbl)=>{
+    if(!arr.length)return'';
+    let s=`<div style="font-size:.68rem;font-weight:800;text-transform:uppercase;color:${arr[0].c};margin:16px 0 8px">${lbl}</div>`;
+    arr.forEach(i=>s+=`<div class="insight" style="border-color:${i.c};margin-bottom:10px"><strong>${i.t}</strong>${i.d}<div style="margin-top:8px;font-size:.78rem;background:${i.c}15;border-radius:6px;padding:8px 12px;border-left:2px solid ${i.c}"><span style="font-weight:800;color:${i.c}">→ Ação: </span>${i.a}</div></div>`);
+    return s;
+  };
+  h+=renderItems(crit,'🚨 Pontos Críticos')+renderItems(attn,'⚠️ Pontos de Atenção')+renderItems(pos,'✅ Pontos Positivos');
+  h+=`</div>`;
+  return h;
+}
+
+// ── PANEL 2: COMPARATIVO ──
+function populateSelects(){
+  ['a','b'].forEach((ab,idx)=>{
+    const sel=document.getElementById(`sel-${ab}-mes`);
+    sel.innerHTML=availableMonths.map((m,i)=>`<option value="${m}" ${i===(idx===0?availableMonths.length-2:availableMonths.length-1)?'selected':''}>${MONTH_NAMES[m]||m}</option>`).join('');
+    updateWeekSelects(ab);
+  });
+}
+
+function updateWeekSelects(ab){
+  const mes=document.getElementById(`sel-${ab}-mes`).value;
+  const sel=document.getElementById(`sel-${ab}-sem`);
+  const mc=cache[mes];
+  const opts=[{v:'TOTAL',l:'📊 Total do Mês'}];
+  if(mc){
+    ['S1','S2','S3','S4'].forEach((w,i)=>{
+      const d=mc[w];
+      if(d&&METRICS.some(m=>d[m.key]?.real!==null))opts.push({v:w,l:`Semana ${i+1}`});
+    });
+  } else {
+    ['S1','S2','S3','S4'].forEach((w,i)=>opts.push({v:w,l:`Semana ${i+1}`}));
+  }
+  sel.innerHTML=opts.map(o=>`<option value="${o.v}">${o.l}</option>`).join('');
+}
+
+async function runComparison(){
+  const btn=document.getElementById('btn-cmp');
+  btn.disabled=true;btn.textContent='Carregando...';
+  const mA=document.getElementById('sel-a-mes').value,wA=document.getElementById('sel-a-sem').value;
+  const mB=document.getElementById('sel-b-mes').value,wB=document.getElementById('sel-b-sem').value;
+  try{
+    await Promise.all([fetchMonthAllWeeks(mA),fetchMonthAllWeeks(mB)]);
+    updateWeekSelects('a');updateWeekSelects('b');
+    document.getElementById('sel-a-sem').value=wA;
+    document.getElementById('sel-b-sem').value=wB;
+    const dA=cache[mA][wA]||cache[mA]['TOTAL'];
+    const dB=cache[mB][wB]||cache[mB]['TOTAL'];
+    const lblA=`${MONTH_NAMES[mA]||mA}${wA!=='TOTAL'?' — Sem.'+wA[1]:''}`;
+    const lblB=`${MONTH_NAMES[mB]||mB}${wB!=='TOTAL'?' — Sem.'+wB[1]:''}`;
+    const cA=MONTH_COLORS[availableMonths.indexOf(mA)%MONTH_COLORS.length];
+    const cB=MONTH_COLORS[availableMonths.indexOf(mB)%MONTH_COLORS.length];
+    renderComparison(lblA,lblB,dA,dB,cA,cB);
+    document.getElementById('cmp-result').style.display='block';
+  }catch(e){alert('Erro: '+e.message);}
+  btn.disabled=false;btn.textContent='Comparar Períodos →';
+}
+
+function resetComparison(){document.getElementById('cmp-result').style.display='none';}
+
+function renderComparison(nA,nB,dA,dB,cA,cB){
+  document.getElementById('cmp-title').innerHTML=`<span style="color:${cA}">${nA}</span> <span style="color:var(--muted);font-weight:400;font-size:.85rem"> vs </span><span style="color:${cB}">${nB}</span>`;
+  document.getElementById('cmp-col-ab').innerHTML=`<span style="color:${cA}">${nA}</span> / <span style="color:${cB}">${nB}</span>`;
+  ['topo','sdr','result'].forEach(g=>{
+    const el=document.getElementById('cmp-'+g+(g==='result'?'-rows':''));
+    if(!el)return;el.innerHTML='';
+    METRICS.filter(m=>m.group===g).forEach(m=>{
+      const vA=dA[m.key]?.real,vB=dB[m.key]?.real,proj=dA[m.key]?.proj;
+      let badge='<span class="delta-badge eq">—</span>';
+      if(vA!=null&&vB!=null&&vA!==0){
+        const d=((vB-vA)/Math.abs(vA)*100);const good=m.lb?d<=0:d>=0;
+        badge=`<span class="delta-badge ${good?'up':'down'}">${d>=0?'▲':'▼'} ${d>=0?'+':''}${d.toFixed(1)}%</span>`;
+      }
+      el.innerHTML+=`<div class="cmp-row"><div class="cr-name">${m.label}</div><div class="cr-meta">${fmt(proj,m.fmt)}</div><div class="cr-vals"><span style="color:${cA}">${fmt(vA,m.fmt)}</span> <span style="color:var(--muted);font-size:.68rem"> / </span><span style="color:${cB}">${fmt(vB,m.fmt)}</span></div><div class="cr-delta">${badge}</div></div>`;
+    });
+  });
+  const bEl=document.getElementById('cmp-bars');bEl.innerHTML='';
+  [{label:'Reuniões Realizadas',kA:dA.reunRealizadas?.real,kB:dB.reunRealizadas?.real,f:'num'},
+   {label:'Vendas Realizadas',kA:dA.vendas?.real,kB:dB.vendas?.real,f:'num'},
+   {label:'Valor Vendido',kA:dA.valorVendido?.real,kB:dB.valorVendido?.real,f:'brl'},
+   {label:'Leads',kA:dA.leads?.real,kB:dB.leads?.real,f:'num'}
+  ].forEach(b=>{
+    const max=Math.max(b.kA||0,b.kB||0,1);
+    bEl.innerHTML+=`<div style="margin-bottom:18px"><div style="font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">${b.label}</div>
+      <div class="bar-row"><div class="bar-label" style="color:${cA}">${nA}</div><div class="bar-track"><div class="bar-fill" style="width:${((b.kA||0)/max*100).toFixed(1)}%;background:${cA}">${fmt(b.kA,b.f)}</div></div></div>
+      <div class="bar-row"><div class="bar-label" style="color:${cB}">${nB}</div><div class="bar-track"><div class="bar-fill" style="width:${((b.kB||0)/max*100).toFixed(1)}%;background:${cB}">${fmt(b.kB,b.f)}</div></div></div>
+    </div>`;
+  });
+  const ins=[];
+  const dd=(k)=>{const a=dA[k]?.real,b=dB[k]?.real;return(a&&b&&a!==0)?((b-a)/Math.abs(a)*100):null;};
+  const dV=dd('vendas');if(dV!=null)ins.push({c:dV>=0?'#4ade80':'#f87171',t:`Vendas: ${dV>=0?'▲':'▼'} ${Math.abs(dV).toFixed(1)}%`,x:`${nA}: ${fmt(dA.vendas?.real,'num')} → ${nB}: ${fmt(dB.vendas?.real,'num')} vendas.`});
+  const dR=dd('reunRealizadas');if(dR!=null)ins.push({c:dR>=0?'#60a5fa':'#facc15',t:`Reuniões: ${dR>=0?'▲':'▼'} ${Math.abs(dR).toFixed(1)}%`,x:`${nA}: ${fmt(dA.reunRealizadas?.real,'num')} → ${nB}: ${fmt(dB.reunRealizadas?.real,'num')}.`});
+  const dC=dd('taxaConversao');if(dC!=null)ins.push({c:Math.abs(dC)<5?'#60a5fa':dC>=0?'#4ade80':'#f87171',t:Math.abs(dC)<5?'Conversão estável':`Conversão: ${dC>=0?'▲':'▼'} ${Math.abs(dC).toFixed(1)}%`,x:`${fmt(dA.taxaConversao?.real,'pct')} → ${fmt(dB.taxaConversao?.real,'pct')}.`});
+  const dRoas=dd('roas');if(dRoas!=null)ins.push({c:dRoas>=0?'#4ade80':'#f87171',t:`ROAS: ${dRoas>=0?'Melhorou':'Piorou'} ${Math.abs(dRoas).toFixed(1)}%`,x:`${fmt(dA.roas?.real,'pct')} → ${fmt(dB.roas?.real,'pct')}.`});
+  document.getElementById('cmp-insights').innerHTML=`<h2>🔍 Diagnóstico ${nA} vs ${nB}</h2>${ins.map(i=>`<div class="insight" style="border-color:${i.c}"><strong>${i.t}</strong>${i.x}</div>`).join('')}`;
+}
+
+// ── PANEL 3: PITCH FEITO ──
+async function loadPitch(){
+  pitchLoaded=true;
+  const el=document.getElementById('pitch-content');
+  try{
+    const url=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent('Picth feito')}&tq=select%20*`;
+    const res=await fetch(url);
+    if(!res.ok)throw new Error('Aba não encontrada na planilha');
+    const text=await res.text();
+    if(text.includes('"errors":[{'))throw new Error('Acesso negado ou aba não existe');
+    const js=text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/);
+    if(!js)throw new Error('Formato inesperado da resposta');
+    const json=JSON.parse(js[1]);
+    if(!json.table||!json.table.rows||json.table.rows.length===0)throw new Error('Aba vazia ou sem dados');
+
+    const cols=(json.table.cols||[]).map((c,i)=>c.label&&c.label.trim()?c.label:null).filter(Boolean);
+    const rows=json.table.rows.map(r=>(r.c||[]).map(c=>(!c||c.v===null||c.v===undefined)?'':typeof c.v==='number'?c.v:String(c.v)));
+    const total=rows.length;
+
+    // Contagens simples para stats
+    const flatText=rows.map(r=>r.join(' ').toLowerCase());
+    const won=flatText.filter(r=>r.includes('sim')||r.includes('fechou')||r.includes('ganho')).length;
+    const lost=flatText.filter(r=>r.includes('não')||r.includes('nao')||r.includes('perdeu')).length;
+    const pend=total-won-lost;
+
+    let html=`
+      <div class="sec-label">🎯 PITCH FEITO — Registro de Pitches</div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 24px;margin-bottom:24px;display:flex;gap:32px;flex-wrap:wrap;align-items:center">
+        <div style="text-align:center"><div style="font-size:1.8rem;font-weight:800;color:#60a5fa">${total}</div><div style="font-size:.65rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-top:2px">Total Pitches</div></div>
+        <div style="text-align:center"><div style="font-size:1.8rem;font-weight:800;color:var(--good)">${won}</div><div style="font-size:.65rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-top:2px">Ganhos</div></div>
+        <div style="text-align:center"><div style="font-size:1.8rem;font-weight:800;color:var(--bad)">${lost}</div><div style="font-size:.65rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-top:2px">Perdidos</div></div>
+        ${pend>0?`<div style="text-align:center"><div style="font-size:1.8rem;font-weight:800;color:var(--warn)">${pend}</div><div style="font-size:.65rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-top:2px">Pendentes</div></div>`:''}
+        ${won>0?`<div style="text-align:center"><div style="font-size:1.8rem;font-weight:800;color:#a78bfa">${((won/total)*100).toFixed(0)}%</div><div style="font-size:.65rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-top:2px">Taxa de Ganho</div></div>`:''}
+      </div>
+      <div class="pitch-table-wrap"><table class="pitch-table"><thead><tr>`;
+    cols.forEach(h=>html+=`<th>${h}</th>`);
+    html+=`</tr></thead><tbody>`;
+    rows.forEach(row=>{
+      html+=`<tr>`;
+      row.slice(0,cols.length).forEach(cell=>{
+        const s=String(cell);let d=s;
+        if(s.toLowerCase().match(/^(sim|fechou|ganho|won)$/))d=`<span class="pbadge won">${s}</span>`;
+        else if(s.toLowerCase().match(/^(n[aã]o|nao|perdeu|lost)$/))d=`<span class="pbadge lost">${s}</span>`;
+        else if(s.toLowerCase().match(/^(pendente|aguardando|em andamento)$/))d=`<span class="pbadge pend">${s}</span>`;
+        html+=`<td>${d}</td>`;
+      });
+      html+=`</tr>`;
+    });
+    html+=`</tbody></table></div>`;
+    el.innerHTML=html;
+  }catch(e){
+    el.innerHTML=`<div style="text-align:center;padding:60px;color:var(--muted)">
+      <div style="font-size:3rem;margin-bottom:16px">🎯</div>
+      <div style="font-weight:700;margin-bottom:8px;color:var(--text);font-size:1rem">Aba "Picth feito" não encontrada</div>
+      <div style="font-size:.82rem;max-width:420px;margin:0 auto;line-height:1.7">Certifique-se de que a aba existe na planilha com o nome exato <strong style="color:#60a5fa">"Picth feito"</strong> e que a planilha está compartilhada para visualização pública.</div>
+      <div style="margin-top:14px;padding:10px 18px;background:#f8717115;border:1px solid #f8717130;border-radius:8px;display:inline-block;font-size:.75rem;color:#f87171">${e.message}</div>
+    </div>`;
+  }
+}
+
+// ── INIT ──
+async function init(){
+  try{
+    availableMonths=await detectMonths();
+    if(!availableMonths.length)throw new Error('Nenhum mês encontrado na planilha');
+    await Promise.all(availableMonths.map(m=>fetchMonthAllWeeks(m)));
+    buildMonthTabs();
+    populateSelects();
+    activeMonth=availableMonths[0];activeWeek='TOTAL';
+    const firstBtn=document.querySelector('.mtab');
+    const fc=MONTH_COLORS[0];
+    firstBtn.style.cssText=`border-color:${fc};color:${fc};background:${fc}18`;
+    buildWeekTabs(availableMonths[0],fc);
+    renderGeral(availableMonths[0],'TOTAL',fc);
+    document.getElementById('loading').style.display='none';
+    document.getElementById('app').style.display='block';
+    document.getElementById('last-update').textContent='Atualizado: '+new Date().toLocaleString('pt-BR');
+  }catch(e){
+    document.getElementById('loading').style.display='none';
+    document.getElementById('error-msg').style.display='block';
+    document.getElementById('error-msg').textContent='❌ '+e.message;
+  }
+}
+init();
+setInterval(()=>{cache={};pitchLoaded=false;init();},5*60*1000);
+</script>
+</body>
+</html>
