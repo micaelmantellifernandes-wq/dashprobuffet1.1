@@ -95,15 +95,6 @@ body{background:var(--bg);color:var(--text);font-family:'Montserrat',sans-serif;
 .insight strong{display:block;margin-bottom:3px;font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;font-weight:800}
 
 /* Bar chart */
-
-/* ── CHARTS ── */
-.chart-section{margin-top:36px}
-.chart-section h2{font-size:.85rem;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:18px}
-.chart-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px;margin-bottom:28px}
-.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 20px 14px;transition:border-color .2s}
-.chart-card:hover{border-color:var(--accent)}
-.chart-card-title{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:12px}
-.chart-card canvas{width:100%!important}
 .bar-chart-box{margin-bottom:28px}
 .bar-chart-box h2{font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:14px}
 .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
@@ -227,10 +218,7 @@ body{background:var(--bg);color:var(--text);font-family:'Montserrat',sans-serif;
       <div id="cmp-sdr"></div>
       <div class="cmp-sec" style="margin-top:6px">💰 Resultados</div>
       <div id="cmp-result-rows"></div>
-      <div class="chart-section" style="margin-top:36px">
-      <h2>📈 Comparativo Visual — Métricas Principais</h2>
-      <div class="chart-grid" id="cmp-chart-grid"></div>
-    </div>
+      <div id="cmp-chart-wrap" style="margin-top:32px"></div>
       <div class="insights-box" id="cmp-insights"></div>
     </div>
   </div>
@@ -592,8 +580,8 @@ function renderComparison(mA,wA,mB,wB,dA,dB){
     });
   });
 
-  // ── LINE CHARTS ──
-  const chartDefs=[
+  // ── SINGLE NAVIGABLE LINE CHART ──
+  const CHART_METRICS=[
     {key:'leads',         label:'Leads',              f:'num', icon:'👥'},
     {key:'reunAgendadas', label:'Reuniões Agendadas', f:'num', icon:'📅'},
     {key:'reunRealizadas',label:'Reuniões Realizadas',f:'num', icon:'🤝'},
@@ -603,105 +591,121 @@ function renderComparison(mA,wA,mB,wB,dA,dB){
     {key:'investimento',  label:'Investimento',       f:'brl', icon:'💸'},
     {key:'roas',          label:'ROAS',               f:'pct', icon:'📈'},
   ];
-
-  // Destroy old charts
-  if(window._cmpCharts){window._cmpCharts.forEach(c=>c.destroy());window._cmpCharts=[];}
-  else window._cmpCharts=[];
-
-  const grid=document.getElementById('cmp-chart-grid');
-  grid.innerHTML='';
-
-  // Build weeks labels (X axis): S1→S4 + Total
-  const weekKeys=['S1','S2','S3','S4','TOTAL'];
-  const weekLabels=weekKeys.map(w=>WEEK_LABELS[w]);
-
-  // For each chart metric: get data across weeks for mA and mB
+  const CMP_WEEK_KEYS=['S1','S2','S3','S4','TOTAL'];
   const mcA=cache[mA], mcB=cache[mB];
 
-  chartDefs.forEach((cd,idx)=>{
-    const valsA=weekKeys.map(w=>mcA?.[w]?.[cd.key]?.real??null);
-    const valsB=weekKeys.map(w=>mcB?.[w]?.[cd.key]?.real??null);
-    const projA=weekKeys.map(w=>mcA?.[w]?.[cd.key]?.proj??null);
+  // Destroy old chart
+  if(window._singleChart){window._singleChart.destroy();window._singleChart=null;}
 
-    // Skip if no data at all
-    const hasA=valsA.some(v=>v!==null);
-    const hasB=valsB.some(v=>v!==null);
-    if(!hasA&&!hasB)return;
+  // Build wrapper
+  const wrap=document.getElementById('cmp-chart-wrap');
+  wrap.innerHTML=`
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px 24px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <button id="chart-prev" onclick="chartNav(-1)" style="background:var(--surface2);border:1px solid var(--border);color:var(--accent);width:34px;height:34px;border-radius:50%;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center">‹</button>
+          <div>
+            <div id="chart-icon-label" style="font-size:1rem;font-weight:800;color:var(--text)"></div>
+            <div style="font-size:.65rem;color:var(--muted);margin-top:2px" id="chart-counter"></div>
+          </div>
+          <button id="chart-next" onclick="chartNav(1)" style="background:var(--surface2);border:1px solid var(--border);color:var(--accent);width:34px;height:34px;border-radius:50%;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center">›</button>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap" id="chart-pills"></div>
+      </div>
+      <div style="position:relative;height:260px">
+        <canvas id="single-chart"></canvas>
+      </div>
+    </div>`;
 
-    const card=document.createElement('div');
-    card.className='chart-card';
-    const canvasId='chart-'+idx;
-    card.innerHTML=`<div class="chart-card-title">${cd.icon} ${cd.label}</div><canvas id="${canvasId}" height="180"></canvas>`;
-    grid.appendChild(card);
+  window._chartState={idx:0,mA,mB,nA,nB,cA,cB,mcA,mcB};
 
-    const ctx=document.getElementById(canvasId).getContext('2d');
+  function buildChartPills(){
+    const el=document.getElementById('chart-pills');
+    if(!el)return;
+    el.innerHTML=CHART_METRICS.map((m,i)=>
+      `<button onclick="chartNav(${i}-window._chartState.idx)" style="background:${i===window._chartState.idx?'var(--accent)':'var(--surface2)'};border:1px solid ${i===window._chartState.idx?'var(--accent)':'var(--border)'};color:${i===window._chartState.idx?'#001830':'var(--muted)'};border-radius:999px;padding:4px 12px;font-size:.65rem;font-weight:700;cursor:pointer;font-family:Montserrat,sans-serif;white-space:nowrap">${m.icon} ${m.label}</button>`
+    ).join('');
+  }
+
+  function renderSingleChart(idx){
+    if(!window._chartState)return;
+    const {mA,mB,nA,nB,cA,cB,mcA,mcB}=window._chartState;
+    const cd=CHART_METRICS[idx];
+    if(!cd)return;
+    window._chartState.idx=idx;
+
+    document.getElementById('chart-icon-label').textContent=cd.icon+' '+cd.label;
+    document.getElementById('chart-counter').textContent=(idx+1)+' de '+CHART_METRICS.length;
+    buildChartPills();
+
+    const weekLabels=CMP_WEEK_KEYS.map(w=>WEEK_LABELS[w]);
+    const valsA=CMP_WEEK_KEYS.map(w=>mcA?.[w]?.[cd.key]?.real??null);
+    const valsB=CMP_WEEK_KEYS.map(w=>mcB?.[w]?.[cd.key]?.real??null);
+    const projA=CMP_WEEK_KEYS.map(w=>mcA?.[w]?.[cd.key]?.proj??null);
 
     const datasets=[];
-    if(hasA) datasets.push({
+    if(valsA.some(v=>v!==null)) datasets.push({
       label:nA, data:valsA,
-      borderColor:cA, backgroundColor:cA+'22',
-      pointBackgroundColor:cA, pointBorderColor:'#fff',
-      pointRadius:5, pointHoverRadius:7,
-      borderWidth:2.5, tension:.35, fill:false
+      borderColor:cA, backgroundColor:cA+'18',
+      pointBackgroundColor:cA, pointBorderColor:'#001830',
+      pointRadius:6, pointHoverRadius:8,
+      borderWidth:2.5, tension:.35, fill:true
     });
-    if(hasB) datasets.push({
+    if(valsB.some(v=>v!==null)) datasets.push({
       label:nB, data:valsB,
-      borderColor:cB, backgroundColor:cB+'22',
-      pointBackgroundColor:cB, pointBorderColor:'#fff',
-      pointRadius:5, pointHoverRadius:7,
-      borderWidth:2.5, tension:.35, fill:false
+      borderColor:cB, backgroundColor:cB+'18',
+      pointBackgroundColor:cB, pointBorderColor:'#001830',
+      pointRadius:6, pointHoverRadius:8,
+      borderWidth:2.5, tension:.35, fill:true
     });
-    // Meta line
-    const hasMeta=projA.some(v=>v!==null);
-    if(hasMeta) datasets.push({
+    if(projA.some(v=>v!==null)) datasets.push({
       label:'Meta', data:projA,
-      borderColor:'#ffffff30', backgroundColor:'transparent',
-      borderWidth:1.5, borderDash:[5,4],
+      borderColor:'#ffffff25', backgroundColor:'transparent',
+      borderWidth:1.5, borderDash:[6,4],
       pointRadius:0, tension:0, fill:false
     });
 
-    const chart=new Chart(ctx,{
-      type:'line',
-      data:{labels:weekLabels, datasets},
-      options:{
-        responsive:true, maintainAspectRatio:false,
-        animation:{duration:600,easing:'easeOutQuart'},
-        plugins:{
-          legend:{
-            display:true,
-            position:'top',
-            labels:{color:'#5a8ab0',font:{size:10,family:'Montserrat',weight:'700'},boxWidth:12,padding:12}
-          },
-          tooltip:{
-            backgroundColor:'#002654',
-            borderColor:'#0a4080',
-            borderWidth:1,
-            titleColor:'#e8f4ff',
-            bodyColor:'#5a8ab0',
-            padding:10,
-            callbacks:{
-              label:(ctx)=>{
-                const v=ctx.parsed.y;
-                if(v===null||isNaN(v))return ctx.dataset.label+': —';
-                return ctx.dataset.label+': '+fmt(v,cd.f);
-              }
+    if(window._singleChart){
+      window._singleChart.data.labels=weekLabels;
+      window._singleChart.data.datasets=datasets;
+      window._singleChart.options.scales.y.ticks.callback=(v)=>fmt(v,cd.f);
+      window._singleChart.options.plugins.tooltip.callbacks.label=(ctx)=>{
+        const v=ctx.parsed.y;
+        return ctx.dataset.label+': '+(v===null||isNaN(v)?'—':fmt(v,cd.f));
+      };
+      window._singleChart.update('active');
+    } else {
+      const ctx2=document.getElementById('single-chart').getContext('2d');
+      window._singleChart=new Chart(ctx2,{
+        type:'line',
+        data:{labels:weekLabels, datasets},
+        options:{
+          responsive:true, maintainAspectRatio:false,
+          animation:{duration:400,easing:'easeOutQuart'},
+          plugins:{
+            legend:{display:true,position:'top',labels:{color:'#5a8ab0',font:{size:10,family:'Montserrat',weight:'700'},boxWidth:10,padding:14}},
+            tooltip:{
+              backgroundColor:'#002654',borderColor:'#0a4080',borderWidth:1,
+              titleColor:'#e8f4ff',bodyColor:'#5a8ab0',padding:12,
+              callbacks:{label:(ctx)=>{const v=ctx.parsed.y;return ctx.dataset.label+': '+(v===null||isNaN(v)?'—':fmt(v,cd.f));}}
             }
-          }
-        },
-        scales:{
-          x:{
-            grid:{color:'#0a408030'},
-            ticks:{color:'#5a8ab0',font:{size:9,family:'Montserrat',weight:'600'}}
           },
-          y:{
-            grid:{color:'#0a408030'},
-            ticks:{color:'#5a8ab0',font:{size:9,family:'Montserrat'},callback:(v)=>fmt(v,cd.f)}
+          scales:{
+            x:{grid:{color:'#0a408028'},ticks:{color:'#5a8ab0',font:{size:9,family:'Montserrat',weight:'600'}}},
+            y:{grid:{color:'#0a408028'},ticks:{color:'#5a8ab0',font:{size:9,family:'Montserrat'},callback:(v)=>fmt(v,cd.f)}}
           }
         }
-      }
-    });
-    window._cmpCharts.push(chart);
-  });
+      });
+    }
+  }
+
+  window.chartNav=function(delta){
+    const n=CHART_METRICS.length;
+    const next=((window._chartState.idx+delta)%n+n)%n;
+    renderSingleChart(next);
+  };
+
+  renderSingleChart(0);
 
   // Insights
   const ins=[];
