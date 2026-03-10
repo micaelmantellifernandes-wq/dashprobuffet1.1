@@ -657,23 +657,15 @@ function renderComparison(mA,wA,mB,wB,dA,dB){
       normA.push(n.a); normB.push(n.b);
     });
 
-    const metaA=CHART_METRICS.map(m=>mcA?.TOTAL?.[m.key]?.proj??null);
-    const normMeta=CHART_METRICS.map((_,i)=>{
-      const max=Math.max(Math.abs(rawA[i]||0),Math.abs(rawB[i]||0),0.001);
-      return metaA[i]!=null?(metaA[i]/max*100):null;
-    });
-
     const datasets=[
       {label:nA,data:normA,borderColor:cA,backgroundColor:cA+'22',pointBackgroundColor:cA,pointBorderColor:'#001830',pointRadius:6,pointHoverRadius:8,borderWidth:2.5,tension:.3,fill:false},
       {label:nB,data:normB,borderColor:cB,backgroundColor:cB+'22',pointBackgroundColor:cB,pointBorderColor:'#001830',pointRadius:6,pointHoverRadius:8,borderWidth:2.5,tension:.3,fill:false},
-      {label:'Meta',data:normMeta,borderColor:'#ffffff25',backgroundColor:'transparent',borderWidth:1.5,borderDash:[6,4],pointRadius:0,tension:0,fill:false},
     ];
 
     const tooltipFmt=(ctx)=>{
       const i=ctx.dataIndex;
       const m=CHART_METRICS[i];
-      // show real value in tooltip
-      const raw=ctx.datasetIndex===0?rawA[i]:ctx.datasetIndex===1?rawB[i]:metaA[i];
+      const raw=ctx.datasetIndex===0?rawA[i]:rawB[i];
       return ctx.dataset.label+': '+(raw!=null?fmt(raw,m.f):'—');
     };
 
