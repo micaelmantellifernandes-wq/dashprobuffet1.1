@@ -430,16 +430,17 @@ function render2026(mk){
   // Chart fonte
   const fontes=Object.entries(d.src).sort((a,b)=>b[1]-a[1]);
   if(fontes.length){
-    const bgColor=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#001830';
     mkChart('ch-fonte26','doughnut',{
       labels:fontes.map(f=>f[0]),
       datasets:[{
         data:fontes.map(f=>f[1]),
         backgroundColor:PAL.slice(0,fontes.length),
         borderWidth:0,
-        hoverOffset:22,
+        borderColor:'transparent',
+        hoverOffset:20,
         hoverBorderWidth:0,
-        offset:0,
+        hoverBorderColor:'transparent',
+        spacing:0,
       }]
     },{
       cutout:'62%',
