@@ -249,7 +249,7 @@ const METRICS=[
   {key:'ticketMedio',    label:'Ticket Médio',           fmt:'brl',group:'result'},
   {key:'valorVendido',   label:'Valor Vendido',          fmt:'brl',group:'result'},
   {key:'cac',            label:'CAC',                    fmt:'brl',group:'result',lb:true},
-  {key:'roas',           label:'ROAS',                   fmt:'pct',group:'result'},
+  {key:'roas',           label:'ROAS',                   fmt:'brl',group:'result'},
 ];
 const LABEL_MAP={
   investimento:'INVESTIMENTO',cpl:'CPL',leads:'LEADS',
@@ -590,7 +590,7 @@ function renderComparison(mA,wA,mB,wB,dA,dB){
     {key:'valorVendido',  label:'Valor Vendido',      f:'brl', icon:'💰'},
     {key:'taxaConversao', label:'Taxa de Conversão',  f:'pct', icon:'📊'},
     {key:'investimento',  label:'Investimento',       f:'brl', icon:'💸'},
-    {key:'roas',          label:'ROAS',               f:'pct', icon:'📈'},
+    {key:'roas',          label:'ROAS',               f:'brl', icon:'📈'},
   ];
   const CMP_WEEK_KEYS=['S1','S2','S3','S4'];
   const mcA=cache[mA], mcB=cache[mB];
