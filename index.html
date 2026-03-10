@@ -503,7 +503,7 @@ function renderGeral(month,week,color){
     if(gap>2)html+=`<div class="insight" style="border-color:#f0b429"><strong>Taxa de Agendamento abaixo</strong>${fmt(data.taxaAgendamento.real,'pct')} vs meta ${fmt(data.taxaAgendamento.proj,'pct')}.</div>`;
   }
   if(data.taxaConversao?.real>=data.taxaConversao?.proj)html+=`<div class="insight" style="border-color:#00d4a8"><strong>✅ Closer performando bem</strong>Conversão ${fmt(data.taxaConversao.real,'pct')} — acima da meta.</div>`;
-  if(data.roas?.real!==null&&data.roas?.real<1)html+=`<div class="insight" style="border-color:#ff5c7a"><strong>⚠️ ROAS negativo</strong>Cada R$1 investido retornou ${fmt(data.roas.real,'pct')}.</div>`;
+  if(data.roas?.real!==null&&data.roas?.real<1)html+=`<div class="insight" style="border-color:#ff5c7a"><strong>⚠️ ROAS negativo</strong>Cada R$1 investido retornou ${fmt(data.roas.real,'brl')}.</div>`;
   html+=`</div>`;
 
   el.innerHTML=html;
@@ -774,7 +774,7 @@ function renderComparison(mA,wA,mB,wB,dA,dB){
   const dR=dd('reunRealizadas');if(dR!==null)ins.push({c:dR>=0?'#00b4dc':'#f0b429',t:`Reuniões: ${dR>=0?'▲':'▼'} ${Math.abs(dR).toFixed(1)}%`,x:`${nA}: ${fmt(dA.reunRealizadas?.real,'num')} → ${nB}: ${fmt(dB.reunRealizadas?.real,'num')}.`});
   const dA2=dd('taxaAgendamento');if(dA2!==null)ins.push({c:dA2>=0?'#00d4a8':'#ff5c7a',t:`Taxa de Agendamento: ${dA2>=0?'Melhorou':'Piorou'}`,x:`${fmt(dA.taxaAgendamento?.real,'pct')} → ${fmt(dB.taxaAgendamento?.real,'pct')}.`});
   const dC=dd('taxaConversao');if(dC!==null)ins.push({c:Math.abs(dC)<5?'#00b4dc':dC>=0?'#00d4a8':'#ff5c7a',t:`Conversão: ${dC>=0?'▲':'▼'} ${Math.abs(dC).toFixed(1)}%`,x:`${fmt(dA.taxaConversao?.real,'pct')} → ${fmt(dB.taxaConversao?.real,'pct')}.`});
-  const dRoas=dd('roas');if(dRoas!==null)ins.push({c:dRoas>=0?'#00d4a8':'#ff5c7a',t:`ROAS: ${dRoas>=0?'Melhorou':'Piorou'}`,x:`${fmt(dA.roas?.real,'pct')} → ${fmt(dB.roas?.real,'pct')}.`});
+  const dRoas=dd('roas');if(dRoas!==null)ins.push({c:dRoas>=0?'#00d4a8':'#ff5c7a',t:`ROAS: ${dRoas>=0?'Melhorou':'Piorou'}`,x:`${fmt(dA.roas?.real,'brl')} → ${fmt(dB.roas?.real,'brl')}.`});
   document.getElementById('cmp-insights').innerHTML=`<h2>🔍 ${nA} vs ${nB}</h2>${ins.map(i=>`<div class="insight" style="border-color:${i.c}"><strong>${i.t}</strong>${i.x}</div>`).join('')}`;
 }
 
