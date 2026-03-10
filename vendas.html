@@ -3,193 +3,236 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vendas Pro Buffet</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<title>Vendas Pro Buffet — Dashboard</title>
 <style>
-:root{
-  --bg:#001830;--surface:#002654;--surface2:#003068;--border:#0a4080;
-  --accent:#00b4dc;--text:#e8f4ff;--muted:#5a8ab0;
-  --good:#00d4a8;--warn:#f0b429;--bad:#ff5c7a;--gold:#ffd166;
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+:root {
+  --bg:#001830;
+  --surface:#002654;
+  --surface2:#003068;
+  --border:#0a4080;
+  --accent:#00b4dc;
+  --accent2:#0090b8;
+  --navy:#003c78;
+  --text:#e8f4ff;
+  --muted:#5a8ab0;
+  --good:#00d4a8;
+  --warn:#f0b429;
+  --bad:#ff5c7a;
 }
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;padding:28px 20px 80px}
+body{background:var(--bg);color:var(--text);font-family:'Montserrat',sans-serif;min-height:100vh;padding:24px 16px 60px}
 
-.header{text-align:center;margin-bottom:32px}
-.header h1{font-family:'Syne',sans-serif;font-size:clamp(1.4rem,3vw,2.2rem);font-weight:800;background:linear-gradient(135deg,#00b4dc,#0090ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.header p{color:var(--muted);font-size:.8rem;margin-top:6px}
+/* HEADER — igual ao index */
+.header{text-align:center;margin-bottom:28px}
+.header h1{font-size:clamp(1.2rem,3vw,1.8rem);font-weight:800;letter-spacing:-.03em;background:linear-gradient(135deg,#00b4dc,#0090ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+.live-badge{display:inline-flex;align-items:center;gap:6px;background:#001c40;border:1px solid #00b4dc40;border-radius:999px;padding:4px 14px;font-size:.7rem;font-weight:700;color:var(--accent);letter-spacing:.06em;text-transform:uppercase}
+.live-dot{width:7px;height:7px;background:var(--accent);border-radius:50%;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.4)}}
+.last-update{margin-top:6px;font-size:.7rem;color:var(--muted)}
 
-.year-tabs{display:flex;justify-content:center;gap:8px;margin-bottom:28px}
-.ytab{padding:10px 28px;border-radius:999px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s}
-.ytab.active{border-color:var(--accent);color:var(--accent);background:#00b4dc14}
-.ytab:hover:not(.active){border-color:var(--accent);color:var(--text)}
+/* BACK LINK */
+.back-link{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:.72rem;font-weight:700;text-decoration:none;letter-spacing:.04em;text-transform:uppercase;margin-bottom:20px;transition:color .2s}
+.back-link:hover{color:var(--accent)}
 
+/* MAIN NAV TABS — igual ao index */
+.main-tabs{display:flex;justify-content:center;gap:6px;margin-bottom:28px;flex-wrap:wrap}
+.main-tab{padding:9px 24px;border-radius:999px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-family:'Montserrat',sans-serif;font-size:.8rem;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.02em}
+.main-tab:hover{border-color:var(--accent);color:var(--text)}
+.main-tab.active{border-color:var(--accent);color:var(--accent);background:#00b4dc14}
+
+/* MONTH TABS — igual ao index */
 .month-tabs{display:flex;justify-content:center;gap:6px;margin-bottom:24px;flex-wrap:wrap}
-.mtab{padding:7px 18px;border-radius:999px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.75rem;font-weight:600;cursor:pointer;transition:all .2s}
+.mtab{padding:7px 18px;border-radius:999px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-family:'Montserrat',sans-serif;font-size:.75rem;font-weight:700;cursor:pointer;transition:all .2s}
+.mtab:hover{border-color:var(--accent);color:var(--text)}
 .mtab.active{border-color:var(--accent);color:var(--accent);background:#00b4dc14}
 
-.kpi-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;margin-bottom:24px;max-width:1100px;margin-left:auto;margin-right:auto}
-.kpi{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 20px}
-.kpi-icon{font-size:1.2rem;margin-bottom:8px}
-.kpi-val{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;color:var(--accent);line-height:1}
-.kpi-val.gold{color:var(--gold)}
-.kpi-val.good{color:var(--good)}
-.kpi-label{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-top:6px}
-.kpi-sub{font-size:.68rem;color:var(--muted);margin-top:3px}
+/* PANEL */
+.panel{display:none}.panel.visible{display:block}
 
-.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:1100px;margin:0 auto 24px}
-@media(max-width:700px){.charts-grid{grid-template-columns:1fr}}
-.chart-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 22px}
+/* CARDS GRID — igual ao index */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:10px;margin-bottom:28px;max-width:1060px;margin-left:auto;margin-right:auto}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;position:relative;overflow:hidden;transition:transform .15s}
+.card:hover{transform:translateY(-2px)}
+.card::before{content:'';position:absolute;top:0;left:0;width:100%;height:3px}
+.card.good::before{background:var(--good)}.card.warn::before{background:var(--warn)}.card.bad::before{background:var(--bad)}.card.neutral::before{background:var(--accent)}
+.card .cn{font-size:.66rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:7px;font-weight:600}
+.card .cv{font-size:1.2rem;font-weight:800}
+.card .cp{font-size:.7rem;color:var(--muted);margin-top:3px}
+
+/* SEC LABEL — igual ao index */
+.sec-label{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);padding:16px 0 10px;border-bottom:1px solid var(--border);margin-bottom:12px;max-width:1060px;margin-left:auto;margin-right:auto}
+
+/* CHART BOXES */
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:1060px;margin:0 auto 28px}
+@media(max-width:680px){.charts-grid{grid-template-columns:1fr}}
+.chart-box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 20px}
 .chart-box.wide{grid-column:1/-1}
-.chart-title{font-family:'Syne',sans-serif;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:14px}
-.chart-wrap{position:relative;height:220px}
-.chart-wrap.tall{height:260px}
+.chart-title{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:14px}
+.chart-wrap{position:relative;height:210px}
+.chart-wrap.tall{height:250px}
 
-.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 22px;max-width:1100px;margin:0 auto 28px;overflow-x:auto}
-.table-title{font-family:'Syne',sans-serif;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:14px}
-table{width:100%;border-collapse:collapse;font-size:.74rem}
-th{color:var(--muted);font-weight:700;text-transform:uppercase;font-size:.6rem;letter-spacing:.05em;padding:8px 12px;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
-td{padding:9px 12px;border-bottom:1px solid #0a408028;white-space:nowrap}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:#00b4dc07}
-.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:.58rem;font-weight:700}
+/* TABLE */
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 20px;max-width:1060px;margin:0 auto 28px;overflow-x:auto}
+.table-title{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:14px}
+table{width:100%;border-collapse:collapse;font-size:.75rem}
+th{font-size:.64rem;text-transform:uppercase;letter-spacing:.06em;padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);color:var(--muted);font-weight:700;white-space:nowrap}
+td{padding:9px 12px;border-bottom:1px solid #13192a;white-space:nowrap;font-size:.78rem}
+tr:hover td{background:#0d1220}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:.6rem;font-weight:700}
 .badge-meta{background:#00b4dc18;color:var(--accent)}
 .badge-google{background:#f0b42918;color:var(--warn)}
 .badge-bio{background:#a78bfa18;color:#a78bfa}
 .badge-live{background:#ff5c7a18;color:var(--bad)}
-.badge-com{background:#ffd16618;color:var(--gold)}
+.badge-com{background:#ffd16618;color:#ffd166}
 
-.annual-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px;max-width:1100px;margin:0 auto 24px}
-.month-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px}
-.mc-month{font-family:'Syne',sans-serif;font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
-.mc-ltv{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:var(--accent)}
-.mc-vendas{font-size:.66rem;color:var(--muted);margin-top:4px}
-.mc-bar{height:4px;background:var(--border);border-radius:2px;margin-top:10px}
+/* MONTH CARDS 2025 */
+.month-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px;max-width:1060px;margin:0 auto 28px}
+.mc{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.mc-name{font-size:.66rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:6px;font-weight:700}
+.mc-val{font-size:1.1rem;font-weight:800;color:var(--accent)}
+.mc-sub{font-size:.68rem;color:var(--muted);margin-top:3px}
+.mc-bar{height:3px;background:var(--border);border-radius:2px;margin-top:10px}
 .mc-bar-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--accent),var(--good))}
 
-.vs-row{display:flex;align-items:center;gap:10px;max-width:1100px;margin:0 auto 20px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 20px;flex-wrap:wrap}
+/* VS COMPARE ROW */
+.vs-row{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 20px;max-width:1060px;margin:0 auto 24px;display:flex;flex-wrap:wrap;gap:16px;align-items:center}
 .vs-item{flex:1;min-width:130px}
-.vs-label{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:4px}
-.vs-val{font-family:'Syne',sans-serif;font-size:1rem;font-weight:800}
-.vs-div{color:var(--muted);font-size:1.1rem}
-.vs-delta{font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:999px}
-.vs-up{background:#00d4a820;color:var(--good)}
-.vs-down{background:#ff5c7a20;color:var(--bad)}
+.vs-lbl{font-size:.62rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:700;margin-bottom:4px}
+.vs-val{font-size:1rem;font-weight:800}
+.vs-sep{color:var(--muted);font-size:1rem;font-weight:300}
+.delta-chip{display:inline-block;padding:3px 10px;border-radius:999px;font-size:.7rem;font-weight:700}
+.delta-up{background:#00d4a820;color:var(--good)}
+.delta-down{background:#ff5c7a20;color:var(--bad)}
 
-.year-panel{display:none}.year-panel.visible{display:block}
-#loading{text-align:center;padding:60px;color:var(--muted)}
-.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 14px}
+/* LOADING */
+#loading{text-align:center;padding:60px 20px;color:var(--muted)}
+.spinner{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 14px}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* INSIGHTS — igual ao index */
+.insights-box{max-width:1060px;margin:0 auto 28px}
+.insights-box h2{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:12px}
+.insight{border-left:3px solid;padding:11px 14px;background:var(--surface);border-radius:0 8px 8px 0;margin-bottom:8px;font-size:.8rem;line-height:1.6}
+.insight strong{display:block;margin-bottom:2px;font-size:.67rem;text-transform:uppercase;letter-spacing:.06em;font-weight:800}
 </style>
 </head>
 <body>
 
 <div class="header">
+  <a class="back-link" href="index.html">← KPI Dashboard</a>
   <h1>💰 Dashboard de Vendas — Pro Buffet</h1>
-  <p id="last-update">Carregando...</p>
+  <div class="live-badge"><span class="live-dot"></span>LIVE</div>
+  <div class="last-update" id="last-update">Carregando...</div>
 </div>
 
-<div class="year-tabs">
-  <button class="ytab active" onclick="switchYear('2026',this)">📊 2026</button>
-  <button class="ytab" onclick="switchYear('2025',this)">📅 2025</button>
-  <button class="ytab" onclick="switchYear('compare',this)">⚖️ Comparar Anos</button>
+<div class="main-tabs">
+  <button class="main-tab active" onclick="switchPanel('2026',this)">📊 2026</button>
+  <button class="main-tab" onclick="switchPanel('2025',this)">📅 2025</button>
+  <button class="main-tab" onclick="switchPanel('compare',this)">⚖️ Comparar Anos</button>
 </div>
 
 <div id="loading"><div class="spinner"></div>Carregando dados das planilhas...</div>
 <div id="app" style="display:none">
 
-  <!-- 2026 -->
-  <div id="panel-2026" class="year-panel visible">
+  <!-- ══ 2026 ══ -->
+  <div id="panel-2026" class="panel visible">
     <div class="month-tabs" id="tabs-2026"></div>
-    <div id="kpis-2026" class="kpi-row"></div>
+
+    <div class="sec-label">📌 Resumo do Mês</div>
+    <div class="cards-grid" id="cards-2026"></div>
+
     <div class="charts-grid">
-      <div class="chart-box"><div class="chart-title">📈 Receita Mensal 2026</div><div class="chart-wrap"><canvas id="ch-receita26"></canvas></div></div>
+      <div class="chart-box"><div class="chart-title">📈 Receita por Mês</div><div class="chart-wrap"><canvas id="ch-rec26"></canvas></div></div>
       <div class="chart-box"><div class="chart-title">🎯 Fonte dos Leads</div><div class="chart-wrap"><canvas id="ch-fonte26"></canvas></div></div>
-      <div class="chart-box wide"><div class="chart-title">👥 Performance por Closer</div><div class="chart-wrap tall"><canvas id="ch-closer26"></canvas></div></div>
+      <div class="chart-box wide"><div class="chart-title">👥 Vendas por Closer</div><div class="chart-wrap tall"><canvas id="ch-closer26"></canvas></div></div>
     </div>
+
+    <div class="insights-box" id="insights-2026"></div>
+
     <div class="table-wrap">
-      <div class="table-title" id="tbl-title26">📋 Vendas do Mês</div>
+      <div class="table-title" id="tbl-title26">📋 Clientes do Mês</div>
       <div id="tbl-26"></div>
     </div>
   </div>
 
-  <!-- 2025 -->
-  <div id="panel-2025" class="year-panel">
-    <div class="kpi-row" id="kpis-2025"></div>
+  <!-- ══ 2025 ══ -->
+  <div id="panel-2025" class="panel">
+    <div class="sec-label">📌 Resumo Anual 2025</div>
+    <div class="cards-grid" id="cards-2025"></div>
+
     <div class="charts-grid">
       <div class="chart-box wide"><div class="chart-title">📈 LTV Mensal + Acumulado 2025</div><div class="chart-wrap"><canvas id="ch-ltv25"></canvas></div></div>
-      <div class="chart-box"><div class="chart-title">🏆 Vendas por Mês</div><div class="chart-wrap"><canvas id="ch-vendas25"></canvas></div></div>
-      <div class="chart-box"><div class="chart-title">💰 Mensalidade vs Implantação</div><div class="chart-wrap"><canvas id="ch-receita25"></canvas></div></div>
+      <div class="chart-box"><div class="chart-title">🏆 Qtd. Vendas por Mês</div><div class="chart-wrap"><canvas id="ch-vend25"></canvas></div></div>
+      <div class="chart-box"><div class="chart-title">💰 Mensalidade vs Implantação</div><div class="chart-wrap"><canvas id="ch-rec25"></canvas></div></div>
     </div>
-    <div class="annual-grid" id="cards-2025"></div>
+
+    <div class="sec-label">📅 Meses 2025</div>
+    <div class="month-cards" id="mcards-2025"></div>
   </div>
 
-  <!-- Compare -->
-  <div id="panel-compare" class="year-panel">
-    <div class="vs-row" id="vs-summary"></div>
+  <!-- ══ COMPARE ══ -->
+  <div id="panel-compare" class="panel">
+    <div class="sec-label">⚖️ Comparativo 2025 vs 2026</div>
+    <div class="vs-row" id="vs-row"></div>
+
     <div class="charts-grid">
-      <div class="chart-box wide"><div class="chart-title">⚖️ LTV por Mês — 2025 vs 2026</div><div class="chart-wrap"><canvas id="ch-vs-ltv"></canvas></div></div>
-      <div class="chart-box"><div class="chart-title">🏆 Qtd. Vendas por Mês</div><div class="chart-wrap"><canvas id="ch-vs-vendas"></canvas></div></div>
-      <div class="chart-box"><div class="chart-title">🎯 Ticket Médio Mensal</div><div class="chart-wrap"><canvas id="ch-vs-ticket"></canvas></div></div>
+      <div class="chart-box wide"><div class="chart-title">📊 LTV por Mês — 2025 vs 2026</div><div class="chart-wrap"><canvas id="ch-vs-ltv"></canvas></div></div>
+      <div class="chart-box"><div class="chart-title">🏆 Qtd. Vendas</div><div class="chart-wrap"><canvas id="ch-vs-vend"></canvas></div></div>
+      <div class="chart-box"><div class="chart-title">🎯 Ticket Médio</div><div class="chart-wrap"><canvas id="ch-vs-tick"></canvas></div></div>
     </div>
+
+    <div class="insights-box" id="insights-compare"></div>
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
-const ID26 = '1dDXLQx_MTlB9V7T12G_RZa3Z8QjKjG7FGsp8Fp9GiKk';
-const ID25 = '1UYnpBz2vnZxEmN2CIpsnl98jN4vTk6yn0beL8oFK3qo';
-
-// Months config with their column layout
-// Each month: hasContrato = whether col0 is CONTRATO status
-const MONTHS26 = [
-  {key:'JANEIRO/26',  label:'Janeiro',  hasContrato:true},
-  {key:'FEVEREIRO/26',label:'Fevereiro',hasContrato:false},
-  {key:'MARÇO/26',    label:'Março',    hasContrato:false},
+const ID26='1dDXLQx_MTlB9V7T12G_RZa3Z8QjKjG7FGsp8Fp9GiKk';
+const ID25='1UYnpBz2vnZxEmN2CIpsnl98jN4vTk6yn0beL8oFK3qo';
+const MONTHS26=[
+  {key:'JANEIRO/26',  label:'Janeiro',  off:true},
+  {key:'FEVEREIRO/26',label:'Fevereiro',off:false},
+  {key:'MARÇO/26',    label:'Março',    off:false},
 ];
+const AC='#00b4dc',GD='#00d4a8',WN='#f0b429',BD='#ff5c7a',GL='#ffd166';
+const PAL=[AC,'#0090ff',GD,GL,WN,BD,'#a78bfa','#60a5fa'];
 
-const ACCENT='#00b4dc', GOOD='#00d4a8', WARN='#f0b429', BAD='#ff5c7a', GOLD='#ffd166';
-const PALETTE=[ACCENT,'#0090ff',GOOD,GOLD,WARN,BAD,'#a78bfa','#00a0e8'];
+let d26={},d25=[],activeMon='JANEIRO/26',charts={};
 
-let data26={}, data25=[], activeMonth='JANEIRO/26', charts={};
-
-// ── Helpers ──────────────────────────────────────────────
-const brl = v => (v===null||v===undefined||v===''||isNaN(Number(v))) ? '—' :
-  'R$ '+Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-const num = v => Number(v)||0;
+const brl=v=>(v===null||v===undefined||isNaN(Number(v)))
+  ?'—':'R$ '+Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const num=v=>Number(v)||0;
 
 function srcBadge(s){
   if(!s)return '';
   const t=String(s).toLowerCase();
-  if(t.includes('meta'))return `<span class="badge badge-meta">Meta</span>`;
-  if(t.includes('google'))return `<span class="badge badge-google">Google</span>`;
-  if(t.includes('bio')||t.includes('link'))return `<span class="badge badge-bio">Link Bio</span>`;
-  if(t.includes('live'))return `<span class="badge badge-live">Live</span>`;
-  if(t.includes('comuni'))return `<span class="badge badge-com">Comunidade</span>`;
-  if(t.includes('indica'))return `<span class="badge badge-com">Indicação</span>`;
-  if(t.includes('jÁ tinha')||t.includes('ja tinha'))return `<span class="badge badge-bio">Já tinha</span>`;
-  return `<span class="badge badge-meta">${s}</span>`;
+  if(t.includes('meta'))return`<span class="badge badge-meta">Meta</span>`;
+  if(t.includes('google'))return`<span class="badge badge-google">Google</span>`;
+  if(t.includes('bio')||t.includes('link'))return`<span class="badge badge-bio">Link Bio</span>`;
+  if(t.includes('live'))return`<span class="badge badge-live">Live</span>`;
+  if(t.includes('comuni')||t.includes('indica')||t.includes('já')||t.includes('ja'))
+    return`<span class="badge badge-com">${s}</span>`;
+  return`<span class="badge badge-meta">${s}</span>`;
 }
 
 function mkChart(id,type,data,extra={}){
   if(charts[id]){charts[id].destroy();delete charts[id];}
-  const el=document.getElementById(id);
-  if(!el)return;
+  const el=document.getElementById(id);if(!el)return;
   charts[id]=new Chart(el,{type,data,options:{
-    responsive:true,maintainAspectRatio:false,
-    animation:{duration:400},
+    responsive:true,maintainAspectRatio:false,animation:{duration:350},
     plugins:{
-      legend:{labels:{color:'#5a8ab0',font:{size:9,family:'DM Sans',weight:'600'},boxWidth:10,padding:10}},
-      tooltip:{backgroundColor:'#002654',borderColor:'#0a4080',borderWidth:1,titleColor:'#e8f4ff',bodyColor:'#5a8ab0',padding:10}
+      legend:{labels:{color:'#5a8ab0',font:{size:9,family:'Montserrat',weight:'600'},boxWidth:10,padding:10}},
+      tooltip:{backgroundColor:'#002654',borderColor:'#0a4080',borderWidth:1,titleColor:'#e8f4ff',bodyColor:'#5a8ab0',padding:10,titleFont:{family:'Montserrat'},bodyFont:{family:'Montserrat'}}
     },
-    scales: (type==='pie'||type==='doughnut') ? {} : {
-      x:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'DM Sans',weight:'600'}}},
-      y:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'DM Sans'}}}
+    scales:(type==='pie'||type==='doughnut')?{}:{
+      x:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat',weight:'600'}}},
+      y:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat'}}}
     },
     ...extra
   }});
 }
 
-// ── Fetch ────────────────────────────────────────────────
 async function fetchSheet(id,sheet){
   const url=`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheet)}`;
   const res=await fetch(url);
@@ -198,140 +241,118 @@ async function fetchSheet(id,sheet){
   return json.table.rows.map(r=>(r.c||[]).map(c=>(!c||c.v===null)?null:c.v));
 }
 
-// Parse a date cell (either "Date(y,m,d)" string or already a string)
 function parseDate(v){
   if(!v)return null;
-  const s=String(v);
-  const m=s.match(/Date\((\d+),(\d+),(\d+)\)/);
-  if(m)return new Date(+m[1],+m[2],+m[3]);
-  return new Date(s);
+  const m=String(v).match(/Date\((\d+),(\d+),(\d+)\)/);
+  return m?new Date(+m[1],+m[2],+m[3]):null;
 }
 
-// ── Load all data ────────────────────────────────────────
 async function loadAll(){
-  // ── 2026 ──
+  // 2026
   for(const cfg of MONTHS26){
     try{
       const rows=await fetchSheet(ID26,cfg.key);
-      // row[0]=summary, row[1]=header labels, row[2+]=data
-      const dataRows=rows.slice(2).filter(r=>r&&(r[cfg.hasContrato?2:1])&&String(r[cfg.hasContrato?2:1]).trim());
-
-      // Column offsets depending on whether this month has CONTRATO col
-      const off=cfg.hasContrato?1:0; // extra offset when CONTRATO col exists
-      // Jan: [0]=contrato,[1]=data,[2]=nome,[3]=coletado,[4]=mens,[5]=impl,[6]=fonte,[7]=meses,[8]=ltv,[9]=sdr,[10]=closer
-      // Fev/Mar: [0]=data,[1]=nome,[2]=coletado,[3]=mens,[4]=impl,[5]=fonte,[6]=meses,[7]=ltv,[8]=sdr,[9]=closer
-
+      const dataRows=rows.slice(2).filter(r=>r&&r[cfg.off?2:1]&&String(r[cfg.off?2:1]).trim());
       const parsed=dataRows.map(r=>({
-        raw:r,
-        contrato: cfg.hasContrato ? String(r[0]||'').trim() : 'Ok',
-        data: parseDate(r[off+0]),  // col1 for jan, col0 for fev/mar
-        // Wait - let me use explicit indexes:
-        nome:   String(r[cfg.hasContrato?2:1]||'').trim(),
-        coletado: num(r[cfg.hasContrato?3:2]),
-        mens:   num(r[cfg.hasContrato?4:3]),
-        impl:   num(r[cfg.hasContrato?5:4]),
-        fonte:  String(r[cfg.hasContrato?6:5]||'').trim(),
-        meses:  num(r[cfg.hasContrato?7:6]),
-        ltv:    num(r[cfg.hasContrato?8:7]),
-        sdr:    String(r[cfg.hasContrato?9:8]||'').trim(),
-        closer: String(r[cfg.hasContrato?10:9]||'').trim(),
+        nome:   String(r[cfg.off?2:1]||'').trim(),
+        data:   parseDate(r[cfg.off?1:0]),
+        colet:  num(r[cfg.off?3:2]),
+        mens:   num(r[cfg.off?4:3]),
+        impl:   num(r[cfg.off?5:4]),
+        fonte:  String(r[cfg.off?6:5]||'').trim(),
+        meses:  num(r[cfg.off?7:6]),
+        ltv:    num(r[cfg.off?8:7]),
+        sdr:    String(r[cfg.off?9:8]||'').trim(),
+        closer: String(r[cfg.off?10:9]||'').trim(),
       }));
-
       const ltv=parsed.reduce((s,r)=>s+r.ltv,0);
       const mens=parsed.reduce((s,r)=>s+r.mens,0);
       const impl=parsed.reduce((s,r)=>s+r.impl,0);
-      const coletado=parsed.reduce((s,r)=>s+r.coletado,0);
-
-      const sources={}, closers={};
-      parsed.forEach(r=>{
-        if(r.fonte)sources[r.fonte]=(sources[r.fonte]||0)+1;
-        if(r.closer)closers[r.closer]=(closers[r.closer]||0)+1;
-      });
-
-      data26[cfg.key]={rows:parsed,count:parsed.length,ltv,mens,impl,coletado,sources,closers,label:cfg.label};
+      const colet=parsed.reduce((s,r)=>s+r.colet,0);
+      const src={},cls={};
+      parsed.forEach(r=>{if(r.fonte)src[r.fonte]=(src[r.fonte]||0)+1;if(r.closer)cls[r.closer]=(cls[r.closer]||0)+1;});
+      d26[cfg.key]={rows:parsed,count:parsed.length,ltv,mens,impl,colet,src,cls,label:cfg.label};
     }catch(e){
-      console.error('Error loading',cfg.key,e);
-      data26[cfg.key]={rows:[],count:0,ltv:0,mens:0,impl:0,coletado:0,sources:{},closers:{},label:cfg.label};
+      d26[cfg.key]={rows:[],count:0,ltv:0,mens:0,impl:0,colet:0,src:{},cls:{},label:cfg.label};
     }
   }
-
-  // ── 2025 ──
+  // 2025
   try{
     const rows=await fetchSheet(ID25,'Base de Dados');
-    data25=rows.filter(r=>r&&r[0]&&String(r[0]).trim()).map(r=>({
+    d25=rows.filter(r=>r&&r[0]&&String(r[0]).trim()).map(r=>({
       mes:String(r[0]),ltv:num(r[1]),mens:num(r[2]),impl:num(r[3]),vendas:num(r[4])
     }));
-  }catch(e){console.error('Error 2025',e);data25=[];}
+  }catch(e){d25=[];}
 
-  // Render
-  render2026();
-  render2025();
-  renderCompare();
-
+  render2026();render2025();renderCompare();
   document.getElementById('loading').style.display='none';
   document.getElementById('app').style.display='block';
   document.getElementById('last-update').textContent='Atualizado: '+new Date().toLocaleString('pt-BR');
 }
 
-// ── Render 2026 ──────────────────────────────────────────
-function render2026(monthKey){
-  if(monthKey)activeMonth=monthKey;
-  const d=data26[activeMonth];
-  if(!d){return;}
+function render2026(mk){
+  if(mk)activeMon=mk;
+  const d=d26[activeMon];if(!d)return;
 
   // Tabs
   document.getElementById('tabs-2026').innerHTML=MONTHS26.map(m=>
-    `<button class="mtab${m.key===activeMonth?' active':''}" onclick="render2026('${m.key}')">${m.label}</button>`
+    `<button class="mtab${m.key===activeMon?' active':''}" onclick="render2026('${m.key}')">${m.label}</button>`
   ).join('');
 
-  // KPIs
-  const totalLTV=Object.values(data26).reduce((s,v)=>s+v.ltv,0);
-  const totalVendas=Object.values(data26).reduce((s,v)=>s+v.count,0);
+  // Cards
+  const totLTV=Object.values(d26).reduce((s,v)=>s+v.ltv,0);
+  const totVend=Object.values(d26).reduce((s,v)=>s+v.count,0);
   const ticket=d.count>0?d.mens/d.count:0;
-  document.getElementById('kpis-2026').innerHTML=`
-    <div class="kpi"><div class="kpi-icon">🏆</div><div class="kpi-val gold">${d.count}</div><div class="kpi-label">Vendas no Mês</div><div class="kpi-sub">Total 2026: ${totalVendas}</div></div>
-    <div class="kpi"><div class="kpi-icon">💰</div><div class="kpi-val">${brl(d.ltv)}</div><div class="kpi-label">LTV do Mês</div><div class="kpi-sub">Total: ${brl(totalLTV)}</div></div>
-    <div class="kpi"><div class="kpi-icon">📋</div><div class="kpi-val">${brl(d.mens)}</div><div class="kpi-label">Mensalidade</div><div class="kpi-sub">Implant: ${brl(d.impl)}</div></div>
-    <div class="kpi"><div class="kpi-icon">🎯</div><div class="kpi-val good">${brl(ticket)}</div><div class="kpi-label">Ticket Médio</div><div class="kpi-sub">Mens/venda</div></div>
-    <div class="kpi"><div class="kpi-icon">💵</div><div class="kpi-val">${brl(d.coletado)}</div><div class="kpi-label">Coletado</div></div>
+  document.getElementById('cards-2026').innerHTML=`
+    <div class="card warn"><div class="cn">Vendas no Mês</div><div class="cv" style="color:${GL}">${d.count}</div><div class="cp">Total 2026: ${totVend}</div></div>
+    <div class="card neutral"><div class="cn">LTV do Mês</div><div class="cv" style="color:${AC}">${brl(d.ltv)}</div><div class="cp">Total: ${brl(totLTV)}</div></div>
+    <div class="card neutral"><div class="cn">Mensalidade</div><div class="cv" style="color:${AC}">${brl(d.mens)}</div><div class="cp">Implant: ${brl(d.impl)}</div></div>
+    <div class="card good"><div class="cn">Ticket Médio</div><div class="cv" style="color:${GD}">${brl(ticket)}</div><div class="cp">Mens/venda</div></div>
+    <div class="card neutral"><div class="cn">Coletado</div><div class="cv" style="color:${AC}">${brl(d.colet)}</div></div>
   `;
 
   // Chart receita
-  const mLabels=MONTHS26.map(m=>m.label);
-  mkChart('ch-receita26','bar',{
-    labels:mLabels,
+  mkChart('ch-rec26','bar',{
+    labels:MONTHS26.map(m=>m.label),
     datasets:[
-      {label:'LTV',data:MONTHS26.map(m=>data26[m.key]?.ltv||0),backgroundColor:ACCENT+'99',borderColor:ACCENT,borderWidth:2,borderRadius:6},
-      {label:'Mensalidade',data:MONTHS26.map(m=>data26[m.key]?.mens||0),backgroundColor:GOOD+'77',borderColor:GOOD,borderWidth:2,borderRadius:6},
+      {label:'LTV',data:MONTHS26.map(m=>d26[m.key]?.ltv||0),backgroundColor:AC+'99',borderColor:AC,borderWidth:2,borderRadius:5},
+      {label:'Mensalidade',data:MONTHS26.map(m=>d26[m.key]?.mens||0),backgroundColor:GD+'77',borderColor:GD,borderWidth:2,borderRadius:5},
     ]
-  },{scales:{y:{ticks:{color:'#5a8ab0',font:{size:8},callback:v=>'R$'+Math.round(v/1000)+'k'},grid:{color:'#0a408020'}},x:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,weight:'600'}}}}});
+  },{scales:{y:{ticks:{callback:v=>'R$'+Math.round(v/1000)+'k',color:'#5a8ab0',font:{size:8,family:'Montserrat'}},grid:{color:'#0a408020'}},x:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat',weight:'600'}}}}});
 
   // Chart fonte
-  const fontes=Object.entries(d.sources).sort((a,b)=>b[1]-a[1]);
+  const fontes=Object.entries(d.src).sort((a,b)=>b[1]-a[1]);
   if(fontes.length){
     mkChart('ch-fonte26','doughnut',{
       labels:fontes.map(f=>f[0]),
-      datasets:[{data:fontes.map(f=>f[1]),backgroundColor:PALETTE.slice(0,fontes.length),borderWidth:2,borderColor:'#002654'}]
-    },{plugins:{legend:{position:'right',labels:{color:'#5a8ab0',font:{size:9},boxWidth:10,padding:10}}}});
+      datasets:[{data:fontes.map(f=>f[1]),backgroundColor:PAL.slice(0,fontes.length),borderWidth:2,borderColor:'#002654'}]
+    },{plugins:{legend:{position:'right',labels:{color:'#5a8ab0',font:{size:9,family:'Montserrat',weight:'600'},boxWidth:10,padding:8}}}});
   }
 
-  // Chart closer (all months stacked)
-  const allClosers={};
-  MONTHS26.forEach(m=>Object.entries(data26[m.key]?.closers||{}).forEach(([c,v])=>{allClosers[c]=(allClosers[c]||0)+v;}));
-  const closerList=Object.entries(allClosers).sort((a,b)=>b[1]-a[1]);
+  // Chart closers
+  const allCls={};
+  MONTHS26.forEach(m=>Object.entries(d26[m.key]?.cls||{}).forEach(([c,v])=>{allCls[c]=(allCls[c]||0)+v;}));
+  const clList=Object.entries(allCls).sort((a,b)=>b[1]-a[1]);
   mkChart('ch-closer26','bar',{
-    labels:mLabels,
-    datasets:closerList.map((c,i)=>({
-      label:c[0],
-      data:MONTHS26.map(m=>data26[m.key]?.closers?.[c[0]]||0),
-      backgroundColor:PALETTE[i%PALETTE.length]+'aa',
-      borderColor:PALETTE[i%PALETTE.length],
-      borderWidth:2,borderRadius:4
+    labels:MONTHS26.map(m=>m.label),
+    datasets:clList.map((c,i)=>({
+      label:c[0],data:MONTHS26.map(m=>d26[m.key]?.cls?.[c[0]]||0),
+      backgroundColor:PAL[i%PAL.length]+'99',borderColor:PAL[i%PAL.length],borderWidth:2,borderRadius:4
     }))
-  },{scales:{x:{stacked:true,grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,weight:'600'}}},y:{stacked:true,grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8}}}},plugins:{legend:{position:'bottom',labels:{color:'#5a8ab0',font:{size:9},boxWidth:10,padding:10}}}});
+  },{scales:{x:{stacked:true,grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat',weight:'600'}}},y:{stacked:true,grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat'}}}},plugins:{legend:{position:'bottom',labels:{color:'#5a8ab0',font:{size:9,family:'Montserrat',weight:'600'},boxWidth:10,padding:8}}}});
+
+  // Insights
+  const top=Object.entries(d.src).sort((a,b)=>b[1]-a[1])[0];
+  const topCl=Object.entries(d.cls).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('insights-2026').innerHTML=`
+    <h2>💡 Insights — ${d.label}</h2>
+    ${top?`<div class="insight" style="border-color:${AC}"><strong>🎯 Principal Fonte</strong>${top[0]} gerou ${top[1]} venda${top[1]>1?'s':''} neste mês.</div>`:''}
+    ${topCl?`<div class="insight" style="border-color:${GD}"><strong>🏆 Melhor Closer</strong>${topCl[0]} fechou ${topCl[1]} venda${topCl[1]>1?'s':''} em ${d.label}.</div>`:''}
+    ${d.impl>0?`<div class="insight" style="border-color:${WN}"><strong>⚡ Implantações</strong>Total de ${brl(d.impl)} em implantações — ${((d.impl/(d.ltv||1))*100).toFixed(0)}% do LTV do mês.</div>`:''}
+  `;
 
   // Table
-  document.getElementById('tbl-title26').textContent=`📋 Vendas — ${d.label} 2026 (${d.rows.length} clientes)`;
+  document.getElementById('tbl-title26').textContent=`📋 Clientes — ${d.label} 2026 (${d.rows.length})`;
   const sorted=[...d.rows].sort((a,b)=>(a.data||0)-(b.data||0));
   document.getElementById('tbl-26').innerHTML=`<table>
     <thead><tr><th>Data</th><th>Cliente</th><th>Mensalidade</th><th>Implant.</th><th>Meses</th><th>LTV</th><th>Fonte</th><th>SDR</th><th>Closer</th></tr></thead>
@@ -341,135 +362,138 @@ function render2026(monthKey){
       <td>${brl(r.mens)}</td>
       <td>${r.impl>0?brl(r.impl):'—'}</td>
       <td>${r.meses||'—'}</td>
-      <td style="color:var(--accent);font-weight:700">${brl(r.ltv)}</td>
+      <td style="color:${AC};font-weight:700">${brl(r.ltv)}</td>
       <td>${srcBadge(r.fonte)}</td>
       <td style="color:var(--muted)">${r.sdr||'—'}</td>
-      <td style="color:var(--good);font-weight:600">${r.closer||'—'}</td>
+      <td style="color:${GD};font-weight:700">${r.closer||'—'}</td>
     </tr>`).join('')}</tbody>
   </table>`;
 }
 
-// ── Render 2025 ──────────────────────────────────────────
 function render2025(){
-  if(!data25.length)return;
-  const tLTV=data25.reduce((s,r)=>s+r.ltv,0);
-  const tVendas=data25.reduce((s,r)=>s+r.vendas,0);
-  const tMens=data25.reduce((s,r)=>s+r.mens,0);
-  const tImpl=data25.reduce((s,r)=>s+r.impl,0);
-  const best=data25.reduce((a,b)=>b.ltv>a.ltv?b:a,data25[0]);
-
-  document.getElementById('kpis-2025').innerHTML=`
-    <div class="kpi"><div class="kpi-icon">🏆</div><div class="kpi-val gold">${tVendas}</div><div class="kpi-label">Total Vendas 2025</div><div class="kpi-sub">${data25.length} meses</div></div>
-    <div class="kpi"><div class="kpi-icon">💰</div><div class="kpi-val">${brl(tLTV)}</div><div class="kpi-label">LTV Total 2025</div></div>
-    <div class="kpi"><div class="kpi-icon">📋</div><div class="kpi-val">${brl(tMens)}</div><div class="kpi-label">Mensalidades</div></div>
-    <div class="kpi"><div class="kpi-icon">⚡</div><div class="kpi-val good">${brl(tImpl)}</div><div class="kpi-label">Implantações</div></div>
-    <div class="kpi"><div class="kpi-icon">🥇</div><div class="kpi-val gold">${best.mes}</div><div class="kpi-label">Melhor Mês</div><div class="kpi-sub">${brl(best.ltv)}</div></div>
-    <div class="kpi"><div class="kpi-icon">🎯</div><div class="kpi-val">${brl(tVendas>0?tMens/tVendas:0)}</div><div class="kpi-label">Ticket Médio</div></div>
+  if(!d25.length)return;
+  const tL=d25.reduce((s,r)=>s+r.ltv,0);
+  const tV=d25.reduce((s,r)=>s+r.vendas,0);
+  const tM=d25.reduce((s,r)=>s+r.mens,0);
+  const tI=d25.reduce((s,r)=>s+r.impl,0);
+  const best=d25.reduce((a,b)=>b.ltv>a.ltv?b:a,d25[0]);
+  document.getElementById('cards-2025').innerHTML=`
+    <div class="card warn"><div class="cn">Total Vendas 2025</div><div class="cv" style="color:${GL}">${tV}</div><div class="cp">${d25.length} meses ativos</div></div>
+    <div class="card neutral"><div class="cn">LTV Total 2025</div><div class="cv" style="color:${AC}">${brl(tL)}</div></div>
+    <div class="card neutral"><div class="cn">Mensalidades</div><div class="cv" style="color:${AC}">${brl(tM)}</div></div>
+    <div class="card good"><div class="cn">Implantações</div><div class="cv" style="color:${GD}">${brl(tI)}</div></div>
+    <div class="card warn"><div class="cn">Melhor Mês</div><div class="cv" style="color:${GL}">${best.mes}</div><div class="cp">${brl(best.ltv)}</div></div>
+    <div class="card neutral"><div class="cn">Ticket Médio</div><div class="cv" style="color:${AC}">${brl(tV>0?tM/tV:0)}</div></div>
   `;
 
-  const labels=data25.map(r=>r.mes.slice(0,3));
-  let acum=0;
+  const lbs=d25.map(r=>r.mes.slice(0,3));
+  let ac=0;
   mkChart('ch-ltv25','line',{
-    labels,
+    labels:lbs,
     datasets:[
-      {label:'LTV Mensal',data:data25.map(r=>r.ltv),borderColor:ACCENT,backgroundColor:ACCENT+'22',pointBackgroundColor:ACCENT,pointRadius:5,borderWidth:2.5,tension:.35,fill:true},
-      {label:'Acumulado',data:data25.map(r=>{acum+=r.ltv;return acum;}),borderColor:GOOD,backgroundColor:'transparent',pointRadius:3,borderWidth:2,tension:.35,yAxisID:'y2'}
+      {label:'LTV Mensal',data:d25.map(r=>r.ltv),borderColor:AC,backgroundColor:AC+'22',pointBackgroundColor:AC,pointRadius:5,borderWidth:2.5,tension:.35,fill:true},
+      {label:'Acumulado',data:d25.map(r=>{ac+=r.ltv;return ac;}),borderColor:GD,backgroundColor:'transparent',pointRadius:3,borderWidth:2,tension:.35,yAxisID:'y2'}
     ]
-  },{scales:{
-    x:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,weight:'600'}}},
-    y:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8},callback:v=>'R$'+Math.round(v/1000)+'k'}},
-    y2:{position:'right',grid:{display:false},ticks:{color:GOOD,font:{size:8},callback:v=>'R$'+Math.round(v/1000)+'k'}}
-  },plugins:{legend:{labels:{color:'#5a8ab0',font:{size:9},boxWidth:10,padding:10}}}});
+  },{scales:{x:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat',weight:'600'}}},y:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat'},callback:v=>'R$'+Math.round(v/1000)+'k'}},y2:{position:'right',grid:{display:false},ticks:{color:GD,font:{size:8,family:'Montserrat'},callback:v=>'R$'+Math.round(v/1000)+'k'}}},plugins:{legend:{labels:{color:'#5a8ab0',font:{size:9,family:'Montserrat',weight:'600'},boxWidth:10,padding:10}}}});
 
-  const maxV=Math.max(...data25.map(r=>r.vendas),1);
-  mkChart('ch-vendas25','bar',{
-    labels,
-    datasets:[{label:'Vendas',data:data25.map(r=>r.vendas),
-      backgroundColor:data25.map(r=>r.vendas===maxV?GOLD+'cc':ACCENT+'88'),
-      borderColor:data25.map(r=>r.vendas===maxV?GOLD:ACCENT),
-      borderWidth:2,borderRadius:6}]
-  },{plugins:{legend:{display:false}},scales:{y:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8},stepSize:1}},x:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,weight:'600'}}}}});
+  const mx=Math.max(...d25.map(r=>r.vendas),1);
+  mkChart('ch-vend25','bar',{
+    labels:lbs,
+    datasets:[{label:'Vendas',data:d25.map(r=>r.vendas),backgroundColor:d25.map(r=>r.vendas===mx?GL+'cc':AC+'88'),borderColor:d25.map(r=>r.vendas===mx?GL:AC),borderWidth:2,borderRadius:5}]
+  },{plugins:{legend:{display:false}},scales:{y:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat'},stepSize:1}},x:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat',weight:'600'}}}}});
 
-  mkChart('ch-receita25','bar',{
-    labels,
+  mkChart('ch-rec25','bar',{
+    labels:lbs,
     datasets:[
-      {label:'Mensalidade',data:data25.map(r=>r.mens),backgroundColor:ACCENT+'88',borderColor:ACCENT,borderWidth:2,borderRadius:6},
-      {label:'Implantação',data:data25.map(r=>r.impl),backgroundColor:GOOD+'66',borderColor:GOOD,borderWidth:2,borderRadius:6},
+      {label:'Mensalidade',data:d25.map(r=>r.mens),backgroundColor:AC+'88',borderColor:AC,borderWidth:2,borderRadius:5},
+      {label:'Implantação',data:d25.map(r=>r.impl),backgroundColor:GD+'66',borderColor:GD,borderWidth:2,borderRadius:5},
     ]
-  },{scales:{y:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8},callback:v=>'R$'+Math.round(v/1000)+'k'}},x:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,weight:'600'}}}},plugins:{legend:{labels:{color:'#5a8ab0',font:{size:9},boxWidth:10,padding:10}}}});
+  },{scales:{y:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat'},callback:v=>'R$'+Math.round(v/1000)+'k'}},x:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat',weight:'600'}}}},plugins:{legend:{labels:{color:'#5a8ab0',font:{size:9,family:'Montserrat',weight:'600'},boxWidth:10,padding:10}}}});
 
-  const maxLTV=Math.max(...data25.map(r=>r.ltv),1);
-  document.getElementById('cards-2025').innerHTML=data25.map(r=>`
-    <div class="month-card">
-      <div class="mc-month">${r.mes}</div>
-      <div class="mc-ltv">${brl(r.ltv)}</div>
-      <div class="mc-vendas">${r.vendas} vendas · ${brl(r.vendas>0?r.mens/r.vendas:0)}/venda</div>
-      <div class="mc-bar"><div class="mc-bar-fill" style="width:${(r.ltv/maxLTV*100).toFixed(1)}%"></div></div>
+  const mxLTV=Math.max(...d25.map(r=>r.ltv),1);
+  document.getElementById('mcards-2025').innerHTML=d25.map(r=>`
+    <div class="mc">
+      <div class="mc-name">${r.mes}</div>
+      <div class="mc-val">${brl(r.ltv)}</div>
+      <div class="mc-sub">${r.vendas} vendas · ${brl(r.vendas>0?r.mens/r.vendas:0)}/venda</div>
+      <div class="mc-bar"><div class="mc-bar-fill" style="width:${(r.ltv/mxLTV*100).toFixed(1)}%"></div></div>
     </div>`).join('');
 }
 
-// ── Render Compare ───────────────────────────────────────
 function renderCompare(){
-  const ltv26=Object.values(data26).reduce((s,v)=>s+v.ltv,0);
-  const v26=Object.values(data26).reduce((s,v)=>s+v.count,0);
-  const m26Keys=MONTHS26.filter(m=>data26[m.key]?.ltv>0);
-  const avg26=m26Keys.length?ltv26/m26Keys.length:0;
-  const ltv25=data25.reduce((s,r)=>s+r.ltv,0);
-  const v25=data25.reduce((s,r)=>s+r.vendas,0);
-  const avg25=data25.length?ltv25/data25.length:0;
+  const ltv26=Object.values(d26).reduce((s,v)=>s+v.ltv,0);
+  const v26=Object.values(d26).reduce((s,v)=>s+v.count,0);
+  const active26=MONTHS26.filter(m=>d26[m.key]?.ltv>0).length;
+  const avg26=active26>0?ltv26/active26:0;
+  const ltv25=d25.reduce((s,r)=>s+r.ltv,0);
+  const v25=d25.reduce((s,r)=>s+r.vendas,0);
+  const avg25=d25.length>0?ltv25/d25.length:0;
   const delta=avg25>0?((avg26-avg25)/avg25*100):0;
 
-  document.getElementById('vs-summary').innerHTML=`
-    <div class="vs-item"><div class="vs-label">LTV Total 2025 (Jul–Dez)</div><div class="vs-val" style="color:var(--muted)">${brl(ltv25)}</div></div>
-    <div class="vs-div">→</div>
-    <div class="vs-item"><div class="vs-label">LTV Total 2026 (Jan–Mar)</div><div class="vs-val" style="color:var(--accent)">${brl(ltv26)}</div></div>
-    <div class="vs-div">·</div>
-    <div class="vs-item"><div class="vs-label">Média/Mês 2025</div><div class="vs-val" style="color:var(--muted)">${brl(avg25)}</div></div>
-    <div class="vs-div">→</div>
-    <div class="vs-item"><div class="vs-label">Média/Mês 2026</div><div class="vs-val" style="color:var(--accent)">${brl(avg26)}</div></div>
-    <div class="vs-item"><span class="vs-delta ${delta>=0?'vs-up':'vs-down'}">${delta>=0?'▲':'▼'} ${Math.abs(delta).toFixed(1)}% vs 2025</span></div>
+  document.getElementById('vs-row').innerHTML=`
+    <div class="vs-item"><div class="vs-lbl">LTV Total 2025 (Jul–Dez)</div><div class="vs-val" style="color:var(--muted)">${brl(ltv25)}</div></div>
+    <div class="vs-sep">→</div>
+    <div class="vs-item"><div class="vs-lbl">LTV Total 2026 (Jan–Mar)</div><div class="vs-val" style="color:${AC}">${brl(ltv26)}</div></div>
+    <div class="vs-sep">·</div>
+    <div class="vs-item"><div class="vs-lbl">Média/Mês 2025</div><div class="vs-val" style="color:var(--muted)">${brl(avg25)}</div></div>
+    <div class="vs-sep">→</div>
+    <div class="vs-item"><div class="vs-lbl">Média/Mês 2026</div><div class="vs-val" style="color:${AC}">${brl(avg26)}</div></div>
+    <div class="vs-item"><span class="delta-chip ${delta>=0?'delta-up':'delta-down'}">${delta>=0?'▲':'▼'} ${Math.abs(delta).toFixed(1)}% vs 2025</span></div>
   `;
 
-  const l25=data25.map(r=>r.mes.slice(0,3));
+  const l25=d25.map(r=>r.mes.slice(0,3));
   const l26=MONTHS26.map(m=>m.label.slice(0,3)+' 26');
+  const nulls25=d25.map(()=>null),nulls26=MONTHS26.map(()=>null);
+
   mkChart('ch-vs-ltv','line',{
     labels:[...l25,...l26],
     datasets:[
-      {label:'2025',data:[...data25.map(r=>r.ltv),...MONTHS26.map(()=>null)],borderColor:'#5a8ab0',backgroundColor:'transparent',borderWidth:2,tension:.35,pointRadius:4,pointBackgroundColor:'#5a8ab0'},
-      {label:'2026',data:[...data25.map(()=>null),...MONTHS26.map(m=>data26[m.key]?.ltv||0)],borderColor:ACCENT,backgroundColor:ACCENT+'22',borderWidth:2.5,tension:.35,pointRadius:5,pointBackgroundColor:ACCENT,fill:true}
+      {label:'2025',data:[...d25.map(r=>r.ltv),...nulls26],borderColor:'#5a8ab0',backgroundColor:'transparent',borderWidth:2,tension:.35,pointRadius:4,pointBackgroundColor:'#5a8ab0'},
+      {label:'2026',data:[...nulls25,...MONTHS26.map(m=>d26[m.key]?.ltv||0)],borderColor:AC,backgroundColor:AC+'22',borderWidth:2.5,tension:.35,pointRadius:5,pointBackgroundColor:AC,fill:true}
     ]
-  },{scales:{x:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,weight:'600'}}},y:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8},callback:v=>'R$'+Math.round(v/1000)+'k'}}},plugins:{legend:{labels:{color:'#5a8ab0',font:{size:9},boxWidth:10,padding:10}}}});
+  },{scales:{x:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat',weight:'600'}}},y:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat'},callback:v=>'R$'+Math.round(v/1000)+'k'}}},plugins:{legend:{labels:{color:'#5a8ab0',font:{size:9,family:'Montserrat',weight:'600'},boxWidth:10,padding:10}}}});
 
-  mkChart('ch-vs-vendas','bar',{
+  mkChart('ch-vs-vend','bar',{
     labels:[...l25,...l26],
     datasets:[
-      {label:'2025',data:[...data25.map(r=>r.vendas),...MONTHS26.map(()=>0)],backgroundColor:'#5a8ab077',borderColor:'#5a8ab0',borderWidth:2,borderRadius:4},
-      {label:'2026',data:[...data25.map(()=>0),...MONTHS26.map(m=>data26[m.key]?.count||0)],backgroundColor:ACCENT+'88',borderColor:ACCENT,borderWidth:2,borderRadius:4}
+      {label:'2025',data:[...d25.map(r=>r.vendas),...nulls26.map(()=>0)],backgroundColor:'#5a8ab077',borderColor:'#5a8ab0',borderWidth:2,borderRadius:4},
+      {label:'2026',data:[...nulls25.map(()=>0),...MONTHS26.map(m=>d26[m.key]?.count||0)],backgroundColor:AC+'88',borderColor:AC,borderWidth:2,borderRadius:4}
     ]
-  },{scales:{x:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,weight:'600'}}},y:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8}}}},plugins:{legend:{labels:{color:'#5a8ab0',font:{size:9},boxWidth:10,padding:10}}}});
+  },{scales:{x:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat',weight:'600'}}},y:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat'}}}},plugins:{legend:{labels:{color:'#5a8ab0',font:{size:9,family:'Montserrat',weight:'600'},boxWidth:10,padding:10}}}});
 
-  const t25=data25.map(r=>r.vendas>0?r.mens/r.vendas:0);
-  const t26=MONTHS26.map(m=>{const d=data26[m.key];return d&&d.count>0?d.mens/d.count:0;});
-  mkChart('ch-vs-ticket','line',{
+  const t25=d25.map(r=>r.vendas>0?r.mens/r.vendas:0);
+  const t26=MONTHS26.map(m=>{const d=d26[m.key];return d&&d.count>0?d.mens/d.count:0;});
+  mkChart('ch-vs-tick','line',{
     labels:[...l25,...l26],
     datasets:[
-      {label:'Ticket 2025',data:[...t25,...MONTHS26.map(()=>null)],borderColor:'#5a8ab0',backgroundColor:'transparent',borderWidth:2,tension:.35,pointRadius:4},
-      {label:'Ticket 2026',data:[...data25.map(()=>null),...t26],borderColor:GOLD,backgroundColor:GOLD+'22',borderWidth:2.5,tension:.35,pointRadius:5,fill:true}
+      {label:'Ticket 2025',data:[...t25,...nulls26],borderColor:'#5a8ab0',backgroundColor:'transparent',borderWidth:2,tension:.35,pointRadius:4},
+      {label:'Ticket 2026',data:[...nulls25,...t26],borderColor:GL,backgroundColor:GL+'22',borderWidth:2.5,tension:.35,pointRadius:5,fill:true}
     ]
-  },{scales:{x:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,weight:'600'}}},y:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8},callback:v=>'R$'+Math.round(v)}}},plugins:{legend:{labels:{color:'#5a8ab0',font:{size:9},boxWidth:10,padding:10}}}});
+  },{scales:{x:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat',weight:'600'}}},y:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat'},callback:v=>'R$'+Math.round(v)}}},plugins:{legend:{labels:{color:'#5a8ab0',font:{size:9,family:'Montserrat',weight:'600'},boxWidth:10,padding:10}}}});
+
+  // Insights compare
+  document.getElementById('insights-compare').innerHTML=`
+    <h2>💡 Análise Comparativa</h2>
+    <div class="insight" style="border-color:${delta>=0?GD:BD}">
+      <strong>${delta>=0?'📈 Crescimento':'📉 Variação'} da Média Mensal</strong>
+      A média de LTV por mês passou de ${brl(avg25)} (2025) para ${brl(avg26)} (2026) — ${delta>=0?'crescimento':'queda'} de ${Math.abs(delta).toFixed(1)}%.
+    </div>
+    <div class="insight" style="border-color:${AC}">
+      <strong>🏆 Volume de Vendas</strong>
+      2025 registrou ${v25} vendas em ${d25.length} meses. 2026 já soma ${v26} vendas em apenas ${active26} meses.
+    </div>
+  `;
 }
 
-// ── Panel switch ─────────────────────────────────────────
-function switchYear(year,btn){
-  document.querySelectorAll('.ytab').forEach(t=>t.classList.remove('active'));
+function switchPanel(id,btn){
+  document.querySelectorAll('.main-tab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
-  document.querySelectorAll('.year-panel').forEach(p=>p.classList.remove('visible'));
-  document.getElementById('panel-'+year).classList.add('visible');
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('visible'));
+  document.getElementById('panel-'+id).classList.add('visible');
 }
 
-// ── Init ──────────────────────────────────────────────────
 loadAll();
-setInterval(()=>{data26={};data25=[];loadAll();},5*60*1000);
+setInterval(()=>{d26={};d25=[];loadAll();},5*60*1000);
 </script>
 </body>
 </html>
