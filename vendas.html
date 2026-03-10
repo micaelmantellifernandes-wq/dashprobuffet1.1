@@ -105,20 +105,26 @@ tr:hover td{background:#0d1220}
 .delta-up{background:#00d4a820;color:var(--good)}
 .delta-down{background:#ff5c7a20;color:var(--bad)}
 
-/* SDR RANKING */
-.sdr-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;display:flex;align-items:center;gap:14px;position:relative;overflow:hidden;transition:transform .15s}
-.sdr-card:hover{transform:translateY(-2px)}
-.sdr-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:3px}
-.sdr-rank1::before{background:linear-gradient(90deg,#ffd700,#ffaa00)}
-.sdr-rank2::before{background:linear-gradient(90deg,#c0c0c0,#909090)}
-.sdr-rank3::before{background:linear-gradient(90deg,#cd7f32,#a05a20)}
-.sdr-medal{font-size:1.8rem;flex-shrink:0;line-height:1}
-.sdr-info{flex:1;min-width:0}
-.sdr-name{font-size:.85rem;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sdr-vendas{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-top:3px}
-.sdr-bar-wrap{height:4px;background:var(--border);border-radius:2px;margin-top:8px}
-.sdr-bar-fill{height:100%;border-radius:2px;transition:width .6s ease}
-.sdr-rank{font-family:'Montserrat',sans-serif;font-size:1.6rem;font-weight:800;flex-shrink:0;line-height:1}
+/* SDR PODIUM */
+.podium-wrap{max-width:1060px;margin:0 auto 28px;position:relative}
+.podium-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:10}
+.podium-stage{display:flex;align-items:flex-end;justify-content:center;gap:12px;padding:0 20px 0}
+.podium-col{display:flex;flex-direction:column;align-items:center;gap:0;flex:1;max-width:280px}
+.podium-avatar{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:900;color:#fff;margin-bottom:10px;position:relative;z-index:2;box-shadow:0 0 0 3px var(--bg)}
+.podium-avatar.rank1{background:linear-gradient(135deg,#ffd700,#ff8c00);box-shadow:0 0 0 3px var(--bg),0 0 20px #ffd70066}
+.podium-avatar.rank2{background:linear-gradient(135deg,#c0c0c0,#707070);box-shadow:0 0 0 3px var(--bg),0 0 12px #c0c0c033}
+.podium-avatar.rank3{background:linear-gradient(135deg,#cd7f32,#7a4010);box-shadow:0 0 0 3px var(--bg),0 0 12px #cd7f3233}
+.podium-crown{font-size:1.4rem;margin-bottom:4px;animation:crownBounce 1.2s ease-in-out infinite}
+@keyframes crownBounce{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-5px) rotate(5deg)}}
+.podium-name{font-size:.82rem;font-weight:800;color:var(--text);text-align:center;margin-bottom:4px}
+.podium-stats{font-size:.68rem;font-weight:700;text-align:center;margin-bottom:10px;line-height:1.5}
+.podium-block{width:100%;border-radius:10px 10px 0 0;display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:900;color:#fff;position:relative;overflow:hidden;transition:height .8s cubic-bezier(.34,1.56,.64,1)}
+.podium-block.rank1{background:linear-gradient(180deg,#ffd700 0%,#b8860b 100%);height:110px}
+.podium-block.rank2{background:linear-gradient(180deg,#c0c0c0 0%,#707070 100%);height:80px}
+.podium-block.rank3{background:linear-gradient(180deg,#cd7f32 0%,#7a4010 100%);height:55px}
+.podium-block::after{content:'';position:absolute;top:0;left:-60%;width:40%;height:100%;background:rgba(255,255,255,.15);transform:skewX(-15deg);animation:podiumShine 3s ease-in-out infinite}
+@keyframes podiumShine{0%,100%{left:-60%}50%{left:120%}}
+.podium-empty{color:var(--muted);font-size:.8rem;padding:20px 0;text-align:center}
 
 
 #loading{text-align:center;padding:60px 20px;color:var(--muted)}
@@ -164,7 +170,10 @@ tr:hover td{background:#0d1220}
     </div>
 
     <div class="sec-label">🏅 Ranking de SDR</div>
-    <div id="sdr-ranking" style="max-width:1060px;margin:0 auto 28px;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px"></div>
+    <div class="podium-wrap">
+      <canvas class="podium-canvas" id="confetti-canvas"></canvas>
+      <div class="podium-stage" id="sdr-ranking"></div>
+    </div>
 
     <div class="insights-box" id="insights-2026"></div>
 
@@ -360,30 +369,49 @@ function render2026(mk){
     }))
   },{scales:{x:{stacked:true,grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat',weight:'600'}}},y:{stacked:true,grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat'}}}},plugins:{legend:{position:'bottom',labels:{color:'#5a8ab0',font:{size:9,family:'Montserrat',weight:'600'},boxWidth:10,padding:8}}}});
 
-  // SDR Ranking
+  // SDR Podium
   const sdrMap={};
   d.rows.forEach(r=>{
     if(!r.sdr||r.sdr.trim()===''||r.sdr==='-')return;
     const n=r.sdr.trim();
-    if(!sdrMap[n])sdrMap[n]={vendas:0,ltv:0};
+    if(!sdrMap[n])sdrMap[n]={vendas:0,colet:0};
     sdrMap[n].vendas++;
-    sdrMap[n].ltv+=r.ltv||0;
+    sdrMap[n].colet+=r.colet||0;
   });
-  const sdrArr=Object.entries(sdrMap).sort((a,b)=>b[1].vendas-a[1].vendas||b[1].ltv-a[1].ltv);
-  const medals=['🥇','🥈','🥉'];
+  const sdrArr=Object.entries(sdrMap).sort((a,b)=>b[1].vendas-a[1].vendas||b[1].colet-a[1].colet).slice(0,3);
+
+  const podiumOrder=[1,0,2]; // visual order: 2nd, 1st, 3rd
   const rankColors=['#ffd700','#c0c0c0','#cd7f32'];
-  const rankClasses=['sdr-rank1','sdr-rank2','sdr-rank3'];
-  const maxVendas=sdrArr[0]?sdrArr[0][1].vendas:1;
-  document.getElementById('sdr-ranking').innerHTML=sdrArr.slice(0,3).map(([nome,s],i)=>`
-    <div class="sdr-card ${rankClasses[i]||''}">
-      <div class="sdr-medal">${medals[i]||`#${i+1}`}</div>
-      <div class="sdr-info">
-        <div class="sdr-name">${nome}</div>
-        <div class="sdr-vendas" style="color:${rankColors[i]}">${s.vendas} venda${s.vendas>1?'s':''} · ${brl(s.ltv)} LTV</div>
-        <div class="sdr-bar-wrap"><div class="sdr-bar-fill" style="width:${Math.round((s.vendas/maxVendas)*100)}%;background:${rankColors[i]}"></div></div>
-      </div>
-    </div>
-  `).join('')||'<div style="color:var(--muted);font-size:.8rem">Nenhum SDR registrado neste mês.</div>';
+  const rankLabels=['🥇','🥈','🥉'];
+  const rankNames=['1º','2º','3º'];
+  const rankClasses=['rank1','rank2','rank3'];
+
+  const el=document.getElementById('sdr-ranking');
+  if(!sdrArr.length){
+    el.innerHTML='<div class="podium-empty">Nenhum SDR registrado neste mês.</div>';
+  } else {
+    // Build podium in visual order [2nd place, 1st place, 3rd place]
+    el.innerHTML=podiumOrder.map(pos=>{
+      const entry=sdrArr[pos];
+      if(!entry) return `<div class="podium-col"></div>`;
+      const [nome,s]=entry;
+      const initials=nome.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+      const crown=pos===0?'<div class="podium-crown">👑</div>':'<div style="height:28px"></div>';
+      return `
+        <div class="podium-col">
+          ${crown}
+          <div class="podium-avatar ${rankClasses[pos]}">${initials}</div>
+          <div class="podium-name">${nome}</div>
+          <div class="podium-stats" style="color:${rankColors[pos]}">
+            ${s.vendas} venda${s.vendas>1?'s':''}<br>${brl(s.colet)} coletado
+          </div>
+          <div class="podium-block ${rankClasses[pos]}">${rankNames[pos]}</div>
+        </div>`;
+    }).join('');
+
+    // Confetti
+    launchConfetti();
+  }
 
   // Insights
   const top=Object.entries(d.src).sort((a,b)=>b[1]-a[1])[0];
@@ -538,6 +566,54 @@ function switchPanel(id,btn){
 
 loadAll();
 setInterval(()=>{d26={};d25=[];loadAll();},5*60*1000);
+
+// CONFETTI
+function launchConfetti(){
+  const canvas=document.getElementById('confetti-canvas');
+  if(!canvas)return;
+  const wrap=canvas.parentElement;
+  canvas.width=wrap.offsetWidth;
+  canvas.height=wrap.offsetHeight+60;
+  const ctx=canvas.getContext('2d');
+  const colors=['#ffd700','#00b4dc','#00d4a8','#ff5c7a','#f0b429','#ffffff','#c0c0c0','#cd7f32'];
+  const pieces=[];
+  for(let i=0;i<90;i++){
+    pieces.push({
+      x:Math.random()*canvas.width,
+      y:-10-Math.random()*canvas.height*0.5,
+      w:6+Math.random()*8,
+      h:3+Math.random()*5,
+      color:colors[Math.floor(Math.random()*colors.length)],
+      rot:Math.random()*360,
+      rotSpeed:(Math.random()-0.5)*6,
+      vx:(Math.random()-0.5)*2.5,
+      vy:2+Math.random()*3,
+      opacity:1
+    });
+  }
+  let frame=0;
+  const maxFrames=140;
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    pieces.forEach(p=>{
+      p.x+=p.vx;
+      p.y+=p.vy;
+      p.rot+=p.rotSpeed;
+      if(frame>80) p.opacity=Math.max(0,p.opacity-0.015);
+      ctx.save();
+      ctx.globalAlpha=p.opacity;
+      ctx.translate(p.x,p.y);
+      ctx.rotate(p.rot*Math.PI/180);
+      ctx.fillStyle=p.color;
+      ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+      ctx.restore();
+    });
+    frame++;
+    if(frame<maxFrames) requestAnimationFrame(draw);
+    else ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+  draw();
+}
 </script>
 </body>
 </html>
