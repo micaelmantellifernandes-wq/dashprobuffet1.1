@@ -403,7 +403,6 @@ async function loadAll(){
 
 function render2026(mk){
   if(mk)activeMon=mk;
-  const d=d26[activeMon];if(!d)return;
 
   // Tabs
   const isTot=activeMon==='TOTAL';
@@ -414,6 +413,8 @@ function render2026(mk){
     `<span class="mtab-divider"></span>`+
     `<button class="mtab mtab-total${isTot?' active':''}" onclick="render2026('TOTAL')">Total</button>`;
   if(isTot){renderTotal2026();return;}
+
+  const d=d26[activeMon];if(!d)return;
 
   // Cards
   const totLTV=Object.values(d26).reduce((s,v)=>s+v.ltv,0);
