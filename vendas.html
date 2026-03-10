@@ -105,7 +105,22 @@ tr:hover td{background:#0d1220}
 .delta-up{background:#00d4a820;color:var(--good)}
 .delta-down{background:#ff5c7a20;color:var(--bad)}
 
-/* LOADING */
+/* SDR RANKING */
+.sdr-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;display:flex;align-items:center;gap:14px;position:relative;overflow:hidden;transition:transform .15s}
+.sdr-card:hover{transform:translateY(-2px)}
+.sdr-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:3px}
+.sdr-rank1::before{background:linear-gradient(90deg,#ffd700,#ffaa00)}
+.sdr-rank2::before{background:linear-gradient(90deg,#c0c0c0,#909090)}
+.sdr-rank3::before{background:linear-gradient(90deg,#cd7f32,#a05a20)}
+.sdr-medal{font-size:1.8rem;flex-shrink:0;line-height:1}
+.sdr-info{flex:1;min-width:0}
+.sdr-name{font-size:.85rem;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sdr-vendas{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-top:3px}
+.sdr-bar-wrap{height:4px;background:var(--border);border-radius:2px;margin-top:8px}
+.sdr-bar-fill{height:100%;border-radius:2px;transition:width .6s ease}
+.sdr-rank{font-family:'Montserrat',sans-serif;font-size:1.6rem;font-weight:800;flex-shrink:0;line-height:1}
+
+
 #loading{text-align:center;padding:60px 20px;color:var(--muted)}
 .spinner{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 14px}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -147,6 +162,9 @@ tr:hover td{background:#0d1220}
       <div class="chart-box"><div class="chart-title">🎯 Fonte dos Leads</div><div class="chart-wrap"><canvas id="ch-fonte26"></canvas></div></div>
       <div class="chart-box wide"><div class="chart-title">👥 Vendas por Closer</div><div class="chart-wrap tall"><canvas id="ch-closer26"></canvas></div></div>
     </div>
+
+    <div class="sec-label">🏅 Ranking de SDR</div>
+    <div id="sdr-ranking" style="max-width:1060px;margin:0 auto 28px;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px"></div>
 
     <div class="insights-box" id="insights-2026"></div>
 
@@ -306,7 +324,8 @@ function render2026(mk){
   document.getElementById('cards-2026').innerHTML=`
     <div class="card warn"><div class="cn">Vendas no Mês</div><div class="cv" style="color:${GL}">${d.count}</div><div class="cp">Total 2026: ${totVend}</div></div>
     <div class="card neutral"><div class="cn">LTV do Mês</div><div class="cv" style="color:${AC}">${brl(d.ltv)}</div><div class="cp">Total: ${brl(totLTV)}</div></div>
-    <div class="card neutral"><div class="cn">Mensalidade</div><div class="cv" style="color:${AC}">${brl(d.mens)}</div><div class="cp">Implant: ${brl(d.impl)}</div></div>
+    <div class="card neutral"><div class="cn">Mensalidade</div><div class="cv" style="color:${AC}">${brl(d.mens)}</div><div class="cp">Total 2026: ${brl(Object.values(d26).reduce((s,v)=>s+v.mens,0))}</div></div>
+    <div class="card good"><div class="cn">Consultoria</div><div class="cv" style="color:${GD}">${brl(d.impl)}</div><div class="cp">Total 2026: ${brl(Object.values(d26).reduce((s,v)=>s+v.impl,0))}</div></div>
     <div class="card good"><div class="cn">Ticket Médio</div><div class="cv" style="color:${GD}">${brl(ticket)}</div><div class="cp">Mens/venda</div></div>
     <div class="card neutral"><div class="cn">Coletado</div><div class="cv" style="color:${AC}">${brl(d.colet)}</div></div>
   `;
@@ -340,6 +359,31 @@ function render2026(mk){
       backgroundColor:PAL[i%PAL.length]+'99',borderColor:PAL[i%PAL.length],borderWidth:2,borderRadius:4
     }))
   },{scales:{x:{stacked:true,grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat',weight:'600'}}},y:{stacked:true,grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat'}}}},plugins:{legend:{position:'bottom',labels:{color:'#5a8ab0',font:{size:9,family:'Montserrat',weight:'600'},boxWidth:10,padding:8}}}});
+
+  // SDR Ranking
+  const sdrMap={};
+  d.rows.forEach(r=>{
+    if(!r.sdr||r.sdr.trim()===''||r.sdr==='-')return;
+    const n=r.sdr.trim();
+    if(!sdrMap[n])sdrMap[n]={vendas:0,ltv:0};
+    sdrMap[n].vendas++;
+    sdrMap[n].ltv+=r.ltv||0;
+  });
+  const sdrArr=Object.entries(sdrMap).sort((a,b)=>b[1].vendas-a[1].vendas||b[1].ltv-a[1].ltv);
+  const medals=['🥇','🥈','🥉'];
+  const rankColors=['#ffd700','#c0c0c0','#cd7f32'];
+  const rankClasses=['sdr-rank1','sdr-rank2','sdr-rank3'];
+  const maxVendas=sdrArr[0]?sdrArr[0][1].vendas:1;
+  document.getElementById('sdr-ranking').innerHTML=sdrArr.slice(0,3).map(([nome,s],i)=>`
+    <div class="sdr-card ${rankClasses[i]||''}">
+      <div class="sdr-medal">${medals[i]||`#${i+1}`}</div>
+      <div class="sdr-info">
+        <div class="sdr-name">${nome}</div>
+        <div class="sdr-vendas" style="color:${rankColors[i]}">${s.vendas} venda${s.vendas>1?'s':''} · ${brl(s.ltv)} LTV</div>
+        <div class="sdr-bar-wrap"><div class="sdr-bar-fill" style="width:${Math.round((s.vendas/maxVendas)*100)}%;background:${rankColors[i]}"></div></div>
+      </div>
+    </div>
+  `).join('')||'<div style="color:var(--muted);font-size:.8rem">Nenhum SDR registrado neste mês.</div>';
 
   // Insights
   const top=Object.entries(d.src).sort((a,b)=>b[1]-a[1])[0];
