@@ -650,16 +650,18 @@ function renderComparison(mA,wA,mB,wB,dA,dB){
     const labels=CHART_METRICS.map(m=>m.icon+' '+m.label);
     const rawA=CHART_METRICS.map(m=>mcA?.TOTAL?.[m.key]?.real??null);
     const rawB=CHART_METRICS.map(m=>mcB?.TOTAL?.[m.key]?.real??null);
-    // Normalize per-metric (0–100)
+    // Normalize per-metric independently (each metric 0–100 relative to its own max)
     const normA=[],normB=[];
     CHART_METRICS.forEach((_,i)=>{
-      const n=normalizePct(rawA[i],rawB[i]);
-      normA.push(n.a); normB.push(n.b);
+      const vA=rawA[i], vB=rawB[i];
+      const max=Math.max(Math.abs(vA||0),Math.abs(vB||0),0.001);
+      normA.push(vA!=null?(vA/max*100):null);
+      normB.push(vB!=null?(vB/max*100):null);
     });
 
     const datasets=[
-      {label:nA,data:normA,borderColor:cA,backgroundColor:cA+'22',pointBackgroundColor:cA,pointBorderColor:'#001830',pointRadius:6,pointHoverRadius:8,borderWidth:2.5,tension:.3,fill:false},
-      {label:nB,data:normB,borderColor:cB,backgroundColor:cB+'22',pointBackgroundColor:cB,pointBorderColor:'#001830',pointRadius:6,pointHoverRadius:8,borderWidth:2.5,tension:.3,fill:false},
+      {label:nA,data:normA,borderColor:cA,backgroundColor:cA+'22',pointBackgroundColor:cA,pointBorderColor:'#001830',pointRadius:6,pointHoverRadius:8,borderWidth:2.5,tension:0,fill:false},
+      {label:nB,data:normB,borderColor:cB,backgroundColor:cB+'22',pointBackgroundColor:cB,pointBorderColor:'#001830',pointRadius:6,pointHoverRadius:8,borderWidth:2.5,tension:0,fill:false},
     ];
 
     const tooltipFmt=(ctx)=>{
