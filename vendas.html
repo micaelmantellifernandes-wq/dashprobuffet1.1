@@ -430,10 +430,42 @@ function render2026(mk){
   // Chart fonte
   const fontes=Object.entries(d.src).sort((a,b)=>b[1]-a[1]);
   if(fontes.length){
+    const bgColor=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#001830';
     mkChart('ch-fonte26','doughnut',{
       labels:fontes.map(f=>f[0]),
-      datasets:[{data:fontes.map(f=>f[1]),backgroundColor:PAL.slice(0,fontes.length),borderWidth:3,borderColor:getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#001830',hoverOffset:8}]
-    },{plugins:{legend:{position:'right',labels:{color:'#5a8ab0',font:{size:9,family:'Montserrat',weight:'600'},boxWidth:10,padding:8}}}});
+      datasets:[{
+        data:fontes.map(f=>f[1]),
+        backgroundColor:PAL.slice(0,fontes.length),
+        borderWidth:4,
+        borderColor:bgColor,
+        hoverOffset:22,
+        hoverBorderWidth:0,
+        offset:0,
+      }]
+    },{
+      cutout:'62%',
+      plugins:{
+        legend:{position:'right',labels:{color:'#5a8ab0',font:{size:9,family:'Montserrat',weight:'600'},boxWidth:10,padding:10}},
+        tooltip:{
+          backgroundColor:getComputedStyle(document.documentElement).getPropertyValue('--surface').trim(),
+          borderColor:getComputedStyle(document.documentElement).getPropertyValue('--border').trim(),
+          borderWidth:1,
+          titleColor:'#e8f4ff',
+          bodyColor:'#5a8ab0',
+          padding:10,
+          titleFont:{family:'Montserrat',weight:'700'},
+          bodyFont:{family:'Montserrat'},
+          callbacks:{
+            label:ctx=>{
+              const total=ctx.dataset.data.reduce((a,b)=>a+b,0);
+              const pct=((ctx.parsed/total)*100).toFixed(0);
+              return ` ${ctx.parsed} venda${ctx.parsed>1?'s':''} (${pct}%)`;
+            }
+          }
+        }
+      },
+      animation:{animateRotate:true,animateScale:true,duration:600},
+    });
   }
 
   // Chart closers
