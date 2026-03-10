@@ -462,6 +462,7 @@ function render2026(mk){
     <div class="card good"><div class="cn">Consultoria</div><div class="cv" style="color:${GD}">${brl(d.impl)}</div><div class="cp">Total 2026: ${brl(Object.values(d26).reduce((s,v)=>s+v.impl,0))}</div></div>
     <div class="card good"><div class="cn">Ticket Médio</div><div class="cv" style="color:${GD}">${brl(ticket)}</div><div class="cp">Mens/venda</div></div>
     <div class="card neutral"><div class="cn">Coletado</div><div class="cv" style="color:${AC}">${brl(d.colet)}</div></div>
+    <div class="card warn"><div class="cn">Total Vendido</div><div class="cv" style="color:${WN}">${brl(d.colet+d.impl)}</div><div class="cp">Mens. coletada + Consultoria</div></div>
   `;
 
   // Chart receita
@@ -555,14 +556,15 @@ function render2026(mk){
   document.getElementById('tbl-title26').textContent=`📋 Clientes — ${d.label} 2026 (${d.rows.length})`;
   const sorted=[...d.rows].sort((a,b)=>(a.data||0)-(b.data||0));
   document.getElementById('tbl-26').innerHTML=`<table>
-    <thead><tr><th>Data</th><th>Cliente</th><th>Mensalidade</th><th>Implant.</th><th>Meses</th><th>LTV</th><th>Fonte</th><th>SDR</th><th>Closer</th></tr></thead>
+    <thead><tr><th>Data</th><th>Cliente</th><th>Mens. Coletada</th><th>Implant.</th><th>Meses</th><th>LTV</th><th>Total Vendido</th><th>Fonte</th><th>SDR</th><th>Closer</th></tr></thead>
     <tbody>${sorted.map(r=>`<tr>
       <td>${r.data?r.data.toLocaleDateString('pt-BR'):''}</td>
       <td><strong>${r.nome}</strong></td>
-      <td>${brl(r.mens)}</td>
+      <td>${brl(r.colet)}</td>
       <td>${r.impl>0?brl(r.impl):'—'}</td>
       <td>${r.meses||'—'}</td>
       <td style="color:${AC};font-weight:700">${brl(r.ltv)}</td>
+      <td style="color:${WN};font-weight:700">${brl((r.colet||0)+(r.impl||0))}</td>
       <td>${srcBadge(r.fonte)}</td>
       <td style="color:var(--muted)">${r.sdr||'—'}</td>
       <td style="color:${GD};font-weight:700">${r.closer||'—'}</td>
@@ -591,6 +593,7 @@ function renderTotal2026(){
     <div class="card good"><div class="cn">Consultoria</div><div class="cv" style="color:${GD}">${brl(tot.impl)}</div><div class="cp">Implantações total</div></div>
     <div class="card good"><div class="cn">Ticket Médio</div><div class="cv" style="color:${GD}">${brl(ticket)}</div><div class="cp">Mens/venda</div></div>
     <div class="card neutral"><div class="cn">Coletado</div><div class="cv" style="color:${AC}">${brl(tot.colet)}</div><div class="cp">Total recebido</div></div>
+    <div class="card warn"><div class="cn">Total Vendido</div><div class="cv" style="color:${WN}">${brl(tot.colet+tot.impl)}</div><div class="cp">Mens. coletada + Consultoria</div></div>
   `;
 
   // Destroy old charts
@@ -747,6 +750,7 @@ function render2025(mk){
     <div class="card good"><div class="cn">Consultoria</div><div class="cv" style="color:${GD}">${brl(d.impl)}</div><div class="cp">Total 2025: ${brl(Object.values(d25).reduce((s,v)=>s+v.impl,0))}</div></div>
     <div class="card good"><div class="cn">Ticket Médio</div><div class="cv" style="color:${GD}">${brl(ticket)}</div><div class="cp">Mens/venda</div></div>
     <div class="card neutral"><div class="cn">Coletado</div><div class="cv" style="color:${AC}">${brl(d.colet)}</div></div>
+    <div class="card warn"><div class="cn">Total Vendido</div><div class="cv" style="color:${WN}">${brl(d.colet+d.impl)}</div><div class="cp">Mens. coletada + Consultoria</div></div>
   `;
 
   // Charts
@@ -800,14 +804,15 @@ function render2025(mk){
   document.getElementById('tbl-title25').textContent=`📋 Clientes — ${d.label} 2025 (${d.rows.length})`;
   const sorted=[...d.rows].sort((a,b)=>(a.data||0)-(b.data||0));
   document.getElementById('tbl-25').innerHTML=`<table>
-    <thead><tr><th>Data</th><th>Cliente</th><th>Mensalidade</th><th>Implant.</th><th>Meses</th><th>LTV</th><th>Fonte</th><th>SDR</th><th>Closer</th></tr></thead>
+    <thead><tr><th>Data</th><th>Cliente</th><th>Mens. Coletada</th><th>Implant.</th><th>Meses</th><th>LTV</th><th>Total Vendido</th><th>Fonte</th><th>SDR</th><th>Closer</th></tr></thead>
     <tbody>${sorted.map(r=>`<tr>
       <td>${r.data?r.data.toLocaleDateString('pt-BR'):''}</td>
       <td><strong>${r.nome}</strong></td>
-      <td>${brl(r.mens)}</td>
+      <td>${brl(r.colet)}</td>
       <td>${r.impl>0?brl(r.impl):'—'}</td>
       <td>${r.meses||'—'}</td>
       <td style="color:${AC};font-weight:700">${brl(r.ltv)}</td>
+      <td style="color:${WN};font-weight:700">${brl((r.colet||0)+(r.impl||0))}</td>
       <td><span class="badge">${r.fonte||'—'}</span></td>
       <td style="color:var(--muted)">${r.sdr||'—'}</td>
       <td style="color:${GD};font-weight:700">${r.closer||'—'}</td>
@@ -833,6 +838,7 @@ function renderTotal2025(){
     <div class="card good"><div class="cn">Consultoria</div><div class="cv" style="color:${GD}">${brl(tot.impl)}</div><div class="cp">Implantações total</div></div>
     <div class="card good"><div class="cn">Ticket Médio</div><div class="cv" style="color:${GD}">${brl(ticket)}</div><div class="cp">Mens/venda</div></div>
     <div class="card neutral"><div class="cn">Coletado</div><div class="cv" style="color:${AC}">${brl(tot.colet)}</div><div class="cp">Total recebido</div></div>
+    <div class="card warn"><div class="cn">Total Vendido</div><div class="cv" style="color:${WN}">${brl(tot.colet+tot.impl)}</div><div class="cp">Mens. coletada + Consultoria</div></div>
   `;
 
   Object.keys(charts).forEach(k=>{if(k.includes('25')&&!k.includes('26')){charts[k]?.destroy();delete charts[k];}});
