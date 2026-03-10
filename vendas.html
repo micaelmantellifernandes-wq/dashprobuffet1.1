@@ -571,6 +571,20 @@ setInterval(()=>{d26={};d25=[];loadAll();},5*60*1000);
 function launchConfetti(){
   const canvas=document.getElementById('confetti-canvas');
   if(!canvas)return;
+
+  // Dispara só quando o pódio entrar na tela
+  const observer=new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        observer.disconnect();
+        runConfetti(canvas);
+      }
+    });
+  },{threshold:0.4});
+  observer.observe(canvas.parentElement);
+}
+
+function runConfetti(canvas){
   const wrap=canvas.parentElement;
   canvas.width=wrap.offsetWidth;
   canvas.height=wrap.offsetHeight+60;
