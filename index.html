@@ -57,6 +57,7 @@ body{background:var(--bg);color:var(--text);font-family:'Montserrat',sans-serif;
 .mtab:hover{border-color:var(--accent);color:var(--text)}
 .wtab{background:transparent;border:1.5px solid var(--border);border-radius:20px;color:var(--muted);font-size:.72rem;font-weight:700;padding:5px 14px;cursor:pointer;transition:all .2s;letter-spacing:.04em}
 .wtab.active,.wtab:hover{opacity:1}
+#chart-pills::-webkit-scrollbar{display:none}
 .kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-top:10px}
 .kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;transition:border-color .2s}.kpi-card:hover{border-color:var(--accent)}
 .kc-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:6px}
@@ -208,7 +209,7 @@ body{background:var(--bg);color:var(--text);font-family:'Montserrat',sans-serif;
     </div>
     <div id="cmp-result">
       <div class="cmp-header-row">
-        <div class="cmp-title" id="cmp-title"></div>
+        <div class="cmp-title" id="cmp-title" style="margin-top:16px"></div>
         <button class="btn-back" onclick="resetComparison()">← Trocar meses</button>
       </div>
       <div class="cmp-sec">📈 Topo do Funil</div>
@@ -612,7 +613,7 @@ function renderComparison(mA,wA,mB,wB,dA,dB){
           </div>
           <button id="chart-next" onclick="chartNav(1)" style="background:var(--surface2);border:1px solid var(--border);color:var(--accent);width:34px;height:34px;border-radius:50%;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">›</button>
         </div>
-        <div id="chart-pills" style="display:flex;gap:5px;flex-wrap:wrap"></div>
+        <div id="chart-pills" style="display:flex;gap:5px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;-ms-overflow-style:none"></div>
       </div>
       <div style="position:relative;height:280px">
         <canvas id="single-chart"></canvas>
