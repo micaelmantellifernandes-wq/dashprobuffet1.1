@@ -19,14 +19,48 @@
   --good:#00d4a8;
   --warn:#f0b429;
   --bad:#ff5c7a;
+  --insight-bg:#001c40;
+  --table-head-bg:#001c40;
 }
+[data-theme="light"] {
+  --bg:#f0f4f8;
+  --surface:#ffffff;
+  --surface2:#eaf0f7;
+  --border:#cbd5e1;
+  --accent:#0090b8;
+  --accent2:#0070a0;
+  --navy:#dbeafe;
+  --text:#0f2340;
+  --muted:#5a7a9a;
+  --good:#009e7e;
+  --warn:#c07c00;
+  --bad:#cc2a50;
+  --insight-bg:#e8f0f9;
+  --table-head-bg:#dce8f5;
+}
+html{transition:background .25s}
+*{transition:background-color .25s,border-color .25s,color .15s,box-shadow .25s}
+
+/* Light mode overrides */
+[data-theme="light"] body{background:var(--bg)}
+[data-theme="light"] .header h1{background:linear-gradient(135deg,#0070a0,#0050c0);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+[data-theme="light"] .main-tab.active{background:#0090b820}
+[data-theme="light"] .mtab.active{background:#0090b820}
+[data-theme="light"] .card{box-shadow:0 2px 8px rgba(0,0,0,.08)}
+[data-theme="light"] .chart-box{box-shadow:0 2px 8px rgba(0,0,0,.06)}
+[data-theme="light"] .table-wrap{box-shadow:0 2px 8px rgba(0,0,0,.06)}
+[data-theme="light"] .podium-block.rank1{box-shadow:inset 0 2px 0 rgba(255,255,255,.3),0 4px 16px rgba(200,150,10,.25)}
+[data-theme="light"] .theme-toggle{box-shadow:0 2px 12px rgba(0,0,0,.12)}
+[data-theme="light"] .badge-meta{background:#0090b820;color:var(--accent)}
+[data-theme="light"] .delta-up{background:#00a88420;color:var(--good)}
+[data-theme="light"] .delta-down{background:#cc2a5020;color:var(--bad)}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--text);font-family:'Montserrat',sans-serif;min-height:100vh;padding:24px 16px 60px}
 
 /* HEADER — igual ao index */
 .header{text-align:center;margin-bottom:28px}
 .header h1{font-size:clamp(1.2rem,3vw,1.8rem);font-weight:800;letter-spacing:-.03em;background:linear-gradient(135deg,#00b4dc,#0090ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
-.live-badge{display:inline-flex;align-items:center;gap:6px;background:#001c40;border:1px solid #00b4dc40;border-radius:999px;padding:4px 14px;font-size:.7rem;font-weight:700;color:var(--accent);letter-spacing:.06em;text-transform:uppercase}
+.live-badge{display:inline-flex;align-items:center;gap:6px;background:var(--insight-bg);border:1px solid #00b4dc40;border-radius:999px;padding:4px 14px;font-size:.7rem;font-weight:700;color:var(--accent);letter-spacing:.06em;text-transform:uppercase}
 .live-dot{width:7px;height:7px;background:var(--accent);border-radius:50%;animation:pulse 1.5s infinite}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.4)}}
 .last-update{margin-top:6px;font-size:.7rem;color:var(--muted)}
@@ -77,8 +111,8 @@ body{background:var(--bg);color:var(--text);font-family:'Montserrat',sans-serif;
 .table-title{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:14px}
 table{width:100%;border-collapse:collapse;font-size:.75rem}
 th{font-size:.64rem;text-transform:uppercase;letter-spacing:.06em;padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);color:var(--muted);font-weight:700;white-space:nowrap}
-td{padding:9px 12px;border-bottom:1px solid #13192a;white-space:nowrap;font-size:.78rem}
-tr:hover td{background:#0d1220}
+td{padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap;font-size:.78rem}
+tr:hover td{background:var(--surface2)}
 .badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:.6rem;font-weight:700}
 .badge-meta{background:#00b4dc18;color:var(--accent)}
 .badge-google{background:#f0b42918;color:var(--warn)}
@@ -106,26 +140,65 @@ tr:hover td{background:#0d1220}
 .delta-down{background:#ff5c7a20;color:var(--bad)}
 
 /* SDR PODIUM */
-.podium-wrap{max-width:1060px;margin:0 auto 28px;position:relative}
+.podium-wrap{max-width:900px;margin:0 auto 36px;position:relative;padding-bottom:4px}
 .podium-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:10}
-.podium-stage{display:flex;align-items:flex-end;justify-content:center;gap:12px;padding:0 20px 0}
-.podium-col{display:flex;flex-direction:column;align-items:center;gap:0;flex:1;max-width:280px}
-.podium-avatar{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:900;color:#fff;margin-bottom:10px;position:relative;z-index:2;overflow:hidden;box-shadow:0 0 0 3px var(--bg)}
-.podium-avatar.rank1{background:linear-gradient(135deg,#ffd700,#ff8c00);box-shadow:0 0 0 3px var(--bg),0 0 20px #ffd70066}
-.podium-avatar.rank2{background:linear-gradient(135deg,#c0c0c0,#707070);box-shadow:0 0 0 3px var(--bg),0 0 12px #c0c0c033}
-.podium-avatar.rank3{background:linear-gradient(135deg,#cd7f32,#7a4010);box-shadow:0 0 0 3px var(--bg),0 0 12px #cd7f3233}
-.podium-crown{font-size:1.4rem;margin-bottom:4px;animation:crownBounce 1.2s ease-in-out infinite}
-@keyframes crownBounce{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-5px) rotate(5deg)}}
-.podium-name{font-size:.82rem;font-weight:800;color:var(--text);text-align:center;margin-bottom:4px}
-.podium-stats{font-size:.68rem;font-weight:700;text-align:center;margin-bottom:10px;line-height:1.5}
-.podium-block{width:100%;border-radius:10px 10px 0 0;display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:900;color:#fff;position:relative;overflow:hidden;transition:height .8s cubic-bezier(.34,1.56,.64,1)}
-.podium-block.rank1{background:linear-gradient(180deg,#ffd700 0%,#b8860b 100%);height:110px}
-.podium-block.rank2{background:linear-gradient(180deg,#c0c0c0 0%,#707070 100%);height:80px}
-.podium-block.rank3{background:linear-gradient(180deg,#cd7f32 0%,#7a4010 100%);height:55px}
-.podium-block::after{content:'';position:absolute;top:0;left:-60%;width:40%;height:100%;background:rgba(255,255,255,.15);transform:skewX(-15deg);animation:podiumShine 3s ease-in-out infinite}
-@keyframes podiumShine{0%,100%{left:-60%}50%{left:120%}}
+.podium-stage{display:flex;align-items:flex-end;justify-content:center;gap:0;padding:0}
+
+/* Each column */
+.podium-col{display:flex;flex-direction:column;align-items:center;flex:1;max-width:300px;position:relative}
+
+/* Avatar */
+.podium-avatar{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;position:relative;z-index:2;overflow:hidden;flex-shrink:0}
+.podium-avatar.rank1{width:90px;height:90px;font-size:2rem;box-shadow:0 0 0 4px #001830,0 0 0 7px #ffd700,0 0 30px #ffd70055}
+.podium-avatar.rank2{width:72px;height:72px;font-size:1.5rem;box-shadow:0 0 0 3px #001830,0 0 0 5px #c0c0c0,0 0 16px #c0c0c033}
+.podium-avatar.rank3{width:65px;height:65px;font-size:1.3rem;box-shadow:0 0 0 3px #001830,0 0 0 5px #cd7f32,0 0 16px #cd7f3233}
+.podium-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+/* fallback bg when no photo */
+.podium-avatar.rank1{background:linear-gradient(135deg,#ffd700,#ff8c00)}
+.podium-avatar.rank2{background:linear-gradient(135deg,#b0b0b0,#606060)}
+.podium-avatar.rank3{background:linear-gradient(135deg,#cd7f32,#7a4010)}
+
+/* Crown */
+.podium-crown{font-size:1.6rem;margin-bottom:6px;animation:crownBounce 1.4s ease-in-out infinite;filter:drop-shadow(0 0 6px #ffd700aa)}
+@keyframes crownBounce{0%,100%{transform:translateY(0) rotate(-6deg) scale(1)}50%{transform:translateY(-7px) rotate(6deg) scale(1.1)}}
+.podium-spacer{height:36px}
+
+/* Name & stats above the block */
+.podium-info{text-align:center;margin-bottom:14px;padding:0 8px}
+.podium-name{font-size:.88rem;font-weight:800;color:var(--text);margin-bottom:5px;letter-spacing:.01em}
+.podium-vendas{font-size:.72rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.podium-colet{font-size:.72rem;font-weight:600;color:var(--muted);margin-top:2px}
+
+/* The block itself */
+.podium-block{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:2rem;font-weight:900;color:rgba(255,255,255,.85);position:relative;overflow:hidden;border-radius:14px 14px 0 0;gap:4px}
+.podium-block.rank1{height:130px;background:linear-gradient(175deg,#f5c200 0%,#c8960a 60%,#9a6f00 100%);box-shadow:inset 0 2px 0 rgba(255,255,255,.25),0 -4px 20px #ffd70033}
+.podium-block.rank2{height:95px;background:linear-gradient(175deg,#d4d4d4 0%,#909090 60%,#606060 100%);box-shadow:inset 0 2px 0 rgba(255,255,255,.2)}
+.podium-block.rank3{height:68px;background:linear-gradient(175deg,#d4895a 0%,#a05a20 60%,#7a3f10 100%);box-shadow:inset 0 2px 0 rgba(255,255,255,.15)}
+.podium-block-label{font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;opacity:.75;margin-top:-2px}
+
+/* Shine sweep */
+.podium-block::before{content:'';position:absolute;top:0;left:-80%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);transform:skewX(-20deg);animation:podiumShine 4s ease-in-out infinite}
+.podium-block.rank2::before{animation-delay:.8s}
+.podium-block.rank3::before{animation-delay:1.6s}
+@keyframes podiumShine{0%,100%{left:-80%}60%{left:130%}}
+
+/* Base connector */
+.podium-base{width:100%;height:6px;background:rgba(0,0,0,.3)}
+.podium-base.rank1{background:linear-gradient(90deg,#9a6f00,#c8960a,#9a6f00)}
+.podium-base.rank2{background:linear-gradient(90deg,#505050,#888,#505050)}
+.podium-base.rank3{background:linear-gradient(90deg,#5a2e08,#a05a20,#5a2e08)}
+
 .podium-empty{color:var(--muted);font-size:.8rem;padding:20px 0;text-align:center}
 
+
+/* THEME TOGGLE */
+.theme-toggle{position:fixed;top:16px;right:16px;z-index:999;display:flex;align-items:center;gap:8px;background:var(--surface);border:1.5px solid var(--border);border-radius:999px;padding:6px 14px 6px 10px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:.72rem;font-weight:700;color:var(--muted);box-shadow:0 4px 20px rgba(0,0,0,.25)}
+.theme-toggle:hover{border-color:var(--accent);color:var(--text)}
+.toggle-track{width:36px;height:20px;border-radius:999px;background:var(--border);position:relative;transition:background .3s;flex-shrink:0}
+.toggle-track.on{background:var(--accent)}
+.toggle-knob{position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:#fff;transition:transform .3s cubic-bezier(.34,1.56,.64,1);box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.toggle-track.on .toggle-knob{transform:translateX(16px)}
+.toggle-icon{font-size:1rem;line-height:1}
 
 #loading{text-align:center;padding:60px 20px;color:var(--muted)}
 .spinner{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 14px}
@@ -140,9 +213,17 @@ tr:hover td{background:#0d1220}
 </head>
 <body>
 
+<!-- THEME TOGGLE -->
+<button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()">
+  <span class="toggle-icon" id="toggle-icon">🌙</span>
+  <div class="toggle-track" id="toggle-track"><div class="toggle-knob"></div></div>
+  <span id="toggle-label">Dark</span>
+</button>
+
+
 <div class="header">
   <a class="back-link" href="index.html">← KPI Dashboard</a>
-  <h1>💰 Dashboard de Vendas — Pro Buffet</h1>
+  <h1>Dashboard de Vendas — Pro Buffet</h1>
   <div class="live-badge"><span class="live-dot"></span>LIVE</div>
   <div class="last-update" id="last-update">Carregando...</div>
 </div>
@@ -412,16 +493,21 @@ function render2026(mk){
       const avatarInner=photo
         ?`<img src="${photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`
         :initials;
-      const crown=pos===0?'<div class="podium-crown">👑</div>':'<div style="height:28px"></div>';
+      const crown=pos===0?'<div class="podium-crown">👑</div>':'<div class="podium-spacer"></div>';
       return `
         <div class="podium-col">
           ${crown}
           <div class="podium-avatar ${rankClasses[pos]}">${avatarInner}</div>
-          <div class="podium-name">${nome}</div>
-          <div class="podium-stats" style="color:${rankColors[pos]}">
-            ${s.vendas} venda${s.vendas>1?'s':''}<br>${brl(s.colet)} coletado
+          <div class="podium-info" style="margin-top:12px">
+            <div class="podium-name">${nome}</div>
+            <div class="podium-vendas" style="color:${rankColors[pos]}">${s.vendas} venda${s.vendas>1?'s':''}</div>
+            <div class="podium-colet">${brl(s.colet)} coletado</div>
           </div>
-          <div class="podium-block ${rankClasses[pos]}">${rankNames[pos]}</div>
+          <div class="podium-block ${rankClasses[pos]}">
+            <span>${rankNames[pos]}</span>
+            <span class="podium-block-label">lugar</span>
+          </div>
+          <div class="podium-base ${rankClasses[pos]}"></div>
         </div>`;
     }).join('');
 
@@ -581,6 +667,40 @@ function switchPanel(id,btn){
 }
 
 loadAll();
+// THEME TOGGLE
+function toggleTheme(){
+  const isLight=document.documentElement.getAttribute('data-theme')==='light';
+  const newTheme=isLight?'dark':'light';
+  document.documentElement.setAttribute('data-theme', newTheme==='dark'?'':newTheme);
+  const track=document.getElementById('toggle-track');
+  const icon=document.getElementById('toggle-icon');
+  const label=document.getElementById('toggle-label');
+  if(newTheme==='light'){
+    track.classList.add('on');
+    icon.textContent='☀️';
+    label.textContent='Light';
+    localStorage.setItem('theme','light');
+  } else {
+    track.classList.remove('on');
+    icon.textContent='🌙';
+    label.textContent='Dark';
+    localStorage.setItem('theme','dark');
+  }
+}
+// Load saved theme
+(function(){
+  const saved=localStorage.getItem('theme');
+  if(saved==='light'){
+    document.documentElement.setAttribute('data-theme','light');
+    const track=document.getElementById('toggle-track');
+    const icon=document.getElementById('toggle-icon');
+    const label=document.getElementById('toggle-label');
+    if(track) track.classList.add('on');
+    if(icon) icon.textContent='☀️';
+    if(label) label.textContent='Light';
+  }
+})();
+
 setInterval(()=>{d26={};d25=[];loadAll();},5*60*1000);
 
 // CONFETTI
