@@ -269,17 +269,21 @@ tr:hover td{background:var(--surface2)}
 
   <!-- ══ 2025 ══ -->
   <div id="panel-2025" class="panel">
-    <div class="sec-label">📌 Resumo Anual 2025</div>
+    <div class="month-tabs" id="tabs-2025"></div>
     <div class="cards-grid" id="cards-2025"></div>
 
     <div class="charts-grid">
-      <div class="chart-box wide"><div class="chart-title">📈 LTV Mensal + Acumulado 2025</div><div class="chart-wrap"><canvas id="ch-ltv25"></canvas></div></div>
-      <div class="chart-box"><div class="chart-title">🏆 Qtd. Vendas por Mês</div><div class="chart-wrap"><canvas id="ch-vend25"></canvas></div></div>
-      <div class="chart-box"><div class="chart-title">💰 Mensalidade vs Implantação</div><div class="chart-wrap"><canvas id="ch-rec25"></canvas></div></div>
+      <div class="chart-box wide"><div class="chart-title">📈 Receita por Mês</div><div class="chart-wrap"><canvas id="ch-ltv25"></canvas></div></div>
+      <div class="chart-box"><div class="chart-title">🎯 Fonte dos Leads</div><div class="chart-wrap"><canvas id="ch-fonte25"></canvas></div></div>
+      <div class="chart-box"><div class="chart-title">🏆 Closers</div><div class="chart-wrap"><canvas id="ch-closer25"></canvas></div></div>
     </div>
 
-    <div class="sec-label">📅 Meses 2025</div>
-    <div class="month-cards" id="mcards-2025"></div>
+    <div class="podium-wrap"><div class="sec-label" style="margin-bottom:16px">🥇 Ranking de SDR</div><div class="podium-stage" id="sdr-ranking25"></div></div>
+
+    <div id="insights-2025" class="insights-box"></div>
+
+    <div class="sec-label" id="tbl-title25">📋 Clientes</div>
+    <div class="table-wrap" id="tbl-25"></div>
   </div>
 
   <!-- ══ COMPARE ══ -->
@@ -306,10 +310,20 @@ const MONTHS26=[
   {key:'FEVEREIRO/26',label:'Fevereiro',off:false},
   {key:'MARÇO/26',    label:'Março',    off:false},
 ];
+const MONTHS25=[
+  {key:'MAIO',      label:'Maio',      off:false},
+  {key:'JUNHO',     label:'Junho',     off:false},
+  {key:'JULHO',     label:'Julho',     off:false},
+  {key:'AGOSTO',    label:'Agosto',    off:false},
+  {key:'SETEMBRO',  label:'Setembro',  off:false},
+  {key:'OUTUBRO',   label:'Outubro',   off:false},
+  {key:'NOVEMBRO',  label:'Novembro',  off:false},
+  {key:'DEZEMBRO',  label:'Dezembro',  off:false},
+];
 const AC='#00b4dc',GD='#00d4a8',WN='#f0b429',BD='#ff5c7a',GL='#ffd166';
 const PAL=[AC,'#0090ff',GD,GL,WN,BD,'#a78bfa','#60a5fa'];
 
-let d26={},d25=[],activeMon='JANEIRO/26',charts={};
+let d26={},d25={},activeMon='JANEIRO/26',activeMon25='MAIO',charts={};
 
 const brl=v=>(v===null||v===undefined||isNaN(Number(v)))
   ?'—':'R$ '+Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -388,12 +402,33 @@ async function loadAll(){
     }
   }
   // 2025
-  try{
-    const rows=await fetchSheet(ID25,'Base de Dados');
-    d25=rows.filter(r=>r&&r[0]&&String(r[0]).trim()).map(r=>({
-      mes:String(r[0]),ltv:num(r[1]),mens:num(r[2]),impl:num(r[3]),vendas:num(r[4])
-    }));
-  }catch(e){d25=[];}
+  for(const cfg of MONTHS25){
+    try{
+      const rows=await fetchSheet(ID25,cfg.key);
+      const dataRows=rows.slice(2).filter(r=>r&&r[cfg.off?2:1]&&String(r[cfg.off?2:1]).trim());
+      const parsed=dataRows.map(r=>({
+        nome:   String(r[cfg.off?2:1]||'').trim(),
+        data:   parseDate(r[cfg.off?1:0]),
+        colet:  num(r[cfg.off?3:2]),
+        mens:   num(r[cfg.off?4:3]),
+        impl:   num(r[cfg.off?5:4]),
+        fonte:  String(r[cfg.off?6:5]||'').trim(),
+        meses:  num(r[cfg.off?7:6]),
+        ltv:    num(r[cfg.off?8:7]),
+        sdr:    String(r[cfg.off?9:8]||'').trim(),
+        closer: String(r[cfg.off?10:9]||'').trim(),
+      }));
+      const ltv=parsed.reduce((s,r)=>s+r.ltv,0);
+      const mens=parsed.reduce((s,r)=>s+r.mens,0);
+      const impl=parsed.reduce((s,r)=>s+r.impl,0);
+      const colet=parsed.reduce((s,r)=>s+r.colet,0);
+      const src={},cls={};
+      parsed.forEach(r=>{if(r.fonte)src[r.fonte]=(src[r.fonte]||0)+1;if(r.closer)cls[r.closer]=(cls[r.closer]||0)+1;});
+      d25[cfg.key]={rows:parsed,count:parsed.length,ltv,mens,impl,colet,src,cls,label:cfg.label};
+    }catch(e){
+      d25[cfg.key]={rows:[],count:0,ltv:0,mens:0,impl:0,colet:0,src:{},cls:{},label:cfg.label};
+    }
+  }
 
   render2026();render2025();renderCompare();
   document.getElementById('loading').style.display='none';
@@ -687,54 +722,168 @@ function renderPodium(sdrArr,targetId){
   }
 }
 
-function render2025(){
-  if(!d25.length)return;
-  const tL=d25.reduce((s,r)=>s+r.ltv,0);
-  const tV=d25.reduce((s,r)=>s+r.vendas,0);
-  const tM=d25.reduce((s,r)=>s+r.mens,0);
-  const tI=d25.reduce((s,r)=>s+r.impl,0);
-  const best=d25.reduce((a,b)=>b.ltv>a.ltv?b:a,d25[0]);
+function render2025(mk){
+  if(mk) activeMon25=mk;
+
+  const isTot25=activeMon25==='TOTAL';
+  document.getElementById('tabs-2025').innerHTML=
+    MONTHS25.map(m=>
+      `<button class="mtab${m.key===activeMon25?' active':''}" onclick="render2025('${m.key}')">${m.label}</button>`
+    ).join('')+
+    `<span class="mtab-divider"></span>`+
+    `<button class="mtab mtab-total${isTot25?' active':''}" onclick="render2025('TOTAL')">Total</button>`;
+  if(isTot25){renderTotal2025();return;}
+
+  const d=d25[activeMon25];if(!d)return;
+
+  // Cards
+  const totLTV=Object.values(d25).reduce((s,v)=>s+(v.ltv||0),0);
+  const totVend=Object.values(d25).reduce((s,v)=>s+(v.count||0),0);
+  const ticket=d.count>0?d.mens/d.count:0;
   document.getElementById('cards-2025').innerHTML=`
-    <div class="card warn"><div class="cn">Total Vendas 2025</div><div class="cv" style="color:${GL}">${tV}</div><div class="cp">${d25.length} meses ativos</div></div>
-    <div class="card neutral"><div class="cn">LTV Total 2025</div><div class="cv" style="color:${AC}">${brl(tL)}</div></div>
-    <div class="card neutral"><div class="cn">Mensalidades</div><div class="cv" style="color:${AC}">${brl(tM)}</div></div>
-    <div class="card good"><div class="cn">Implantações</div><div class="cv" style="color:${GD}">${brl(tI)}</div></div>
-    <div class="card warn"><div class="cn">Melhor Mês</div><div class="cv" style="color:${GL}">${best.mes}</div><div class="cp">${brl(best.ltv)}</div></div>
-    <div class="card neutral"><div class="cn">Ticket Médio</div><div class="cv" style="color:${AC}">${brl(tV>0?tM/tV:0)}</div></div>
+    <div class="card warn"><div class="cn">Vendas no Mês</div><div class="cv" style="color:${GL}">${d.count}</div><div class="cp">Total 2025: ${totVend}</div></div>
+    <div class="card neutral"><div class="cn">LTV do Mês</div><div class="cv" style="color:${AC}">${brl(d.ltv)}</div><div class="cp">Total: ${brl(totLTV)}</div></div>
+    <div class="card neutral"><div class="cn">Mensalidade</div><div class="cv" style="color:${AC}">${brl(d.mens)}</div><div class="cp">Total 2025: ${brl(Object.values(d25).reduce((s,v)=>s+v.mens,0))}</div></div>
+    <div class="card good"><div class="cn">Consultoria</div><div class="cv" style="color:${GD}">${brl(d.impl)}</div><div class="cp">Total 2025: ${brl(Object.values(d25).reduce((s,v)=>s+v.impl,0))}</div></div>
+    <div class="card good"><div class="cn">Ticket Médio</div><div class="cv" style="color:${GD}">${brl(ticket)}</div><div class="cp">Mens/venda</div></div>
+    <div class="card neutral"><div class="cn">Coletado</div><div class="cv" style="color:${AC}">${brl(d.colet)}</div></div>
   `;
 
-  const lbs=d25.map(r=>r.mes.slice(0,3));
-  let ac=0;
-  mkChart('ch-ltv25','line',{
-    labels:lbs,
+  // Charts
+  Object.keys(charts).forEach(k=>{if(k.includes('25')&&!k.includes('26')){charts[k]?.destroy();delete charts[k];}});
+
+  mkChart('ch-ltv25','bar',{
+    labels:MONTHS25.map(m=>m.label.slice(0,3)),
     datasets:[
-      {label:'LTV Mensal',data:d25.map(r=>r.ltv),borderColor:AC,backgroundColor:AC+'22',pointBackgroundColor:AC,pointRadius:5,borderWidth:2.5,tension:.35,fill:true},
-      {label:'Acumulado',data:d25.map(r=>{ac+=r.ltv;return ac;}),borderColor:GD,backgroundColor:'transparent',pointRadius:3,borderWidth:2,tension:.35,yAxisID:'y2'}
+      {label:'LTV',data:MONTHS25.map(m=>d25[m.key]?.ltv||0),backgroundColor:AC+'99',borderColor:AC,borderWidth:2,borderRadius:5},
+      {label:'Mensalidade',data:MONTHS25.map(m=>d25[m.key]?.mens||0),backgroundColor:GD+'77',borderColor:GD,borderWidth:2,borderRadius:5},
     ]
-  },{scales:{x:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat',weight:'600'}}},y:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat'},callback:v=>'R$'+Math.round(v/1000)+'k'}},y2:{position:'right',grid:{display:false},ticks:{color:GD,font:{size:8,family:'Montserrat'},callback:v=>'R$'+Math.round(v/1000)+'k'}}},plugins:{legend:{labels:{color:'#5a8ab0',font:{size:9,family:'Montserrat',weight:'600'},boxWidth:10,padding:10}}}});
+  });
 
-  const mx=Math.max(...d25.map(r=>r.vendas),1);
-  mkChart('ch-vend25','bar',{
-    labels:lbs,
-    datasets:[{label:'Vendas',data:d25.map(r=>r.vendas),backgroundColor:d25.map(r=>r.vendas===mx?GL+'cc':AC+'88'),borderColor:d25.map(r=>r.vendas===mx?GL:AC),borderWidth:2,borderRadius:5}]
-  },{plugins:{legend:{display:false}},scales:{y:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat'},stepSize:1}},x:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat',weight:'600'}}}}});
+  const fontes=Object.entries(d.src).sort((a,b)=>b[1]-a[1]);
+  if(fontes.length){
+    mkChart('ch-fonte25','doughnut',{
+      labels:fontes.map(f=>f[0]),
+      datasets:[{data:fontes.map(f=>f[1]),backgroundColor:PAL.slice(0,fontes.length),borderWidth:0,borderColor:'transparent',hoverOffset:20,hoverBorderWidth:0,hoverBorderColor:'transparent',spacing:0}]
+    },{cutout:'62%',plugins:{legend:{position:'right',labels:{color:'#5a8ab0',font:{size:9,family:'Montserrat',weight:'600'},boxWidth:10,padding:10}},tooltip:{callbacks:{label:ctx=>{const total=ctx.dataset.data.reduce((a,b)=>a+b,0);const pct=((ctx.parsed/total)*100).toFixed(0);return ` ${ctx.parsed} venda${ctx.parsed>1?'s':''} (${pct}%)`;}}}},animation:{animateRotate:true,animateScale:true,duration:600},layout:{padding:24}});
+  }
 
-  mkChart('ch-rec25','bar',{
-    labels:lbs,
+  const allCls={};
+  MONTHS25.forEach(m=>Object.entries(d25[m.key]?.cls||{}).forEach(([c,v])=>{allCls[c]=(allCls[c]||0)+v;}));
+  const clList=Object.entries(allCls).sort((a,b)=>b[1]-a[1]);
+  if(clList.length) mkChart('ch-closer25','bar',{
+    labels:MONTHS25.map(m=>m.label.slice(0,3)),
+    datasets:clList.map((c,i)=>({label:c[0],data:MONTHS25.map(m=>d25[m.key]?.cls?.[c[0]]||0),backgroundColor:PAL[i%PAL.length]+'99',borderColor:PAL[i%PAL.length],borderWidth:2,borderRadius:4}))
+  },{scales:{x:{stacked:true},y:{stacked:true}}});
+
+  // SDR Podium
+  const sdrMap={};
+  d.rows.forEach(r=>{
+    if(!r.sdr||r.sdr.trim()===''||r.sdr==='-')return;
+    const n=r.sdr.trim();
+    if(!sdrMap[n])sdrMap[n]={vendas:0,colet:0};
+    sdrMap[n].vendas++;sdrMap[n].colet+=r.colet||0;
+  });
+  const sdrArr=Object.entries(sdrMap).sort((a,b)=>b[1].vendas-a[1].vendas||b[1].colet-a[1].colet).slice(0,3);
+  renderPodium(sdrArr,'sdr-ranking25');
+
+  // Insights
+  const top=Object.entries(d.src).sort((a,b)=>b[1]-a[1])[0];
+  const topCl=Object.entries(d.cls).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('insights-2025').innerHTML=`
+    <h2>💡 Insights — ${d.label}</h2>
+    ${top?`<div class="insight" style="border-color:${AC}"><strong>🎯 Principal Fonte</strong>${top[0]} gerou ${top[1]} venda${top[1]>1?'s':''} neste mês.</div>`:''}
+    ${topCl?`<div class="insight" style="border-color:${GD}"><strong>🏆 Melhor Closer</strong>${topCl[0]} fechou ${topCl[1]} venda${topCl[1]>1?'s':''} em ${d.label}.</div>`:''}
+  `;
+
+  // Table
+  document.getElementById('tbl-title25').textContent=`📋 Clientes — ${d.label} 2025 (${d.rows.length})`;
+  const sorted=[...d.rows].sort((a,b)=>(a.data||0)-(b.data||0));
+  document.getElementById('tbl-25').innerHTML=`<table>
+    <thead><tr><th>Data</th><th>Cliente</th><th>Mensalidade</th><th>Implant.</th><th>Meses</th><th>LTV</th><th>Fonte</th><th>SDR</th><th>Closer</th></tr></thead>
+    <tbody>${sorted.map(r=>`<tr>
+      <td>${r.data?r.data.toLocaleDateString('pt-BR'):''}</td>
+      <td><strong>${r.nome}</strong></td>
+      <td>${brl(r.mens)}</td>
+      <td>${r.impl>0?brl(r.impl):'—'}</td>
+      <td>${r.meses||'—'}</td>
+      <td style="color:${AC};font-weight:700">${brl(r.ltv)}</td>
+      <td><span class="badge">${r.fonte||'—'}</span></td>
+      <td style="color:var(--muted)">${r.sdr||'—'}</td>
+      <td style="color:${GD};font-weight:700">${r.closer||'—'}</td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+function renderTotal2025(){
+  const tot={count:0,ltv:0,mens:0,impl:0,colet:0,src:{},cls:{}};
+  const allRows=[];
+  MONTHS25.forEach(m=>{
+    const d=d25[m.key];if(!d)return;
+    tot.count+=d.count;tot.ltv+=d.ltv;tot.mens+=d.mens;tot.impl+=d.impl;tot.colet+=d.colet;
+    Object.entries(d.src||{}).forEach(([k,v])=>{tot.src[k]=(tot.src[k]||0)+v;});
+    Object.entries(d.cls||{}).forEach(([k,v])=>{tot.cls[k]=(tot.cls[k]||0)+v;});
+    (d.rows||[]).forEach(r=>allRows.push({...r,_mes:m.label}));
+  });
+  const ticket=tot.count>0?tot.mens/tot.count:0;
+
+  document.getElementById('cards-2025').innerHTML=`
+    <div class="card warn"><div class="cn">Total de Vendas</div><div class="cv" style="color:${GL}">${tot.count}</div><div class="cp">2025 completo</div></div>
+    <div class="card neutral"><div class="cn">LTV Total</div><div class="cv" style="color:${AC}">${brl(tot.ltv)}</div><div class="cp">Receita acumulada</div></div>
+    <div class="card neutral"><div class="cn">Mensalidade</div><div class="cv" style="color:${AC}">${brl(tot.mens)}</div><div class="cp">Recorrência total</div></div>
+    <div class="card good"><div class="cn">Consultoria</div><div class="cv" style="color:${GD}">${brl(tot.impl)}</div><div class="cp">Implantações total</div></div>
+    <div class="card good"><div class="cn">Ticket Médio</div><div class="cv" style="color:${GD}">${brl(ticket)}</div><div class="cp">Mens/venda</div></div>
+    <div class="card neutral"><div class="cn">Coletado</div><div class="cv" style="color:${AC}">${brl(tot.colet)}</div><div class="cp">Total recebido</div></div>
+  `;
+
+  Object.keys(charts).forEach(k=>{if(k.includes('25')&&!k.includes('26')){charts[k]?.destroy();delete charts[k];}});
+
+  mkChart('ch-ltv25','bar',{
+    labels:MONTHS25.map(m=>m.label.slice(0,3)),
     datasets:[
-      {label:'Mensalidade',data:d25.map(r=>r.mens),backgroundColor:AC+'88',borderColor:AC,borderWidth:2,borderRadius:5},
-      {label:'Implantação',data:d25.map(r=>r.impl),backgroundColor:GD+'66',borderColor:GD,borderWidth:2,borderRadius:5},
+      {label:'LTV',data:MONTHS25.map(m=>d25[m.key]?.ltv||0),backgroundColor:AC+'99',borderColor:AC,borderWidth:2,borderRadius:5},
+      {label:'Mensalidade',data:MONTHS25.map(m=>d25[m.key]?.mens||0),backgroundColor:GD+'77',borderColor:GD,borderWidth:2,borderRadius:5},
     ]
-  },{scales:{y:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat'},callback:v=>'R$'+Math.round(v/1000)+'k'}},x:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat',weight:'600'}}}},plugins:{legend:{labels:{color:'#5a8ab0',font:{size:9,family:'Montserrat',weight:'600'},boxWidth:10,padding:10}}}});
+  });
 
-  const mxLTV=Math.max(...d25.map(r=>r.ltv),1);
-  document.getElementById('mcards-2025').innerHTML=d25.map(r=>`
-    <div class="mc">
-      <div class="mc-name">${r.mes}</div>
-      <div class="mc-val">${brl(r.ltv)}</div>
-      <div class="mc-sub">${r.vendas} vendas · ${brl(r.vendas>0?r.mens/r.vendas:0)}/venda</div>
-      <div class="mc-bar"><div class="mc-bar-fill" style="width:${(r.ltv/mxLTV*100).toFixed(1)}%"></div></div>
-    </div>`).join('');
+  const fontes=Object.entries(tot.src).sort((a,b)=>b[1]-a[1]);
+  if(fontes.length) mkChart('ch-fonte25','doughnut',{
+    labels:fontes.map(f=>f[0]),
+    datasets:[{data:fontes.map(f=>f[1]),backgroundColor:PAL.slice(0,fontes.length),borderWidth:0,borderColor:'transparent',hoverOffset:20,hoverBorderWidth:0,hoverBorderColor:'transparent',spacing:0}]
+  },{cutout:'62%',plugins:{legend:{position:'right',labels:{color:'#5a8ab0',font:{size:9,family:'Montserrat',weight:'600'},boxWidth:10,padding:10}},tooltip:{callbacks:{label:ctx=>{const total=ctx.dataset.data.reduce((a,b)=>a+b,0);const pct=((ctx.parsed/total)*100).toFixed(0);return ` ${ctx.parsed} venda${ctx.parsed>1?'s':''} (${pct}%)`;}}}},animation:{animateRotate:true,animateScale:true,duration:600},layout:{padding:24}});
+
+  const clList=Object.entries(tot.cls).sort((a,b)=>b[1]-a[1]);
+  if(clList.length) mkChart('ch-closer25','bar',{
+    labels:MONTHS25.map(m=>m.label.slice(0,3)),
+    datasets:clList.map((c,i)=>({label:c[0],data:MONTHS25.map(m=>d25[m.key]?.cls?.[c[0]]||0),backgroundColor:PAL[i%PAL.length]+'99',borderColor:PAL[i%PAL.length],borderWidth:2,borderRadius:4}))
+  },{scales:{x:{stacked:true},y:{stacked:true}}});
+
+  const sdrTot={};
+  MONTHS25.forEach(m=>{(d25[m.key]?.rows||[]).forEach(r=>{if(!r.sdr)return;const k=r.sdr.trim();if(!sdrTot[k])sdrTot[k]={vendas:0,colet:0};sdrTot[k].vendas++;sdrTot[k].colet+=(r.colet||0);});});
+  const sdrArr=Object.entries(sdrTot).sort((a,b)=>b[1].vendas-a[1].vendas).slice(0,3);
+  renderPodium(sdrArr,'sdr-ranking25');
+
+  const best=MONTHS25.reduce((b,m)=>(!b||(d25[m.key]?.ltv||0)>(d25[b]?.ltv||0))?m.key:b,null);
+  document.getElementById('insights-2025').innerHTML=`
+    <h2>💡 Insights — 2025 Completo</h2>
+    <div class="insight" style="border-color:${GL}"><strong>📅 Melhor mês:</strong>${MONTHS25.find(m=>m.key===best)?.label||'—'}</div>
+    <div class="insight" style="border-color:${AC}"><strong>🏆 Total de fechamentos:</strong>${tot.count} vendas</div>
+    <div class="insight" style="border-color:${GD}"><strong>💰 Receita total:</strong>${brl(tot.ltv)}</div>
+    <div class="insight" style="border-color:${WN}"><strong>📈 Média mensal:</strong>${brl(tot.ltv/Math.max(MONTHS25.filter(m=>d25[m.key]?.count>0).length,1))}</div>
+  `;
+
+  document.getElementById('tbl-title25').textContent=`📋 Todos os Clientes 2025 (${allRows.length})`;
+  document.getElementById('tbl-25').innerHTML=`<table><thead><tr><th>Mês</th><th>Data</th><th>Cliente</th><th>LTV</th><th>Mens.</th><th>Impl.</th><th>Fonte</th><th>Meses</th><th>Coletado</th><th>SDR</th><th>Closer</th></tr></thead><tbody>
+  ${allRows.map(r=>`<tr>
+    <td style="color:var(--accent);font-weight:700">${r._mes}</td>
+    <td style="color:var(--muted)">${r.data?r.data.toLocaleDateString('pt-BR'):''}</td>
+    <td style="font-weight:600">${r.nome||'—'}</td>
+    <td style="color:${AC}">${brl(r.ltv)}</td><td>${brl(r.mens)}</td><td>${brl(r.impl)}</td>
+    <td><span class="badge">${r.fonte||'—'}</span></td>
+    <td style="text-align:center">${r.meses||'—'}</td>
+    <td style="color:${GD}">${brl(r.colet)}</td>
+    <td style="color:var(--muted)">${r.sdr||'—'}</td>
+    <td style="color:${GD};font-weight:700">${r.closer||'—'}</td>
+  </tr>`).join('')}</tbody></table>`;
 }
 
 function renderCompare(){
@@ -742,13 +891,15 @@ function renderCompare(){
   const v26=Object.values(d26).reduce((s,v)=>s+v.count,0);
   const active26=MONTHS26.filter(m=>d26[m.key]?.ltv>0).length;
   const avg26=active26>0?ltv26/active26:0;
-  const ltv25=d25.reduce((s,r)=>s+r.ltv,0);
-  const v25=d25.reduce((s,r)=>s+r.vendas,0);
-  const avg25=d25.length>0?ltv25/d25.length:0;
+  const d25vals=MONTHS25.map(m=>d25[m.key]).filter(Boolean);
+  const ltv25=d25vals.reduce((s,r)=>s+r.ltv,0);
+  const v25=d25vals.reduce((s,r)=>s+r.count,0);
+  const active25=d25vals.filter(r=>r.ltv>0).length;
+  const avg25=active25>0?ltv25/active25:0;
   const delta=avg25>0?((avg26-avg25)/avg25*100):0;
 
   document.getElementById('vs-row').innerHTML=`
-    <div class="vs-item"><div class="vs-lbl">LTV Total 2025 (Jul–Dez)</div><div class="vs-val" style="color:var(--muted)">${brl(ltv25)}</div></div>
+    <div class="vs-item"><div class="vs-lbl">LTV Total 2025</div><div class="vs-val" style="color:var(--muted)">${brl(ltv25)}</div></div>
     <div class="vs-sep">→</div>
     <div class="vs-item"><div class="vs-lbl">LTV Total 2026 (Jan–Mar)</div><div class="vs-val" style="color:${AC}">${brl(ltv26)}</div></div>
     <div class="vs-sep">·</div>
@@ -758,14 +909,14 @@ function renderCompare(){
     <div class="vs-item"><span class="delta-chip ${delta>=0?'delta-up':'delta-down'}">${delta>=0?'▲':'▼'} ${Math.abs(delta).toFixed(1)}% vs 2025</span></div>
   `;
 
-  const l25=d25.map(r=>r.mes.slice(0,3));
+  const l25=MONTHS25.map(m=>m.label.slice(0,3));
   const l26=MONTHS26.map(m=>m.label.slice(0,3)+' 26');
-  const nulls25=d25.map(()=>null),nulls26=MONTHS26.map(()=>null);
+  const nulls25=MONTHS25.map(()=>null),nulls26=MONTHS26.map(()=>null);
 
   mkChart('ch-vs-ltv','line',{
     labels:[...l25,...l26],
     datasets:[
-      {label:'2025',data:[...d25.map(r=>r.ltv),...nulls26],borderColor:'#5a8ab0',backgroundColor:'transparent',borderWidth:2,tension:.35,pointRadius:4,pointBackgroundColor:'#5a8ab0'},
+      {label:'2025',data:[...MONTHS25.map(m=>d25[m.key]?.ltv||0),...nulls26],borderColor:'#5a8ab0',backgroundColor:'transparent',borderWidth:2,tension:.35,pointRadius:4,pointBackgroundColor:'#5a8ab0'},
       {label:'2026',data:[...nulls25,...MONTHS26.map(m=>d26[m.key]?.ltv||0)],borderColor:AC,backgroundColor:AC+'22',borderWidth:2.5,tension:.35,pointRadius:5,pointBackgroundColor:AC,fill:true}
     ]
   },{scales:{x:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat',weight:'600'}}},y:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat'},callback:v=>'R$'+Math.round(v/1000)+'k'}}},plugins:{legend:{labels:{color:'#5a8ab0',font:{size:9,family:'Montserrat',weight:'600'},boxWidth:10,padding:10}}}});
@@ -773,12 +924,12 @@ function renderCompare(){
   mkChart('ch-vs-vend','bar',{
     labels:[...l25,...l26],
     datasets:[
-      {label:'2025',data:[...d25.map(r=>r.vendas),...nulls26.map(()=>0)],backgroundColor:'#5a8ab077',borderColor:'#5a8ab0',borderWidth:2,borderRadius:4},
+      {label:'2025',data:[...MONTHS25.map(m=>d25[m.key]?.count||0),...nulls26.map(()=>0)],backgroundColor:'#5a8ab077',borderColor:'#5a8ab0',borderWidth:2,borderRadius:4},
       {label:'2026',data:[...nulls25.map(()=>0),...MONTHS26.map(m=>d26[m.key]?.count||0)],backgroundColor:AC+'88',borderColor:AC,borderWidth:2,borderRadius:4}
     ]
   },{scales:{x:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat',weight:'600'}}},y:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat'}}}},plugins:{legend:{labels:{color:'#5a8ab0',font:{size:9,family:'Montserrat',weight:'600'},boxWidth:10,padding:10}}}});
 
-  const t25=d25.map(r=>r.vendas>0?r.mens/r.vendas:0);
+  const t25=MONTHS25.map(m=>{const d=d25[m.key];return d&&d.count>0?d.mens/d.count:0;});
   const t26=MONTHS26.map(m=>{const d=d26[m.key];return d&&d.count>0?d.mens/d.count:0;});
   mkChart('ch-vs-tick','line',{
     labels:[...l25,...l26],
@@ -788,7 +939,6 @@ function renderCompare(){
     ]
   },{scales:{x:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat',weight:'600'}}},y:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat'},callback:v=>'R$'+Math.round(v)}}},plugins:{legend:{labels:{color:'#5a8ab0',font:{size:9,family:'Montserrat',weight:'600'},boxWidth:10,padding:10}}}});
 
-  // Insights compare
   document.getElementById('insights-compare').innerHTML=`
     <h2>💡 Análise Comparativa</h2>
     <div class="insight" style="border-color:${delta>=0?GD:BD}">
@@ -797,7 +947,7 @@ function renderCompare(){
     </div>
     <div class="insight" style="border-color:${AC}">
       <strong>🏆 Volume de Vendas</strong>
-      2025 registrou ${v25} vendas em ${d25.length} meses. 2026 já soma ${v26} vendas em apenas ${active26} meses.
+      2025 registrou ${v25} vendas em ${active25} meses. 2026 já soma ${v26} vendas em apenas ${active26} meses.
     </div>
   `;
 }
