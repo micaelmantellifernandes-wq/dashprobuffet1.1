@@ -651,11 +651,44 @@ function renderTotal2026(){
 
   // Insights
   const best=MONTHS26.reduce((b,m)=>(!b||( d26[m.key]?.ltv||0)>(d26[b]?.ltv||0))?m.key:b,null);
+  const activeMo26=MONTHS26.filter(m=>d26[m.key]?.count>0).length||1;
+  const bestLabel=MONTHS26.find(m=>m.key===best)?.label||'—';
+  const bestVal=d26[best]?.ltv||0;
   document.getElementById('insights-2026').innerHTML=`
-    <div class="insight-item">📅 Melhor mês: <strong>${MONTHS26.find(m=>m.key===best)?.label||'—'}</strong></div>
-    <div class="insight-item">🏆 Total de fechamentos: <strong>${tot.count} vendas</strong></div>
-    <div class="insight-item">💰 Receita total acumulada: <strong>${brl(tot.ltv)}</strong></div>
-    <div class="insight-item">📈 Média mensal: <strong>${brl(tot.ltv/Math.max(MONTHS26.filter(m=>d26[m.key]?.count>0).length,1))}</strong></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;max-width:1060px;margin:0 auto">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:14px">
+        <div style="font-size:1.8rem;line-height:1">🏆</div>
+        <div>
+          <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-bottom:4px">Melhor Mês</div>
+          <div style="font-size:1.1rem;font-weight:800;color:${AC}">${bestLabel}</div>
+          <div style="font-size:.68rem;color:var(--muted);margin-top:2px">${brl(bestVal)} em LTV</div>
+        </div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:14px">
+        <div style="font-size:1.8rem;line-height:1">🤝</div>
+        <div>
+          <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-bottom:4px">Fechamentos</div>
+          <div style="font-size:1.1rem;font-weight:800;color:${GL}">${tot.count} vendas</div>
+          <div style="font-size:.68rem;color:var(--muted);margin-top:2px">${(tot.count/activeMo26).toFixed(1)} vendas/mês</div>
+        </div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:14px">
+        <div style="font-size:1.8rem;line-height:1">💜</div>
+        <div>
+          <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-bottom:4px">Média Mens./Mês</div>
+          <div style="font-size:1.1rem;font-weight:800;color:#a78bfa">${brl(tot.mens/activeMo26)}</div>
+          <div style="font-size:.68rem;color:var(--muted);margin-top:2px">Total: ${brl(tot.mens)}</div>
+        </div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:14px">
+        <div style="font-size:1.8rem;line-height:1">📈</div>
+        <div>
+          <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-bottom:4px">Média LTV/Mês</div>
+          <div style="font-size:1.1rem;font-weight:800;color:#f0b429">${brl(tot.ltv/activeMo26)}</div>
+          <div style="font-size:.68rem;color:var(--muted);margin-top:2px">Total: ${brl(tot.ltv)}</div>
+        </div>
+      </div>
+    </div>
   `;
 
   // Tabela com coluna de mês
@@ -885,12 +918,44 @@ function renderTotal2025(){
   renderPodium(sdrArr,'sdr-ranking25');
 
   const best=MONTHS25.reduce((b,m)=>(!b||(d25[m.key]?.ltv||0)>(d25[b]?.ltv||0))?m.key:b,null);
+  const activeMo25=MONTHS25.filter(m=>d25[m.key]?.count>0).length||1;
+  const bestLabel25=MONTHS25.find(m=>m.key===best)?.label||'—';
+  const bestVal25=d25[best]?.ltv||0;
   document.getElementById('insights-2025').innerHTML=`
-    <h2>💡 Insights — 2025 Completo</h2>
-    <div class="insight" style="border-color:${GL}"><strong>📅 Melhor mês:</strong>${MONTHS25.find(m=>m.key===best)?.label||'—'}</div>
-    <div class="insight" style="border-color:${AC}"><strong>🏆 Total de fechamentos:</strong>${tot.count} vendas</div>
-    <div class="insight" style="border-color:${GD}"><strong>💰 Receita total:</strong>${brl(tot.ltv)}</div>
-    <div class="insight" style="border-color:${WN}"><strong>📈 Média mensal:</strong>${brl(tot.ltv/Math.max(MONTHS25.filter(m=>d25[m.key]?.count>0).length,1))}</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;max-width:1060px;margin:0 auto">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:14px">
+        <div style="font-size:1.8rem;line-height:1">🏆</div>
+        <div>
+          <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-bottom:4px">Melhor Mês</div>
+          <div style="font-size:1.1rem;font-weight:800;color:${AC}">${bestLabel25}</div>
+          <div style="font-size:.68rem;color:var(--muted);margin-top:2px">${brl(bestVal25)} em LTV</div>
+        </div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:14px">
+        <div style="font-size:1.8rem;line-height:1">🤝</div>
+        <div>
+          <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-bottom:4px">Fechamentos</div>
+          <div style="font-size:1.1rem;font-weight:800;color:${GL}">${tot.count} vendas</div>
+          <div style="font-size:.68rem;color:var(--muted);margin-top:2px">${(tot.count/activeMo25).toFixed(1)} vendas/mês</div>
+        </div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:14px">
+        <div style="font-size:1.8rem;line-height:1">💜</div>
+        <div>
+          <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-bottom:4px">Média Mens./Mês</div>
+          <div style="font-size:1.1rem;font-weight:800;color:#a78bfa">${brl(tot.mens/activeMo25)}</div>
+          <div style="font-size:.68rem;color:var(--muted);margin-top:2px">Total: ${brl(tot.mens)}</div>
+        </div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:14px">
+        <div style="font-size:1.8rem;line-height:1">📈</div>
+        <div>
+          <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-bottom:4px">Média LTV/Mês</div>
+          <div style="font-size:1.1rem;font-weight:800;color:#f0b429">${brl(tot.ltv/activeMo25)}</div>
+          <div style="font-size:.68rem;color:var(--muted);margin-top:2px">Total: ${brl(tot.ltv)}</div>
+        </div>
+      </div>
+    </div>
   `;
 
   document.getElementById('tbl-title25').textContent=`📋 Todos os Clientes 2025 (${allRows.length})`;
