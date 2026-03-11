@@ -591,7 +591,8 @@ function renderTotal2026(){
     <div class="card warn"><div class="cn">Total de Vendas</div><div class="cv" style="color:${GL}">${tot.count}</div><div class="cp">Jan + Fev + Mar</div></div>
     <div class="card neutral"><div class="cn">LTV Total</div><div class="cv" style="color:${AC}">${brl(tot.ltv)}</div><div class="cp">Receita acumulada</div></div>
     <div class="card neutral"><div class="cn">Mensalidade</div><div class="cv" style="color:${AC}">${brl(tot.mens)}</div><div class="cp">Recorrência total</div></div>
-    <div class="card neutral" style="border-top:3px solid #a78bfa"><div class="cn">Média Mensal Mens.</div><div class="cv" style="color:#a78bfa">${brl(tot.mens/activeMths26c)}</div><div class="cp">Média por mês com dados</div></div>
+    <div class="card neutral" style="border-top:3px solid #a78bfa"><div class="cn">Média Mensal Mens.</div><div class="cv" style="color:#a78bfa">${brl(tot.mens/activeMths26c)}</div><div class="cp">Média mens. por mês</div></div>
+    <div class="card neutral" style="border-top:3px solid #f0b429"><div class="cn">Média Mensal LTV</div><div class="cv" style="color:#f0b429">${brl(tot.ltv/activeMths26c)}</div><div class="cp">Média LTV por mês</div></div>
     <div class="card good"><div class="cn">Consultoria</div><div class="cv" style="color:${GD}">${brl(tot.impl)}</div><div class="cp">Implantações total</div></div>
     <div class="card good"><div class="cn">Ticket Médio</div><div class="cv" style="color:${GD}">${brl(ticket)}</div><div class="cp">Mens/venda</div></div>
     <div class="card neutral"><div class="cn">Coletado</div><div class="cv" style="color:${AC}">${brl(tot.colet)}</div><div class="cp">Total recebido</div></div>
@@ -843,7 +844,8 @@ function renderTotal2025(){
     <div class="card warn"><div class="cn">Total de Vendas</div><div class="cv" style="color:${GL}">${tot.count}</div><div class="cp">2025 completo</div></div>
     <div class="card neutral"><div class="cn">LTV Total</div><div class="cv" style="color:${AC}">${brl(tot.ltv)}</div><div class="cp">Receita acumulada</div></div>
     <div class="card neutral"><div class="cn">Mensalidade</div><div class="cv" style="color:${AC}">${brl(tot.mens)}</div><div class="cp">Recorrência total</div></div>
-    <div class="card neutral" style="border-top:3px solid #a78bfa"><div class="cn">Média Mensal Mens.</div><div class="cv" style="color:#a78bfa">${brl(tot.mens/activeMths25c)}</div><div class="cp">Média por mês com dados</div></div>
+    <div class="card neutral" style="border-top:3px solid #a78bfa"><div class="cn">Média Mensal Mens.</div><div class="cv" style="color:#a78bfa">${brl(tot.mens/activeMths25c)}</div><div class="cp">Média mens. por mês</div></div>
+    <div class="card neutral" style="border-top:3px solid #f0b429"><div class="cn">Média Mensal LTV</div><div class="cv" style="color:#f0b429">${brl(tot.ltv/activeMths25c)}</div><div class="cp">Média LTV por mês</div></div>
     <div class="card good"><div class="cn">Consultoria</div><div class="cv" style="color:${GD}">${brl(tot.impl)}</div><div class="cp">Implantações total</div></div>
     <div class="card good"><div class="cn">Ticket Médio</div><div class="cv" style="color:${GD}">${brl(ticket)}</div><div class="cp">Mens/venda</div></div>
     <div class="card neutral"><div class="cn">Coletado</div><div class="cv" style="color:${AC}">${brl(tot.colet)}</div><div class="cp">Total recebido</div></div>
