@@ -600,13 +600,18 @@ function renderTotal2026(){
   Object.keys(charts).forEach(k=>{if(k.includes('26')){charts[k]?.destroy();delete charts[k];}});
 
   // Chart receita por mês (bar)
-  mkChart('ch-receita26','bar',{
+  const activeMths26=MONTHS26.filter(m=>d26[m.key]?.ltv>0).length||1;
+  const avgLTV26=tot.ltv/activeMths26;
+  const avgMens26=tot.mens/activeMths26;
+  mkChart('ch-rec26','bar',{
     labels:MONTHS26.map(m=>m.label),
     datasets:[
       {label:'LTV',data:MONTHS26.map(m=>d26[m.key]?.ltv||0),backgroundColor:AC+'99',borderColor:AC,borderWidth:2,borderRadius:5},
       {label:'Mensalidade',data:MONTHS26.map(m=>d26[m.key]?.mens||0),backgroundColor:GD+'77',borderColor:GD,borderWidth:2,borderRadius:5},
+      {label:'Média LTV',data:MONTHS26.map(()=>avgLTV26),type:'line',borderColor:'#f0b429',backgroundColor:'transparent',borderWidth:2,borderDash:[6,4],pointRadius:0,tension:0,order:0},
+      {label:'Média Mens.',data:MONTHS26.map(()=>avgMens26),type:'line',borderColor:'#a78bfa',backgroundColor:'transparent',borderWidth:2,borderDash:[4,4],pointRadius:0,tension:0,order:0},
     ]
-  });
+  },{scales:{y:{ticks:{callback:v=>'R$'+Math.round(v/1000)+'k',color:'#5a8ab0',font:{size:8,family:'Montserrat'}},grid:{color:'#0a408020'}},x:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat',weight:'600'}}}},plugins:{legend:{labels:{color:'#5a8ab0',font:{size:9,family:'Montserrat',weight:'600'},boxWidth:10,padding:8}}}});
 
   // Chart fonte consolidada
   const fontes=Object.entries(tot.src).sort((a,b)=>b[1]-a[1]);
@@ -843,13 +848,18 @@ function renderTotal2025(){
 
   Object.keys(charts).forEach(k=>{if(k.includes('25')&&!k.includes('26')){charts[k]?.destroy();delete charts[k];}});
 
+  const activeMths25=MONTHS25.filter(m=>d25[m.key]?.ltv>0).length||1;
+  const avgLTV25=tot.ltv/activeMths25;
+  const avgMens25=tot.mens/activeMths25;
   mkChart('ch-ltv25','bar',{
     labels:MONTHS25.map(m=>m.label.slice(0,3)),
     datasets:[
       {label:'LTV',data:MONTHS25.map(m=>d25[m.key]?.ltv||0),backgroundColor:AC+'99',borderColor:AC,borderWidth:2,borderRadius:5},
       {label:'Mensalidade',data:MONTHS25.map(m=>d25[m.key]?.mens||0),backgroundColor:GD+'77',borderColor:GD,borderWidth:2,borderRadius:5},
+      {label:'Média LTV',data:MONTHS25.map(()=>avgLTV25),type:'line',borderColor:'#f0b429',backgroundColor:'transparent',borderWidth:2,borderDash:[6,4],pointRadius:0,tension:0,order:0},
+      {label:'Média Mens.',data:MONTHS25.map(()=>avgMens25),type:'line',borderColor:'#a78bfa',backgroundColor:'transparent',borderWidth:2,borderDash:[4,4],pointRadius:0,tension:0,order:0},
     ]
-  });
+  },{scales:{y:{ticks:{callback:v=>'R$'+Math.round(v/1000)+'k',color:'#5a8ab0',font:{size:8,family:'Montserrat'}},grid:{color:'#0a408020'}},x:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat',weight:'600'}}}},plugins:{legend:{labels:{color:'#5a8ab0',font:{size:9,family:'Montserrat',weight:'600'},boxWidth:10,padding:8},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': R$'+Math.round(ctx.parsed.y).toLocaleString('pt-BR')}}}}});
 
   const fontes=Object.entries(tot.src).sort((a,b)=>b[1]-a[1]);
   if(fontes.length) mkChart('ch-fonte25','doughnut',{
