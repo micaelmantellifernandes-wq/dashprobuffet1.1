@@ -586,9 +586,11 @@ function renderTotal2026(){
   const ticket=tot.count>0?tot.mens/tot.count:0;
 
   // Cards
+  const activeMths26c=MONTHS26.filter(m=>d26[m.key]?.ltv>0).length||1;
   document.getElementById('cards-2026').innerHTML=`
     <div class="card warn"><div class="cn">Total de Vendas</div><div class="cv" style="color:${GL}">${tot.count}</div><div class="cp">Jan + Fev + Mar</div></div>
     <div class="card neutral"><div class="cn">LTV Total</div><div class="cv" style="color:${AC}">${brl(tot.ltv)}</div><div class="cp">Receita acumulada</div></div>
+    <div class="card neutral" style="border-top:3px solid #f0b429"><div class="cn">Média Mensal LTV</div><div class="cv" style="color:#f0b429">${brl(tot.ltv/activeMths26c)}</div><div class="cp">Média por mês com dados</div></div>
     <div class="card neutral"><div class="cn">Mensalidade</div><div class="cv" style="color:${AC}">${brl(tot.mens)}</div><div class="cp">Recorrência total</div></div>
     <div class="card good"><div class="cn">Consultoria</div><div class="cv" style="color:${GD}">${brl(tot.impl)}</div><div class="cp">Implantações total</div></div>
     <div class="card good"><div class="cn">Ticket Médio</div><div class="cv" style="color:${GD}">${brl(ticket)}</div><div class="cp">Mens/venda</div></div>
@@ -836,9 +838,11 @@ function renderTotal2025(){
   });
   const ticket=tot.count>0?tot.mens/tot.count:0;
 
+  const activeMths25c=MONTHS25.filter(m=>d25[m.key]?.ltv>0).length||1;
   document.getElementById('cards-2025').innerHTML=`
     <div class="card warn"><div class="cn">Total de Vendas</div><div class="cv" style="color:${GL}">${tot.count}</div><div class="cp">2025 completo</div></div>
     <div class="card neutral"><div class="cn">LTV Total</div><div class="cv" style="color:${AC}">${brl(tot.ltv)}</div><div class="cp">Receita acumulada</div></div>
+    <div class="card neutral" style="border-top:3px solid #f0b429"><div class="cn">Média Mensal LTV</div><div class="cv" style="color:#f0b429">${brl(tot.ltv/activeMths25c)}</div><div class="cp">Média por mês com dados</div></div>
     <div class="card neutral"><div class="cn">Mensalidade</div><div class="cv" style="color:${AC}">${brl(tot.mens)}</div><div class="cp">Recorrência total</div></div>
     <div class="card good"><div class="cn">Consultoria</div><div class="cv" style="color:${GD}">${brl(tot.impl)}</div><div class="cp">Implantações total</div></div>
     <div class="card good"><div class="cn">Ticket Médio</div><div class="cv" style="color:${GD}">${brl(ticket)}</div><div class="cp">Mens/venda</div></div>
