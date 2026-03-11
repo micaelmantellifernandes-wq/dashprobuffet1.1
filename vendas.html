@@ -549,7 +549,7 @@ function render2026(mk){
     <h2>💡 Insights — ${d.label}</h2>
     ${top?`<div class="insight" style="border-color:${AC}"><strong>🎯 Principal Fonte</strong>${top[0]} gerou ${top[1]} venda${top[1]>1?'s':''} neste mês.</div>`:''}
     ${topCl?`<div class="insight" style="border-color:${GD}"><strong>🏆 Melhor Closer</strong>${topCl[0]} fechou ${topCl[1]} venda${topCl[1]>1?'s':''} em ${d.label}.</div>`:''}
-    ${d.impl>0?`<div class="insight" style="border-color:${WN}"><strong>⚡ Implantações</strong>Total de ${brl(d.impl)} em implantações — ${((d.impl/(d.ltv||1))*100).toFixed(0)}% do LTV do mês.</div>`:''}
+    ${d.impl>0?`<div class="insight" style="border-color:${WN}"><strong>⚡ Implantações</strong>Total de ${brl(d.impl)} em implantações — ${(((d.impl)/((d.mens||0)+(d.impl)||1))*100).toFixed(0)}% da receita do mês.</div>`:''}
   `;
 
   // Table
