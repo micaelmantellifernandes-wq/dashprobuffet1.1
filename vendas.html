@@ -474,7 +474,7 @@ function render2026(mk){
     <div class="card good"><div class="cn">Consultoria</div><div class="cv" style="color:${GD}">${brl(d.impl)}</div><div class="cp">Total 2026: ${brl(Object.values(d26).reduce((s,v)=>s+v.impl,0))}</div></div>
     <div class="card good"><div class="cn">Ticket Médio</div><div class="cv" style="color:${GD}">${brl(ticket)}</div><div class="cp">Mens/venda</div></div>
     <div class="card neutral"><div class="cn">Coletado</div><div class="cv" style="color:${AC}">${brl(d.colet)}</div></div>
-    <div class="card warn"><div class="cn">Total Vendido</div><div class="cv" style="color:${WN}">${brl(d.colet+d.impl)}</div><div class="cp">Mens. coletada + Consultoria</div></div>
+    <div class="card warn"><div class="cn">Total Vendido</div><div class="cv" style="color:${WN}">${brl(d.mens+d.impl)}</div><div class="cp">Mensalidade + Consultoria</div></div>
   `;
 
   // Chart receita
@@ -608,7 +608,7 @@ function renderTotal2026(){
     <div class="card good"><div class="cn">Consultoria</div><div class="cv" style="color:${GD}">${brl(tot.impl)}</div><div class="cp">Implantações total</div></div>
     <div class="card good"><div class="cn">Ticket Médio</div><div class="cv" style="color:${GD}">${brl(ticket)}</div><div class="cp">Mens/venda</div></div>
     <div class="card neutral"><div class="cn">Coletado</div><div class="cv" style="color:${AC}">${brl(tot.colet)}</div><div class="cp">Total recebido</div></div>
-    <div class="card warn"><div class="cn">Total Vendido</div><div class="cv" style="color:${WN}">${brl(tot.colet+tot.impl)}</div><div class="cp">Mens. coletada + Consultoria</div></div>
+    <div class="card warn"><div class="cn">Total Vendido</div><div class="cv" style="color:${WN}">${brl(tot.mens+tot.impl)}</div><div class="cp">Mensalidade + Consultoria</div></div>
   `;
 
   // Destroy old charts
@@ -803,7 +803,7 @@ function render2025(mk){
     <div class="card good"><div class="cn">Consultoria</div><div class="cv" style="color:${GD}">${brl(d.impl)}</div><div class="cp">Total 2025: ${brl(Object.values(d25).reduce((s,v)=>s+v.impl,0))}</div></div>
     <div class="card good"><div class="cn">Ticket Médio</div><div class="cv" style="color:${GD}">${brl(ticket)}</div><div class="cp">Mens/venda</div></div>
     <div class="card neutral"><div class="cn">Coletado</div><div class="cv" style="color:${AC}">${brl(d.colet)}</div></div>
-    <div class="card warn"><div class="cn">Total Vendido</div><div class="cv" style="color:${WN}">${brl(d.colet+d.impl)}</div><div class="cp">Mens. coletada + Consultoria</div></div>
+    <div class="card warn"><div class="cn">Total Vendido</div><div class="cv" style="color:${WN}">${brl(d.mens+d.impl)}</div><div class="cp">Mensalidade + Consultoria</div></div>
   `;
 
   // Charts
@@ -894,7 +894,7 @@ function renderTotal2025(){
     <div class="card good"><div class="cn">Consultoria</div><div class="cv" style="color:${GD}">${brl(tot.impl)}</div><div class="cp">Implantações total</div></div>
     <div class="card good"><div class="cn">Ticket Médio</div><div class="cv" style="color:${GD}">${brl(ticket)}</div><div class="cp">Mens/venda</div></div>
     <div class="card neutral"><div class="cn">Coletado</div><div class="cv" style="color:${AC}">${brl(tot.colet)}</div><div class="cp">Total recebido</div></div>
-    <div class="card warn"><div class="cn">Total Vendido</div><div class="cv" style="color:${WN}">${brl(tot.colet+tot.impl)}</div><div class="cp">Mens. coletada + Consultoria</div></div>
+    <div class="card warn"><div class="cn">Total Vendido</div><div class="cv" style="color:${WN}">${brl(tot.mens+tot.impl)}</div><div class="cp">Mensalidade + Consultoria</div></div>
   `;
 
   Object.keys(charts).forEach(k=>{if(k.includes('25')&&!k.includes('26')){charts[k]?.destroy();delete charts[k];}});
