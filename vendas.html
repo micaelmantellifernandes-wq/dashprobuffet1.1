@@ -237,7 +237,7 @@ tr:hover td{background:var(--surface2)}
   <button class="main-tab" onclick="switchPanel('compare',this)">⚖️ Comparar Anos</button>
 </div>
 
-<div id="loading"><div class="spinner" id="loading-spinner"></div><div id="loading-msg">Carregando dados das planilhas...</div><div id="loading-error" style="display:none;margin-top:16px;max-width:420px;margin-left:auto;margin-right:auto"><div style="background:#ff444420;border:1px solid #ff4444;border-radius:10px;padding:14px 18px;color:#ff8888;font-size:.8rem;font-weight:600;margin-bottom:12px">⚠️ Não foi possível carregar os dados.<br><span style="font-size:.72rem;font-weight:400;opacity:.85">Verifique se as planilhas estão públicas e tente novamente.</span></div><button onclick="retryLoad()" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:9px 22px;font-family:Montserrat,sans-serif;font-size:.78rem;font-weight:700;cursor:pointer;letter-spacing:.04em">🔄 Tentar Novamente</button></div></div>
+<div id="loading"><div class="spinner" id="loading-spinner"></div><div id="loading-msg">Carregando dados das planilhas...</div><div id="loading-error" style="display:none;margin-top:16px;max-width:420px;margin-left:auto;margin-right:auto"><div style="background:#ff444420;border:1px solid #ff4444;border-radius:10px;padding:14px 18px;color:#ff8888;font-size:.8rem;font-weight:600;margin-bottom:12px">⚠️ Não foi possível carregar os dados.<br><span style="font-size:.72rem;font-weight:400;opacity:.85">Verifique se as planilhas estão públicas e tente novamente. Se estiver abrindo como arquivo local, use um servidor web (ex: VS Code Live Server).</span></div><button onclick="retryLoad()" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:9px 22px;font-family:Montserrat,sans-serif;font-size:.78rem;font-weight:700;cursor:pointer;letter-spacing:.04em">🔄 Tentar Novamente</button></div></div>
 <div id="app" style="display:none">
 
   <!-- ══ 2026 ══ -->
@@ -359,18 +359,16 @@ function mkChart(id,type,data,extra={}){
 }
 
 async function fetchSheet(id,sheet){
+  const url=`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheet)}`;
   const controller=new AbortController();
   const timer=setTimeout(()=>controller.abort(),10000);
-  const url=`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheet)}`;
-  let res,text;
   try{
-    res=await fetch(url,{signal:controller.signal});
+    const res=await fetch(url,{signal:controller.signal});
     clearTimeout(timer);
-    text=await res.text();
+    const text=await res.text();
+    const json=JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/)[1]);
+    return json.table.rows.map(r=>(r.c||[]).map(c=>(!c||c.v===null)?null:c.v));
   }catch(e){clearTimeout(timer);throw e;}
-
-  const json=JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/)[1]);
-  return json.table.rows.map(r=>(r.c||[]).map(c=>(!c||c.v===null)?null:c.v));
 }
 
 function parseDate(v){
@@ -437,7 +435,6 @@ async function loadAll(){
     }
   }
 
-  // Verifica se carregou algum dado real
   const totalRows=Object.values(d26).reduce((s,v)=>s+v.count,0)+Object.values(d25).reduce((s,v)=>s+v.count,0);
   if(totalRows===0){
     document.getElementById('loading-spinner').style.display='none';
@@ -477,7 +474,7 @@ function render2026(mk){
     <div class="card good"><div class="cn">Consultoria</div><div class="cv" style="color:${GD}">${brl(d.impl)}</div><div class="cp">Total 2026: ${brl(Object.values(d26).reduce((s,v)=>s+v.impl,0))}</div></div>
     <div class="card good"><div class="cn">Ticket Médio</div><div class="cv" style="color:${GD}">${brl(ticket)}</div><div class="cp">Mens/venda</div></div>
     <div class="card neutral"><div class="cn">Coletado</div><div class="cv" style="color:${AC}">${brl(d.colet)}</div></div>
-    <div class="card warn"><div class="cn">Total Vendido</div><div class="cv" style="color:${WN}">${brl(d.mens+d.impl)}</div><div class="cp">Mensalidade + Consultoria</div></div>
+    <div class="card warn"><div class="cn">Total Vendido</div><div class="cv" style="color:${WN}">${brl(d.colet+d.impl)}</div><div class="cp">Mens. coletada + Consultoria</div></div>
   `;
 
   // Chart receita
@@ -487,7 +484,7 @@ function render2026(mk){
       {label:'LTV',data:MONTHS26.map(m=>d26[m.key]?.ltv||0),backgroundColor:AC+'99',borderColor:AC,borderWidth:2,borderRadius:5},
       {label:'Mensalidade',data:MONTHS26.map(m=>d26[m.key]?.mens||0),backgroundColor:GD+'77',borderColor:GD,borderWidth:2,borderRadius:5},
     ]
-  },{scales:{y:{ticks:{callback:v=>'R$'+Math.round(v/1000)+'k',color:'#5a8ab0',font:{size:8,family:'Montserrat'}},grid:{color:'#0a408020'}},x:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat',weight:'600'}}}},plugins:{tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': R$ '+Math.round(ctx.parsed.y).toLocaleString('pt-BR')}}}},});
+  },{scales:{y:{ticks:{callback:v=>'R$'+Math.round(v/1000)+'k',color:'#5a8ab0',font:{size:8,family:'Montserrat'}},grid:{color:'#0a408020'}},x:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat',weight:'600'}}}}});
 
   // Chart fonte
   const fontes=Object.entries(d.src).sort((a,b)=>b[1]-a[1]);
@@ -611,7 +608,7 @@ function renderTotal2026(){
     <div class="card good"><div class="cn">Consultoria</div><div class="cv" style="color:${GD}">${brl(tot.impl)}</div><div class="cp">Implantações total</div></div>
     <div class="card good"><div class="cn">Ticket Médio</div><div class="cv" style="color:${GD}">${brl(ticket)}</div><div class="cp">Mens/venda</div></div>
     <div class="card neutral"><div class="cn">Coletado</div><div class="cv" style="color:${AC}">${brl(tot.colet)}</div><div class="cp">Total recebido</div></div>
-    <div class="card warn"><div class="cn">Total Vendido</div><div class="cv" style="color:${WN}">${brl(tot.mens+tot.impl)}</div><div class="cp">Mensalidade + Consultoria</div></div>
+    <div class="card warn"><div class="cn">Total Vendido</div><div class="cv" style="color:${WN}">${brl(tot.colet+tot.impl)}</div><div class="cp">Mens. coletada + Consultoria</div></div>
   `;
 
   // Destroy old charts
@@ -806,7 +803,7 @@ function render2025(mk){
     <div class="card good"><div class="cn">Consultoria</div><div class="cv" style="color:${GD}">${brl(d.impl)}</div><div class="cp">Total 2025: ${brl(Object.values(d25).reduce((s,v)=>s+v.impl,0))}</div></div>
     <div class="card good"><div class="cn">Ticket Médio</div><div class="cv" style="color:${GD}">${brl(ticket)}</div><div class="cp">Mens/venda</div></div>
     <div class="card neutral"><div class="cn">Coletado</div><div class="cv" style="color:${AC}">${brl(d.colet)}</div></div>
-    <div class="card warn"><div class="cn">Total Vendido</div><div class="cv" style="color:${WN}">${brl(d.mens+d.impl)}</div><div class="cp">Mensalidade + Consultoria</div></div>
+    <div class="card warn"><div class="cn">Total Vendido</div><div class="cv" style="color:${WN}">${brl(d.colet+d.impl)}</div><div class="cp">Mens. coletada + Consultoria</div></div>
   `;
 
   // Charts
@@ -818,7 +815,7 @@ function render2025(mk){
       {label:'Consultoria',data:MONTHS25.map(m=>d25[m.key]?.impl||0),backgroundColor:AC+'99',borderColor:AC,borderWidth:2,borderRadius:5},
       {label:'Mensalidade',data:MONTHS25.map(m=>d25[m.key]?.mens||0),backgroundColor:GD+'77',borderColor:GD,borderWidth:2,borderRadius:5},
     ]
-  },{scales:{y:{ticks:{callback:v=>'R$'+Math.round(v/1000)+'k',color:'#5a8ab0',font:{size:8,family:'Montserrat'}},grid:{color:'#0a408020'}},x:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat',weight:'600'}}}},plugins:{tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': R$ '+Math.round(ctx.parsed.y).toLocaleString('pt-BR')}}}},});
+  });
 
   const fontes=Object.entries(d.src).sort((a,b)=>b[1]-a[1]);
   if(fontes.length){
@@ -897,7 +894,7 @@ function renderTotal2025(){
     <div class="card good"><div class="cn">Consultoria</div><div class="cv" style="color:${GD}">${brl(tot.impl)}</div><div class="cp">Implantações total</div></div>
     <div class="card good"><div class="cn">Ticket Médio</div><div class="cv" style="color:${GD}">${brl(ticket)}</div><div class="cp">Mens/venda</div></div>
     <div class="card neutral"><div class="cn">Coletado</div><div class="cv" style="color:${AC}">${brl(tot.colet)}</div><div class="cp">Total recebido</div></div>
-    <div class="card warn"><div class="cn">Total Vendido</div><div class="cv" style="color:${WN}">${brl(tot.mens+tot.impl)}</div><div class="cp">Mensalidade + Consultoria</div></div>
+    <div class="card warn"><div class="cn">Total Vendido</div><div class="cv" style="color:${WN}">${brl(tot.colet+tot.impl)}</div><div class="cp">Mens. coletada + Consultoria</div></div>
   `;
 
   Object.keys(charts).forEach(k=>{if(k.includes('25')&&!k.includes('26')){charts[k]?.destroy();delete charts[k];}});
@@ -913,7 +910,7 @@ function renderTotal2025(){
       {label:'Média Consultoria',data:MONTHS25.map(()=>avgImpl25),type:'line',borderColor:'#f0b429',backgroundColor:'transparent',borderWidth:2,borderDash:[6,4],pointRadius:0,tension:0,order:0},
       {label:'Média Mens.',data:MONTHS25.map(()=>avgMens25),type:'line',borderColor:'#a78bfa',backgroundColor:'transparent',borderWidth:2,borderDash:[4,4],pointRadius:0,tension:0,order:0},
     ]
-  },{scales:{y:{ticks:{callback:v=>'R$'+Math.round(v/1000)+'k',color:'#5a8ab0',font:{size:8,family:'Montserrat'}},grid:{color:'#0a408020'}},x:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat',weight:'600'}}}},plugins:{legend:{labels:{color:'#5a8ab0',font:{size:9,family:'Montserrat',weight:'600'},boxWidth:10,padding:8}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': R$ '+Math.round(ctx.parsed.y).toLocaleString('pt-BR')}}}}}); 
+  },{scales:{y:{ticks:{callback:v=>'R$'+Math.round(v/1000)+'k',color:'#5a8ab0',font:{size:8,family:'Montserrat'}},grid:{color:'#0a408020'}},x:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat',weight:'600'}}}},plugins:{legend:{labels:{color:'#5a8ab0',font:{size:9,family:'Montserrat',weight:'600'},boxWidth:10,padding:8},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': R$'+Math.round(ctx.parsed.y).toLocaleString('pt-BR')}}}}});
 
   const fontes=Object.entries(tot.src).sort((a,b)=>b[1]-a[1]);
   if(fontes.length) mkChart('ch-fonte25','doughnut',{
@@ -1061,20 +1058,19 @@ function switchPanel(id,btn){
   document.getElementById('panel-'+id).classList.add('visible');
 }
 
-// Detecta se está rodando como arquivo local (file://)
-if(location.protocol==='file:'){
-  document.getElementById('loading-spinner').style.display='none';
-  document.getElementById('loading-msg').innerHTML='<strong>⚠️ Arquivo aberto localmente</strong><br><span style="font-size:.75rem;font-weight:400">Abra este arquivo em um servidor web (ex: VS Code Live Server, ou hospede online) para carregar os dados do Google Sheets.</span>';
-  document.getElementById('loading-error').style.display='none';
-}
-
 function retryLoad(){
-  document.getElementById("loading-spinner").style.display="block";
-  document.getElementById("loading-msg").textContent="Carregando dados das planilhas...";
-  document.getElementById("loading-error").style.display="none";
+  d26={};d25={};
+  document.getElementById('loading-spinner').style.display='block';
+  document.getElementById('loading-msg').textContent='Carregando dados das planilhas...';
+  document.getElementById('loading-error').style.display='none';
   loadAll();
 }
-loadAll();
+if(location.protocol==='file:'){
+  document.getElementById('loading-spinner').style.display='none';
+  document.getElementById('loading-msg').innerHTML='<strong style="color:var(--accent)">⚠️ Arquivo aberto localmente</strong><br><span style="font-size:.75rem;font-weight:400;opacity:.8">Abra este arquivo via servidor web para carregar os dados do Google Sheets.<br>Dica: use a extensão <strong>Live Server</strong> no VS Code.</span>';
+}else{
+  loadAll();
+}
 // THEME TOGGLE
 function toggleTheme(){
   const isLight=document.documentElement.getAttribute('data-theme')==='light';
