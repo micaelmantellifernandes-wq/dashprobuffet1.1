@@ -33,7 +33,6 @@ body{background:var(--bg);color:var(--text);font-family:'Montserrat',sans-serif;
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.4)}}
 .last-update{margin-top:6px;font-size:.7rem;color:var(--muted)}
 
-/* LOADING */
 #loading{text-align:center;padding:60px 20px;color:var(--muted)}
 .spinner{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 14px}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -58,10 +57,10 @@ body{background:var(--bg);color:var(--text);font-family:'Montserrat',sans-serif;
 .wtab{background:transparent;border:1.5px solid var(--border);border-radius:20px;color:var(--muted);font-size:.72rem;font-weight:700;padding:5px 14px;cursor:pointer;transition:all .2s;letter-spacing:.04em}
 .wtab.active,.wtab:hover{opacity:1}
 #chart-pills::-webkit-scrollbar{display:none}
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-top:10px}
-.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;transition:border-color .2s}.kpi-card:hover{border-color:var(--accent)}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:12px;margin-top:10px}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;transition:border-color .2s;max-width:280px}.kpi-card:hover{border-color:var(--accent)}
 .kc-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:6px}
-.kc-val{font-size:1.4rem;font-weight:800;margin-bottom:4px}
+.kc-val{font-size:1.1rem;font-weight:800;margin-bottom:4px;white-space:nowrap;line-height:1.2;overflow:hidden;text-overflow:ellipsis}
 .kc-meta{font-size:.68rem;color:var(--muted);margin-bottom:4px}
 .kc-delta{font-size:.65rem;font-weight:700}
 .delta-up{color:var(--accent)}.delta-down{color:var(--bad)}.delta-eq{color:var(--muted)}
@@ -276,7 +275,7 @@ function parseBR(v){
 }
 function fmt(v,t){
   if(v===null||v===undefined||isNaN(v))return'—';
-  if(t==='brl')return'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  if(t==='brl')return'R$\u00A0'+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
   if(t==='pct')return v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+' %';
   return v.toLocaleString('pt-BR',{maximumFractionDigits:1});
 }
@@ -439,9 +438,11 @@ function renderGeral(month,week,color){
       const st=getStatus(m.key,v,p,m.lb);
       const c=st==='good'?'var(--good)':st==='warn'?'var(--warn)':st==='bad'?'var(--bad)':'var(--muted)';
       const dlt=getDelta(m.key,v,p,m.lb);
+      const fmtVal = fmt(v,m.fmt);
+      const valStyle = m.fmt==='num' ? 'font-size:1.1rem' : 'font-size:1.1rem';
       html+=`<div class="kpi-card">
         <div class="kc-label">${m.label}</div>
-        <div class="kc-val" style="color:${c}">${fmt(v,m.fmt)}</div>
+        <div class="kc-val" style="color:${c};${valStyle}">${fmtVal}</div>
         <div class="kc-meta">Meta: ${fmt(p,m.fmt)}</div>
         <div class="kc-delta delta-${dlt.c}">${dlt.t}</div>
       </div>`;
@@ -801,7 +802,9 @@ async function init(){
   }
 }
 init();
+
 setInterval(()=>{cache={};init();},5*60*1000);
+
 </script>
 </body>
 </html>
