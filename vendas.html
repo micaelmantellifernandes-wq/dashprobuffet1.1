@@ -273,14 +273,6 @@ tr:hover td{background:var(--surface2)}
     <div class="sec-label">📌 Resumo do Mês</div>
     <div class="cards-grid" id="cards-2026"></div>
 
-    <div class="inad-box" id="inad-box-26">
-      <div class="inad-box-header">
-        <div class="inad-box-title"><div class="inad-pulse"></div>🚨 Inadimplentes do Ano</div>
-        <div class="inad-summary" id="inad-summary-26"></div>
-      </div>
-      <div class="inad-table-wrap" id="inad-body-26"></div>
-    </div>
-
     <div class="charts-grid">
       <div class="chart-box"><div class="chart-title">📈 Receita por Mês</div><div class="chart-wrap"><canvas id="ch-rec26"></canvas></div></div>
       <div class="chart-box"><div class="chart-title">🎯 Fonte dos Leads</div><div class="chart-wrap"><canvas id="ch-fonte26"></canvas></div></div>
@@ -295,6 +287,15 @@ tr:hover td{background:var(--surface2)}
 
     <div class="insights-box" id="insights-2026"></div>
 
+
+    <div class="inad-box" id="inad-box-26">
+      <div class="inad-box-header">
+        <div class="inad-box-title"><div class="inad-pulse"></div>🚨 <span id="inad-title-26">Inadimplentes</span></div>
+        <div class="inad-summary" id="inad-summary-26"></div>
+      </div>
+      <div class="inad-table-wrap" id="inad-body-26"></div>
+    </div>
+
     <div class="table-wrap">
       <div class="table-title" id="tbl-title26">📋 Clientes do Mês</div>
       <div id="tbl-26"></div>
@@ -306,14 +307,6 @@ tr:hover td{background:var(--surface2)}
     <div class="month-tabs" id="tabs-2025"></div>
     <div class="cards-grid" id="cards-2025"></div>
 
-    <div class="inad-box" id="inad-box-25">
-      <div class="inad-box-header">
-        <div class="inad-box-title"><div class="inad-pulse"></div>🚨 Inadimplentes do Ano</div>
-        <div class="inad-summary" id="inad-summary-25"></div>
-      </div>
-      <div class="inad-table-wrap" id="inad-body-25"></div>
-    </div>
-
     <div class="charts-grid">
       <div class="chart-box wide"><div class="chart-title">📈 Receita por Mês</div><div class="chart-wrap"><canvas id="ch-ltv25"></canvas></div></div>
       <div class="chart-box"><div class="chart-title">🎯 Fonte dos Leads</div><div class="chart-wrap"><canvas id="ch-fonte25"></canvas></div></div>
@@ -323,6 +316,15 @@ tr:hover td{background:var(--surface2)}
     <div class="podium-wrap"><div class="sec-label" style="margin-bottom:16px">🥇 Ranking de SDR</div><div class="podium-stage" id="sdr-ranking25"></div></div>
 
     <div id="insights-2025" class="insights-box"></div>
+
+
+    <div class="inad-box" id="inad-box-25">
+      <div class="inad-box-header">
+        <div class="inad-box-title"><div class="inad-pulse"></div>🚨 <span id="inad-title-25">Inadimplentes</span></div>
+        <div class="inad-summary" id="inad-summary-25"></div>
+      </div>
+      <div class="inad-table-wrap" id="inad-body-25"></div>
+    </div>
 
     <div class="sec-label" id="tbl-title25">📋 Clientes</div>
     <div class="table-wrap" id="tbl-25"></div>
@@ -495,7 +497,8 @@ async function loadAll(){
 }
 
 
-function renderInad(allRows, boxId, summaryId, bodyId){
+function renderInad(allRows, boxId, summaryId, bodyId, titleId, label){
+  if(titleId) document.getElementById(titleId).textContent = label ? `Inadimplentes — ${label}` : "Inadimplentes";
   const today = new Date(); today.setHours(0,0,0,0);
   const rows = allRows.filter(r => r.inadimplente && Number(r.inadimplente) > 0);
   const box  = document.getElementById(boxId);
@@ -584,7 +587,7 @@ function render2026(mk){
   `;
 
   // Inadimplentes (mês atual)
-  renderInad(d.rows,'inad-box-26','inad-summary-26','inad-body-26');
+  renderInad(d.rows,'inad-box-26','inad-summary-26','inad-body-26','inad-title-26',d.label+' 2026');
 
   // Chart receita
   mkChart('ch-rec26','bar',{
@@ -596,7 +599,7 @@ function render2026(mk){
   },{scales:{y:{ticks:{callback:v=>'R$'+Math.round(v/1000)+'k',color:'#5a8ab0',font:{size:8,family:'Montserrat'}},grid:{color:'#0a408020'}},x:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat',weight:'600'}}}}});
 
   // Inadimplentes (mês atual)
-  renderInad(d.rows,'inad-box-25','inad-summary-25','inad-body-25');
+  renderInad(d.rows,'inad-box-25','inad-summary-25','inad-body-25','inad-title-25',d.label+' 2025');
 
   // Chart fonte
   const fontes=Object.entries(d.src).sort((a,b)=>b[1]-a[1]);
@@ -724,7 +727,7 @@ function renderTotal2026(){
   `;
 
   // Inadimplentes (total do ano)
-  renderInad(MONTHS26.flatMap(m=>d26[m.key]?.rows||[]),'inad-box-26','inad-summary-26','inad-body-26');
+  renderInad(MONTHS26.flatMap(m=>d26[m.key]?.rows||[]),'inad-box-26','inad-summary-26','inad-body-26','inad-title-26','Ano 2026');
 
   // Destroy old charts
   Object.keys(charts).forEach(k=>{if(k.includes('26')){charts[k]?.destroy();delete charts[k];}});
@@ -923,7 +926,7 @@ function render2025(mk){
 
   // Charts
   // Inadimplentes (total do ano)
-  renderInad(MONTHS25.flatMap(m=>d25[m.key]?.rows||[]),'inad-box-25','inad-summary-25','inad-body-25');
+  renderInad(MONTHS25.flatMap(m=>d25[m.key]?.rows||[]),'inad-box-25','inad-summary-25','inad-body-25','inad-title-25','Ano 2025');
 
   Object.keys(charts).forEach(k=>{if(k.includes('25')&&!k.includes('26')){charts[k]?.destroy();delete charts[k];}});
 
