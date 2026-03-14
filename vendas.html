@@ -212,6 +212,21 @@ tr:hover td{background:var(--surface2)}
 .insights-box h2{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:12px}
 .insight{border-left:3px solid;padding:11px 14px;background:var(--surface);border-radius:0 8px 8px 0;margin-bottom:8px;font-size:.8rem;line-height:1.6}
 .insight strong{display:block;margin-bottom:2px;font-size:.67rem;text-transform:uppercase;letter-spacing:.06em;font-weight:800}
+
+.inad-section{max-width:1060px;margin:0 auto 28px}
+.inad-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.inad-title{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#ff5c7a}
+.inad-total{font-size:.75rem;font-weight:700;color:#ff5c7a;background:#ff5c7a18;border:1px solid #ff5c7a40;border-radius:999px;padding:3px 12px}
+.inad-empty{text-align:center;padding:24px;color:var(--muted);font-size:.8rem;font-weight:600;background:var(--surface);border:1px solid var(--border);border-radius:10px}
+.inad-table{width:100%;border-collapse:collapse;font-size:.78rem}
+.inad-table th{background:var(--surface2);color:#ff5c7a;font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;padding:8px 12px;text-align:left;border-bottom:2px solid #ff5c7a40}
+.inad-table td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+.inad-table tr:last-child td{border-bottom:none}
+.inad-table tr:hover td{background:var(--surface2)}
+.inad-valor{color:#ff5c7a;font-weight:700}
+.inad-vencido{color:#ff5c7a;font-weight:700;font-size:.72rem}
+.inad-ok{color:#00d4a8;font-weight:700;font-size:.72rem}
+.inad-wrap{background:var(--surface);border:1px solid #ff5c7a40;border-radius:10px;overflow:hidden}
 </style>
 </head>
 <body>
@@ -261,6 +276,14 @@ tr:hover td{background:var(--surface2)}
 
     <div class="insights-box" id="insights-2026"></div>
 
+    <div class="inad-section" id="inad-section-26" style="display:none">
+      <div class="inad-header">
+        <div class="inad-title">🚨 Inadimplentes</div>
+        <div class="inad-total" id="inad-total-26"></div>
+      </div>
+      <div class="inad-wrap" id="inad-list-26"></div>
+    </div>
+
     <div class="table-wrap">
       <div class="table-title" id="tbl-title26">📋 Clientes do Mês</div>
       <div id="tbl-26"></div>
@@ -281,6 +304,14 @@ tr:hover td{background:var(--surface2)}
     <div class="podium-wrap"><div class="sec-label" style="margin-bottom:16px">🥇 Ranking de SDR</div><div class="podium-stage" id="sdr-ranking25"></div></div>
 
     <div id="insights-2025" class="insights-box"></div>
+
+    <div class="inad-section" id="inad-section-25" style="display:none">
+      <div class="inad-header">
+        <div class="inad-title">🚨 Inadimplentes</div>
+        <div class="inad-total" id="inad-total-25"></div>
+      </div>
+      <div class="inad-wrap" id="inad-list-25"></div>
+    </div>
 
     <div class="sec-label" id="tbl-title25">📋 Clientes</div>
     <div class="table-wrap" id="tbl-25"></div>
@@ -394,6 +425,8 @@ async function loadAll(){
         ltv:    num(r[cfg.off?8:7]),
         sdr:    String(r[cfg.off?9:8]||'').trim(),
         closer: String(r[cfg.off?10:9]||'').trim(),
+        inadimplente: num(r[cfg.off?14:13]),
+        retorno: parseDate(r[cfg.off?15:14]),
       }));
       const ltv=parsed.reduce((s,r)=>s+r.ltv,0);
       const mens=parsed.reduce((s,r)=>s+r.mens,0);
@@ -422,6 +455,8 @@ async function loadAll(){
         ltv:    num(r[cfg.off?8:7]),
         sdr:    String(r[cfg.off?9:8]||'').trim(),
         closer: String(r[cfg.off?10:9]||'').trim(),
+        inadimplente: num(r[cfg.off?14:13]),
+        retorno: parseDate(r[cfg.off?15:14]),
       }));
       const ltv=parsed.reduce((s,r)=>s+r.ltv,0);
       const mens=parsed.reduce((s,r)=>s+r.mens,0);
@@ -446,6 +481,41 @@ async function loadAll(){
   document.getElementById('loading').style.display='none';
   document.getElementById('app').style.display='block';
   document.getElementById('last-update').textContent='Atualizado: '+new Date().toLocaleString('pt-BR');
+}
+
+
+function renderInad(rows, allRows, sectionId, totalId, listId){
+  // Coleta todos os inadimplentes de todas as abas do ano
+  const inadRows = allRows.filter(r => r.inadimplente && Number(r.inadimplente) > 0);
+  const section = document.getElementById(sectionId);
+  const totalEl = document.getElementById(totalId);
+  const listEl  = document.getElementById(listId);
+  if(!inadRows.length){
+    section.style.display='none';
+    return;
+  }
+  section.style.display='block';
+  const totalDev = inadRows.reduce((s,r)=>s+Number(r.inadimplente),0);
+  totalEl.textContent = inadRows.length + ' cliente' + (inadRows.length>1?'s':'') + ' · ' + brl(totalDev) + ' em aberto';
+  const today = new Date();
+  const rows_html = inadRows.map(r => {
+    const ret = r.retorno;
+    let retStr = '—';
+    let retClass = '';
+    if(ret){
+      retStr = ret.toLocaleDateString('pt-BR');
+      retClass = ret < today ? 'inad-vencido' : 'inad-ok';
+    }
+    return `<tr>
+      <td><strong>${r.nome}</strong></td>
+      <td class="inad-valor">${brl(r.inadimplente)}</td>
+      <td class="${retClass}">${retStr}${ret && ret < today ? ' ⚠️' : ''}</td>
+    </tr>`;
+  }).join('');
+  listEl.innerHTML = `<table class="inad-table">
+    <thead><tr><th>Cliente</th><th>Valor em Aberto</th><th>Data de Retorno/Pagamento</th></tr></thead>
+    <tbody>${rows_html}</tbody>
+  </table>`;
 }
 
 function render2026(mk){
@@ -474,7 +544,7 @@ function render2026(mk){
     <div class="card good"><div class="cn">Consultoria</div><div class="cv" style="color:${GD}">${brl(d.impl)}</div><div class="cp">Total 2026: ${brl(Object.values(d26).reduce((s,v)=>s+v.impl,0))}</div></div>
     <div class="card good"><div class="cn">Ticket Médio</div><div class="cv" style="color:${GD}">${brl(ticket)}</div><div class="cp">Mens/venda</div></div>
     <div class="card neutral"><div class="cn">Coletado</div><div class="cv" style="color:${AC}">${brl(d.colet)}</div></div>
-    <div class="card warn"><div class="cn">Total Vendido</div><div class="cv" style="color:${WN}">${brl(d.mens+d.impl)}</div><div class="cp">Mensalidade + Consultoria</div></div>
+    <div class="card warn"><div class="cn">Total Vendido</div><div class="cv" style="color:${WN}">${brl(d.colet+d.impl)}</div><div class="cp">Mens. coletada + Consultoria</div></div>
   `;
 
   // Chart receita
@@ -565,6 +635,10 @@ function render2026(mk){
   `;
 
   // Table
+  // Inadimplentes 2026 — usa todos os dados do ano
+  const allRows26 = MONTHS26.flatMap(m=>d26[m.key]?.rows||[]);
+  renderInad(d.rows, allRows26, 'inad-section-26', 'inad-total-26', 'inad-list-26');
+
   document.getElementById('tbl-title26').textContent=`📋 Clientes — ${d.label} 2026 (${d.rows.length})`;
   const sorted=[...d.rows].sort((a,b)=>(a.data||0)-(b.data||0));
   document.getElementById('tbl-26').innerHTML=`<table>
@@ -608,7 +682,7 @@ function renderTotal2026(){
     <div class="card good"><div class="cn">Consultoria</div><div class="cv" style="color:${GD}">${brl(tot.impl)}</div><div class="cp">Implantações total</div></div>
     <div class="card good"><div class="cn">Ticket Médio</div><div class="cv" style="color:${GD}">${brl(ticket)}</div><div class="cp">Mens/venda</div></div>
     <div class="card neutral"><div class="cn">Coletado</div><div class="cv" style="color:${AC}">${brl(tot.colet)}</div><div class="cp">Total recebido</div></div>
-    <div class="card warn"><div class="cn">Total Vendido</div><div class="cv" style="color:${WN}">${brl(tot.mens+tot.impl)}</div><div class="cp">Mensalidade + Consultoria</div></div>
+    <div class="card warn"><div class="cn">Total Vendido</div><div class="cv" style="color:${WN}">${brl(tot.colet+tot.impl)}</div><div class="cp">Mens. coletada + Consultoria</div></div>
   `;
 
   // Destroy old charts
@@ -803,7 +877,7 @@ function render2025(mk){
     <div class="card good"><div class="cn">Consultoria</div><div class="cv" style="color:${GD}">${brl(d.impl)}</div><div class="cp">Total 2025: ${brl(Object.values(d25).reduce((s,v)=>s+v.impl,0))}</div></div>
     <div class="card good"><div class="cn">Ticket Médio</div><div class="cv" style="color:${GD}">${brl(ticket)}</div><div class="cp">Mens/venda</div></div>
     <div class="card neutral"><div class="cn">Coletado</div><div class="cv" style="color:${AC}">${brl(d.colet)}</div></div>
-    <div class="card warn"><div class="cn">Total Vendido</div><div class="cv" style="color:${WN}">${brl(d.mens+d.impl)}</div><div class="cp">Mensalidade + Consultoria</div></div>
+    <div class="card warn"><div class="cn">Total Vendido</div><div class="cv" style="color:${WN}">${brl(d.colet+d.impl)}</div><div class="cp">Mens. coletada + Consultoria</div></div>
   `;
 
   // Charts
@@ -854,6 +928,10 @@ function render2025(mk){
   `;
 
   // Table
+  // Inadimplentes 2025 — usa todos os dados do ano
+  const allRows25 = MONTHS25.flatMap(m=>d25[m.key]?.rows||[]);
+  renderInad(d.rows, allRows25, 'inad-section-25', 'inad-total-25', 'inad-list-25');
+
   document.getElementById('tbl-title25').textContent=`📋 Clientes — ${d.label} 2025 (${d.rows.length})`;
   const sorted=[...d.rows].sort((a,b)=>(a.data||0)-(b.data||0));
   document.getElementById('tbl-25').innerHTML=`<table>
@@ -894,7 +972,7 @@ function renderTotal2025(){
     <div class="card good"><div class="cn">Consultoria</div><div class="cv" style="color:${GD}">${brl(tot.impl)}</div><div class="cp">Implantações total</div></div>
     <div class="card good"><div class="cn">Ticket Médio</div><div class="cv" style="color:${GD}">${brl(ticket)}</div><div class="cp">Mens/venda</div></div>
     <div class="card neutral"><div class="cn">Coletado</div><div class="cv" style="color:${AC}">${brl(tot.colet)}</div><div class="cp">Total recebido</div></div>
-    <div class="card warn"><div class="cn">Total Vendido</div><div class="cv" style="color:${WN}">${brl(tot.mens+tot.impl)}</div><div class="cp">Mensalidade + Consultoria</div></div>
+    <div class="card warn"><div class="cn">Total Vendido</div><div class="cv" style="color:${WN}">${brl(tot.colet+tot.impl)}</div><div class="cp">Mens. coletada + Consultoria</div></div>
   `;
 
   Object.keys(charts).forEach(k=>{if(k.includes('25')&&!k.includes('26')){charts[k]?.destroy();delete charts[k];}});
