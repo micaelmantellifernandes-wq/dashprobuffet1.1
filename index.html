@@ -57,10 +57,10 @@ body{background:var(--bg);color:var(--text);font-family:'Montserrat',sans-serif;
 .wtab{background:transparent;border:1.5px solid var(--border);border-radius:20px;color:var(--muted);font-size:.72rem;font-weight:700;padding:5px 14px;cursor:pointer;transition:all .2s;letter-spacing:.04em}
 .wtab.active,.wtab:hover{opacity:1}
 #chart-pills::-webkit-scrollbar{display:none}
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:12px;margin-top:10px}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:10px}
 .kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;transition:border-color .2s;max-width:280px}.kpi-card:hover{border-color:var(--accent)}
 .kc-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:6px}
-.kc-val{font-size:1.1rem;font-weight:800;margin-bottom:4px;white-space:nowrap;line-height:1.2;overflow:hidden;text-overflow:ellipsis}
+.kc-val{font-size:1.05rem;font-weight:800;margin-bottom:4px;white-space:nowrap;line-height:1.2;overflow:hidden;text-overflow:ellipsis}
 .kc-meta{font-size:.68rem;color:var(--muted);margin-bottom:4px}
 .kc-delta{font-size:.65rem;font-weight:700}
 .delta-up{color:var(--accent)}.delta-down{color:var(--bad)}.delta-eq{color:var(--muted)}
@@ -442,7 +442,7 @@ function renderGeral(month,week,color){
       const valStyle = m.fmt==='num' ? 'font-size:1.1rem' : 'font-size:1.1rem';
       html+=`<div class="kpi-card">
         <div class="kc-label">${m.label}</div>
-        <div class="kc-val" style="color:${c};${valStyle}">${fmtVal}</div>
+        <div class="kc-val" style="color:${c}"><span style="white-space:nowrap">${fmtVal}</span></div>
         <div class="kc-meta">Meta: ${fmt(p,m.fmt)}</div>
         <div class="kc-delta delta-${dlt.c}">${dlt.t}</div>
       </div>`;
