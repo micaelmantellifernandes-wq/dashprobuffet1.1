@@ -788,8 +788,8 @@ function renderTotal2026(){
   const bestLabel=MONTHS26.find(m=>m.key===best)?.label||'—';
   const bestVal=d26[best]?.ltv||0;
   document.getElementById('insights-2026').innerHTML=`
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;max-width:1060px;margin:0 auto;justify-items:center">
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:14px">
+    <div style="display:flex;flex-wrap:wrap;gap:12px;max-width:1060px;margin:0 auto;justify-content:center">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:14px;width:220px;flex-shrink:0">
         <div style="font-size:1.8rem;line-height:1">🏆</div>
         <div>
           <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-bottom:4px">Melhor Mês</div>
@@ -797,7 +797,7 @@ function renderTotal2026(){
           <div style="font-size:.68rem;color:var(--muted);margin-top:2px">${brl(bestVal)} em LTV</div>
         </div>
       </div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:14px">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:14px;width:220px;flex-shrink:0">
         <div style="font-size:1.8rem;line-height:1">🤝</div>
         <div>
           <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-bottom:4px">Fechamentos</div>
@@ -805,7 +805,7 @@ function renderTotal2026(){
           <div style="font-size:.68rem;color:var(--muted);margin-top:2px">${(tot.count/activeMo26).toFixed(1)} vendas/mês</div>
         </div>
       </div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:14px">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:14px;width:220px;flex-shrink:0">
         <div style="font-size:1.8rem;line-height:1">💙</div>
         <div>
           <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-bottom:4px">Média Mens./Mês</div>
@@ -813,7 +813,7 @@ function renderTotal2026(){
           <div style="font-size:.68rem;color:var(--muted);margin-top:2px">Total: ${brl(tot.mens)}</div>
         </div>
       </div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:14px">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:14px;width:220px;flex-shrink:0">
         <div style="font-size:1.8rem;line-height:1">📈</div>
         <div>
           <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-bottom:4px">Média Consultoria/Mês</div>
@@ -1058,8 +1058,8 @@ function renderTotal2025(){
   const bestLabel25=MONTHS25.find(m=>m.key===best)?.label||'—';
   const bestVal25=d25[best]?.ltv||0;
   document.getElementById('insights-2025').innerHTML=`
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;max-width:1060px;margin:0 auto;justify-items:center">
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:14px">
+    <div style="display:flex;flex-wrap:wrap;gap:12px;max-width:1060px;margin:0 auto;justify-content:center">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:14px;width:220px;flex-shrink:0">
         <div style="font-size:1.8rem;line-height:1">🏆</div>
         <div>
           <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-bottom:4px">Melhor Mês</div>
@@ -1067,7 +1067,7 @@ function renderTotal2025(){
           <div style="font-size:.68rem;color:var(--muted);margin-top:2px">${brl(bestVal25)} em LTV</div>
         </div>
       </div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:14px">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:14px;width:220px;flex-shrink:0">
         <div style="font-size:1.8rem;line-height:1">🤝</div>
         <div>
           <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-bottom:4px">Fechamentos</div>
@@ -1075,7 +1075,7 @@ function renderTotal2025(){
           <div style="font-size:.68rem;color:var(--muted);margin-top:2px">${(tot.count/activeMo25).toFixed(1)} vendas/mês</div>
         </div>
       </div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:14px">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:14px;width:220px;flex-shrink:0">
         <div style="font-size:1.8rem;line-height:1">💙</div>
         <div>
           <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-bottom:4px">Média Mens./Mês</div>
@@ -1083,7 +1083,7 @@ function renderTotal2025(){
           <div style="font-size:.68rem;color:var(--muted);margin-top:2px">Total: ${brl(tot.mens)}</div>
         </div>
       </div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:14px">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:14px;width:220px;flex-shrink:0">
         <div style="font-size:1.8rem;line-height:1">📈</div>
         <div>
           <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-bottom:4px">Média Consultoria/Mês</div>
