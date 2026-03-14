@@ -583,9 +583,8 @@ function render2026(mk){
     <div class="card warn"><div class="cn">Total Vendido</div><div class="cv" style="color:${WN}">${brl(d.colet+d.impl)}</div><div class="cp">Mens. coletada + Consultoria</div></div>
   `;
 
-  // Inadimplentes
-  const _allRows26=MONTHS26.flatMap(m=>d26[m.key]?.rows||[]);
-  renderInad(_allRows26,'inad-box-26','inad-summary-26','inad-body-26');
+  // Inadimplentes (mês atual)
+  renderInad(d.rows,'inad-box-26','inad-summary-26','inad-body-26');
 
   // Chart receita
   mkChart('ch-rec26','bar',{
@@ -596,9 +595,8 @@ function render2026(mk){
     ]
   },{scales:{y:{ticks:{callback:v=>'R$'+Math.round(v/1000)+'k',color:'#5a8ab0',font:{size:8,family:'Montserrat'}},grid:{color:'#0a408020'}},x:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat',weight:'600'}}}}});
 
-  // Inadimplentes
-  const _allRows25=MONTHS25.flatMap(m=>d25[m.key]?.rows||[]);
-  renderInad(_allRows25,'inad-box-25','inad-summary-25','inad-body-25');
+  // Inadimplentes (mês atual)
+  renderInad(d.rows,'inad-box-25','inad-summary-25','inad-body-25');
 
   // Chart fonte
   const fontes=Object.entries(d.src).sort((a,b)=>b[1]-a[1]);
@@ -725,9 +723,8 @@ function renderTotal2026(){
     <div class="card warn"><div class="cn">Total Vendido</div><div class="cv" style="color:${WN}">${brl(tot.colet+tot.impl)}</div><div class="cp">Mens. coletada + Consultoria</div></div>
   `;
 
-  // Inadimplentes (total)
-  const _allRows26t=MONTHS26.flatMap(m=>d26[m.key]?.rows||[]);
-  renderInad(_allRows26t,'inad-box-26','inad-summary-26','inad-body-26');
+  // Inadimplentes (total do ano)
+  renderInad(MONTHS26.flatMap(m=>d26[m.key]?.rows||[]),'inad-box-26','inad-summary-26','inad-body-26');
 
   // Destroy old charts
   Object.keys(charts).forEach(k=>{if(k.includes('26')){charts[k]?.destroy();delete charts[k];}});
@@ -925,9 +922,8 @@ function render2025(mk){
   `;
 
   // Charts
-  // Inadimplentes (total)
-  const _allRows25t=MONTHS25.flatMap(m=>d25[m.key]?.rows||[]);
-  renderInad(_allRows25t,'inad-box-25','inad-summary-25','inad-body-25');
+  // Inadimplentes (total do ano)
+  renderInad(MONTHS25.flatMap(m=>d25[m.key]?.rows||[]),'inad-box-25','inad-summary-25','inad-body-25');
 
   Object.keys(charts).forEach(k=>{if(k.includes('25')&&!k.includes('26')){charts[k]?.destroy();delete charts[k];}});
 
