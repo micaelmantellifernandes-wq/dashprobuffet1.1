@@ -150,12 +150,12 @@ tr:hover td{background:var(--surface2)}
 .delta-down{background:#ff5c7a20;color:var(--bad)}
 
 /* SDR PODIUM */
-.podium-wrap{max-width:860px;margin:0 auto 36px;position:relative;padding:20px 20px 0;background:linear-gradient(180deg,var(--surface2) 0%,transparent 100%);border-radius:20px 20px 0 0}
+.podium-wrap{max-width:860px;width:100%;margin:0 auto 36px;position:relative;padding:20px 20px 0;background:linear-gradient(180deg,var(--surface2) 0%,transparent 100%);border-radius:20px 20px 0 0;display:flex;flex-direction:column;align-items:center}
 .podium-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:10}
-.podium-stage{display:flex;align-items:flex-end;justify-content:center;gap:8px}
+.podium-stage{display:flex;align-items:flex-end;justify-content:center;gap:8px;width:100%}
 
 /* Each column */
-.podium-col{display:flex;flex-direction:column;align-items:center;flex:1;max-width:260px;position:relative}
+.podium-col{display:flex;flex-direction:column;align-items:center;flex:1;max-width:280px;min-width:0;position:relative}
 
 /* Avatar ring */
 .podium-avatar{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;position:relative;z-index:2;overflow:hidden;flex-shrink:0}
@@ -215,28 +215,28 @@ tr:hover td{background:var(--surface2)}
 .insight strong{display:block;margin-bottom:2px;font-size:.67rem;text-transform:uppercase;letter-spacing:.06em;font-weight:800}
 
 /* ── INADIMPLENTES ── */
-.inad-box{max-width:1060px;margin:0 auto 28px;background:linear-gradient(135deg,#1a0a0e 0%,#0d1b2e 100%);border:1.5px solid #ff5c7a55;border-radius:14px;overflow:hidden}
-.inad-box-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px 10px;border-bottom:1px solid #ff5c7a30;flex-wrap:wrap;gap:8px}
-.inad-box-title{display:flex;align-items:center;gap:8px;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#ff5c7a}
-.inad-pulse{width:8px;height:8px;background:#ff5c7a;border-radius:50%;box-shadow:0 0 0 0 #ff5c7a66;animation:inadPulse 1.5s infinite}
-@keyframes inadPulse{0%{box-shadow:0 0 0 0 #ff5c7a66}70%{box-shadow:0 0 0 8px transparent}100%{box-shadow:0 0 0 0 transparent}}
+.inad-box{max-width:1060px;margin:0 auto 28px;background:var(--surface);border:1.5px solid var(--bad);border-radius:14px;overflow:hidden;border-color:color-mix(in srgb,var(--bad) 40%,transparent)}
+.inad-box-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px 10px;border-bottom:1px solid color-mix(in srgb,var(--bad) 25%,transparent);flex-wrap:wrap;gap:8px;background:color-mix(in srgb,var(--bad) 8%,var(--surface))}
+.inad-box-title{display:flex;align-items:center;gap:8px;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--bad)}
+.inad-pulse{width:8px;height:8px;background:var(--bad);border-radius:50%;box-shadow:0 0 0 0 color-mix(in srgb,var(--bad) 40%,transparent);animation:inadPulse 1.5s infinite}
+@keyframes inadPulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--bad) 40%,transparent)}70%{box-shadow:0 0 0 8px transparent}100%{box-shadow:0 0 0 0 transparent}}
 .inad-summary{display:flex;gap:16px;flex-wrap:wrap}
-.inad-pill{background:#ff5c7a18;border:1px solid #ff5c7a40;border-radius:999px;padding:3px 14px;font-size:.72rem;font-weight:700;color:#ff5c7a}
-.inad-pill.green{background:#00d4a818;border-color:#00d4a840;color:#00d4a8}
+.inad-pill{background:color-mix(in srgb,var(--bad) 15%,transparent);border:1px solid color-mix(in srgb,var(--bad) 35%,transparent);border-radius:999px;padding:3px 14px;font-size:.72rem;font-weight:700;color:var(--bad)}
+.inad-pill.green{background:color-mix(in srgb,var(--good) 15%,transparent);border-color:color-mix(in srgb,var(--good) 35%,transparent);color:var(--good)}
 .inad-table-wrap{overflow-x:auto}
 .inad-table{width:100%;border-collapse:collapse;font-size:.8rem}
-.inad-table th{background:#ff5c7a12;color:#ff8899;font-size:.63rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;padding:9px 16px;text-align:left;border-bottom:1px solid #ff5c7a30}
-.inad-table td{padding:11px 16px;border-bottom:1px solid #ffffff08;vertical-align:middle}
+.inad-table th{background:color-mix(in srgb,var(--bad) 10%,var(--surface));color:var(--bad);font-size:.63rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;padding:9px 16px;text-align:left;border-bottom:1px solid color-mix(in srgb,var(--bad) 25%,transparent)}
+.inad-table td{padding:11px 16px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
 .inad-table tr:last-child td{border-bottom:none}
-.inad-table tr:hover td{background:#ff5c7a08}
+.inad-table tr:hover td{background:color-mix(in srgb,var(--bad) 5%,transparent)}
 .inad-nome{font-weight:700;color:var(--text)}
-.inad-valor{color:#ff5c7a;font-weight:800;font-size:.85rem}
+.inad-valor{color:var(--bad);font-weight:800;font-size:.85rem}
 .inad-tag{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:.68rem;font-weight:700}
-.inad-tag.vencido{background:#ff5c7a20;color:#ff5c7a;border:1px solid #ff5c7a40}
-.inad-tag.hoje{background:#f0b42920;color:#f0b429;border:1px solid #f0b42940}
-.inad-tag.futuro{background:#00d4a820;color:#00d4a8;border:1px solid #00d4a840}
-.inad-tag.sem-data{background:#ffffff10;color:var(--muted);border:1px solid var(--border)}
-.inad-empty{text-align:center;padding:28px;color:#00d4a8;font-size:.82rem;font-weight:700}
+.inad-tag.vencido{background:color-mix(in srgb,var(--bad) 15%,transparent);color:var(--bad);border:1px solid color-mix(in srgb,var(--bad) 35%,transparent)}
+.inad-tag.hoje{background:color-mix(in srgb,var(--warn) 15%,transparent);color:var(--warn);border:1px solid color-mix(in srgb,var(--warn) 35%,transparent)}
+.inad-tag.futuro{background:color-mix(in srgb,var(--good) 15%,transparent);color:var(--good);border:1px solid color-mix(in srgb,var(--good) 35%,transparent)}
+.inad-tag.sem-data{background:color-mix(in srgb,var(--muted) 10%,transparent);color:var(--muted);border:1px solid var(--border)}
+.inad-empty{text-align:center;padding:28px;color:var(--good);font-size:.82rem;font-weight:700}
 .inad-empty span{display:block;font-size:1.4rem;margin-bottom:6px}
 
 </style>
@@ -281,7 +281,7 @@ tr:hover td{background:var(--surface2)}
     </div>
 
     <div class="sec-label" style="text-align:center;max-width:1060px;margin-left:auto;margin-right:auto">🏅 Ranking de SDR</div>
-    <div class="podium-wrap" style="max-width:860px;margin-left:auto;margin-right:auto">
+    <div class="podium-wrap">
       <canvas class="podium-canvas" id="confetti-canvas"></canvas>
       <div class="podium-stage" id="sdr-ranking"></div>
     </div>
@@ -507,8 +507,8 @@ function renderInad(allRows, boxId, summaryId, bodyId, titleId, label){
   if(!rows.length){
     document.getElementById(summaryId).innerHTML='<span class="inad-pill green">✅ Nenhum inadimplente</span>';
     document.getElementById(bodyId).innerHTML='<div class="inad-empty"><span>🎉</span>Sem inadimplências registradas!</div>';
-    box.style.borderColor='#00d4a840';
-    box.style.background='linear-gradient(135deg,#0a1e0f 0%,#0d1b2e 100%)';
+    box.style.borderColor='';
+    box.style.background='';
     return;
   }
 
