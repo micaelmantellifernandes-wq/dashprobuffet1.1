@@ -800,7 +800,7 @@ function render2025(mk){
   mkChart('ch-ltv25','bar',{
     labels:MONTHS25.map(m=>m.label.slice(0,3)),
     datasets:[
-      {label:'LTV',data:MONTHS25.map(m=>d25[m.key]?.ltv||0),backgroundColor:AC+'99',borderColor:AC,borderWidth:2,borderRadius:5},
+      {label:'Consultoria',data:MONTHS25.map(m=>d25[m.key]?.impl||0),backgroundColor:AC+'99',borderColor:AC,borderWidth:2,borderRadius:5},
       {label:'Mensalidade',data:MONTHS25.map(m=>d25[m.key]?.mens||0),backgroundColor:GD+'77',borderColor:GD,borderWidth:2,borderRadius:5},
     ]
   });
@@ -888,14 +888,14 @@ function renderTotal2025(){
   Object.keys(charts).forEach(k=>{if(k.includes('25')&&!k.includes('26')){charts[k]?.destroy();delete charts[k];}});
 
   const activeMths25=MONTHS25.filter(m=>d25[m.key]?.ltv>0).length||1;
-  const avgLTV25=tot.ltv/activeMths25;
+  const avgImpl25=tot.impl/activeMths25;
   const avgMens25=tot.mens/activeMths25;
   mkChart('ch-ltv25','bar',{
     labels:MONTHS25.map(m=>m.label.slice(0,3)),
     datasets:[
-      {label:'LTV',data:MONTHS25.map(m=>d25[m.key]?.ltv||0),backgroundColor:AC+'99',borderColor:AC,borderWidth:2,borderRadius:5},
+      {label:'Consultoria',data:MONTHS25.map(m=>d25[m.key]?.impl||0),backgroundColor:AC+'99',borderColor:AC,borderWidth:2,borderRadius:5},
       {label:'Mensalidade',data:MONTHS25.map(m=>d25[m.key]?.mens||0),backgroundColor:GD+'77',borderColor:GD,borderWidth:2,borderRadius:5},
-      {label:'Média LTV',data:MONTHS25.map(()=>avgLTV25),type:'line',borderColor:'#f0b429',backgroundColor:'transparent',borderWidth:2,borderDash:[6,4],pointRadius:0,tension:0,order:0},
+      {label:'Média Consultoria',data:MONTHS25.map(()=>avgImpl25),type:'line',borderColor:'#f0b429',backgroundColor:'transparent',borderWidth:2,borderDash:[6,4],pointRadius:0,tension:0,order:0},
       {label:'Média Mens.',data:MONTHS25.map(()=>avgMens25),type:'line',borderColor:'#a78bfa',backgroundColor:'transparent',borderWidth:2,borderDash:[4,4],pointRadius:0,tension:0,order:0},
     ]
   },{scales:{y:{ticks:{callback:v=>'R$'+Math.round(v/1000)+'k',color:'#5a8ab0',font:{size:8,family:'Montserrat'}},grid:{color:'#0a408020'}},x:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat',weight:'600'}}}},plugins:{legend:{labels:{color:'#5a8ab0',font:{size:9,family:'Montserrat',weight:'600'},boxWidth:10,padding:8},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': R$'+Math.round(ctx.parsed.y).toLocaleString('pt-BR')}}}}});
