@@ -237,7 +237,7 @@ tr:hover td{background:var(--surface2)}
   <button class="main-tab" onclick="switchPanel('compare',this)">⚖️ Comparar Anos</button>
 </div>
 
-<div id="loading"><div class="spinner"></div>Carregando dados das planilhas...</div>
+<div id="loading"><div class="spinner" id="loading-spinner"></div><div id="loading-msg">Carregando dados das planilhas...</div><div id="loading-error" style="display:none;margin-top:16px;max-width:420px;margin-left:auto;margin-right:auto"><div style="background:#ff444420;border:1px solid #ff4444;border-radius:10px;padding:14px 18px;color:#ff8888;font-size:.8rem;font-weight:600;margin-bottom:12px">⚠️ Não foi possível carregar os dados.<br><span style="font-size:.72rem;font-weight:400;opacity:.85">Verifique se as planilhas estão públicas e tente novamente.</span></div><button onclick="retryLoad()" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:9px 22px;font-family:Montserrat,sans-serif;font-size:.78rem;font-weight:700;cursor:pointer;letter-spacing:.04em">🔄 Tentar Novamente</button></div></div>
 <div id="app" style="display:none">
 
   <!-- ══ 2026 ══ -->
@@ -359,9 +359,16 @@ function mkChart(id,type,data,extra={}){
 }
 
 async function fetchSheet(id,sheet){
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),10000);
   const url=`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheet)}`;
-  const res=await fetch(url);
-  const text=await res.text();
+  let res,text;
+  try{
+    res=await fetch(url,{signal:controller.signal});
+    clearTimeout(timer);
+    text=await res.text();
+  }catch(e){clearTimeout(timer);throw e;}
+
   const json=JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/)[1]);
   return json.table.rows.map(r=>(r.c||[]).map(c=>(!c||c.v===null)?null:c.v));
 }
@@ -430,6 +437,14 @@ async function loadAll(){
     }
   }
 
+  // Verifica se carregou algum dado real
+  const totalRows=Object.values(d26).reduce((s,v)=>s+v.count,0)+Object.values(d25).reduce((s,v)=>s+v.count,0);
+  if(totalRows===0){
+    document.getElementById('loading-spinner').style.display='none';
+    document.getElementById('loading-msg').textContent='Nenhum dado encontrado.';
+    document.getElementById('loading-error').style.display='block';
+    return;
+  }
   render2026();render2025();renderCompare();
   document.getElementById('loading').style.display='none';
   document.getElementById('app').style.display='block';
@@ -1046,6 +1061,19 @@ function switchPanel(id,btn){
   document.getElementById('panel-'+id).classList.add('visible');
 }
 
+// Detecta se está rodando como arquivo local (file://)
+if(location.protocol==='file:'){
+  document.getElementById('loading-spinner').style.display='none';
+  document.getElementById('loading-msg').innerHTML='<strong>⚠️ Arquivo aberto localmente</strong><br><span style="font-size:.75rem;font-weight:400">Abra este arquivo em um servidor web (ex: VS Code Live Server, ou hospede online) para carregar os dados do Google Sheets.</span>';
+  document.getElementById('loading-error').style.display='none';
+}
+
+function retryLoad(){
+  document.getElementById("loading-spinner").style.display="block";
+  document.getElementById("loading-msg").textContent="Carregando dados das planilhas...";
+  document.getElementById("loading-error").style.display="none";
+  loadAll();
+}
 loadAll();
 // THEME TOGGLE
 function toggleTheme(){
