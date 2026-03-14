@@ -213,20 +213,31 @@ tr:hover td{background:var(--surface2)}
 .insight{border-left:3px solid;padding:11px 14px;background:var(--surface);border-radius:0 8px 8px 0;margin-bottom:8px;font-size:.8rem;line-height:1.6}
 .insight strong{display:block;margin-bottom:2px;font-size:.67rem;text-transform:uppercase;letter-spacing:.06em;font-weight:800}
 
-.inad-section{max-width:1060px;margin:0 auto 28px}
-.inad-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
-.inad-title{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#ff5c7a}
-.inad-total{font-size:.75rem;font-weight:700;color:#ff5c7a;background:#ff5c7a18;border:1px solid #ff5c7a40;border-radius:999px;padding:3px 12px}
-.inad-empty{text-align:center;padding:24px;color:var(--muted);font-size:.8rem;font-weight:600;background:var(--surface);border:1px solid var(--border);border-radius:10px}
-.inad-table{width:100%;border-collapse:collapse;font-size:.78rem}
-.inad-table th{background:var(--surface2);color:#ff5c7a;font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;padding:8px 12px;text-align:left;border-bottom:2px solid #ff5c7a40}
-.inad-table td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+/* ── INADIMPLENTES ── */
+.inad-box{max-width:1060px;margin:0 auto 28px;background:linear-gradient(135deg,#1a0a0e 0%,#0d1b2e 100%);border:1.5px solid #ff5c7a55;border-radius:14px;overflow:hidden}
+.inad-box-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px 10px;border-bottom:1px solid #ff5c7a30;flex-wrap:wrap;gap:8px}
+.inad-box-title{display:flex;align-items:center;gap:8px;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#ff5c7a}
+.inad-pulse{width:8px;height:8px;background:#ff5c7a;border-radius:50%;box-shadow:0 0 0 0 #ff5c7a66;animation:inadPulse 1.5s infinite}
+@keyframes inadPulse{0%{box-shadow:0 0 0 0 #ff5c7a66}70%{box-shadow:0 0 0 8px transparent}100%{box-shadow:0 0 0 0 transparent}}
+.inad-summary{display:flex;gap:16px;flex-wrap:wrap}
+.inad-pill{background:#ff5c7a18;border:1px solid #ff5c7a40;border-radius:999px;padding:3px 14px;font-size:.72rem;font-weight:700;color:#ff5c7a}
+.inad-pill.green{background:#00d4a818;border-color:#00d4a840;color:#00d4a8}
+.inad-table-wrap{overflow-x:auto}
+.inad-table{width:100%;border-collapse:collapse;font-size:.8rem}
+.inad-table th{background:#ff5c7a12;color:#ff8899;font-size:.63rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;padding:9px 16px;text-align:left;border-bottom:1px solid #ff5c7a30}
+.inad-table td{padding:11px 16px;border-bottom:1px solid #ffffff08;vertical-align:middle}
 .inad-table tr:last-child td{border-bottom:none}
-.inad-table tr:hover td{background:var(--surface2)}
-.inad-valor{color:#ff5c7a;font-weight:700}
-.inad-vencido{color:#ff5c7a;font-weight:700;font-size:.72rem}
-.inad-ok{color:#00d4a8;font-weight:700;font-size:.72rem}
-.inad-wrap{background:var(--surface);border:1px solid #ff5c7a40;border-radius:10px;overflow:hidden}
+.inad-table tr:hover td{background:#ff5c7a08}
+.inad-nome{font-weight:700;color:var(--text)}
+.inad-valor{color:#ff5c7a;font-weight:800;font-size:.85rem}
+.inad-tag{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:.68rem;font-weight:700}
+.inad-tag.vencido{background:#ff5c7a20;color:#ff5c7a;border:1px solid #ff5c7a40}
+.inad-tag.hoje{background:#f0b42920;color:#f0b429;border:1px solid #f0b42940}
+.inad-tag.futuro{background:#00d4a820;color:#00d4a8;border:1px solid #00d4a840}
+.inad-tag.sem-data{background:#ffffff10;color:var(--muted);border:1px solid var(--border)}
+.inad-empty{text-align:center;padding:28px;color:#00d4a8;font-size:.82rem;font-weight:700}
+.inad-empty span{display:block;font-size:1.4rem;margin-bottom:6px}
+
 </style>
 </head>
 <body>
@@ -262,6 +273,14 @@ tr:hover td{background:var(--surface2)}
     <div class="sec-label">📌 Resumo do Mês</div>
     <div class="cards-grid" id="cards-2026"></div>
 
+    <div class="inad-box" id="inad-box-26">
+      <div class="inad-box-header">
+        <div class="inad-box-title"><div class="inad-pulse"></div>🚨 Inadimplentes do Ano</div>
+        <div class="inad-summary" id="inad-summary-26"></div>
+      </div>
+      <div class="inad-table-wrap" id="inad-body-26"></div>
+    </div>
+
     <div class="charts-grid">
       <div class="chart-box"><div class="chart-title">📈 Receita por Mês</div><div class="chart-wrap"><canvas id="ch-rec26"></canvas></div></div>
       <div class="chart-box"><div class="chart-title">🎯 Fonte dos Leads</div><div class="chart-wrap"><canvas id="ch-fonte26"></canvas></div></div>
@@ -276,14 +295,6 @@ tr:hover td{background:var(--surface2)}
 
     <div class="insights-box" id="insights-2026"></div>
 
-    <div class="inad-section" id="inad-section-26" style="display:none">
-      <div class="inad-header">
-        <div class="inad-title">🚨 Inadimplentes</div>
-        <div class="inad-total" id="inad-total-26"></div>
-      </div>
-      <div class="inad-wrap" id="inad-list-26"></div>
-    </div>
-
     <div class="table-wrap">
       <div class="table-title" id="tbl-title26">📋 Clientes do Mês</div>
       <div id="tbl-26"></div>
@@ -295,6 +306,14 @@ tr:hover td{background:var(--surface2)}
     <div class="month-tabs" id="tabs-2025"></div>
     <div class="cards-grid" id="cards-2025"></div>
 
+    <div class="inad-box" id="inad-box-25">
+      <div class="inad-box-header">
+        <div class="inad-box-title"><div class="inad-pulse"></div>🚨 Inadimplentes do Ano</div>
+        <div class="inad-summary" id="inad-summary-25"></div>
+      </div>
+      <div class="inad-table-wrap" id="inad-body-25"></div>
+    </div>
+
     <div class="charts-grid">
       <div class="chart-box wide"><div class="chart-title">📈 Receita por Mês</div><div class="chart-wrap"><canvas id="ch-ltv25"></canvas></div></div>
       <div class="chart-box"><div class="chart-title">🎯 Fonte dos Leads</div><div class="chart-wrap"><canvas id="ch-fonte25"></canvas></div></div>
@@ -304,14 +323,6 @@ tr:hover td{background:var(--surface2)}
     <div class="podium-wrap"><div class="sec-label" style="margin-bottom:16px">🥇 Ranking de SDR</div><div class="podium-stage" id="sdr-ranking25"></div></div>
 
     <div id="insights-2025" class="insights-box"></div>
-
-    <div class="inad-section" id="inad-section-25" style="display:none">
-      <div class="inad-header">
-        <div class="inad-title">🚨 Inadimplentes</div>
-        <div class="inad-total" id="inad-total-25"></div>
-      </div>
-      <div class="inad-wrap" id="inad-list-25"></div>
-    </div>
 
     <div class="sec-label" id="tbl-title25">📋 Clientes</div>
     <div class="table-wrap" id="tbl-25"></div>
@@ -426,7 +437,7 @@ async function loadAll(){
         sdr:    String(r[cfg.off?9:8]||'').trim(),
         closer: String(r[cfg.off?10:9]||'').trim(),
         inadimplente: num(r[cfg.off?14:13]),
-        retorno: parseDate(r[cfg.off?15:14]),
+        retorno:       parseDate(r[cfg.off?15:14]),
       }));
       const ltv=parsed.reduce((s,r)=>s+r.ltv,0);
       const mens=parsed.reduce((s,r)=>s+r.mens,0);
@@ -456,7 +467,7 @@ async function loadAll(){
         sdr:    String(r[cfg.off?9:8]||'').trim(),
         closer: String(r[cfg.off?10:9]||'').trim(),
         inadimplente: num(r[cfg.off?14:13]),
-        retorno: parseDate(r[cfg.off?15:14]),
+        retorno:       parseDate(r[cfg.off?15:14]),
       }));
       const ltv=parsed.reduce((s,r)=>s+r.ltv,0);
       const mens=parsed.reduce((s,r)=>s+r.mens,0);
@@ -484,38 +495,63 @@ async function loadAll(){
 }
 
 
-function renderInad(rows, allRows, sectionId, totalId, listId){
-  // Coleta todos os inadimplentes de todas as abas do ano
-  const inadRows = allRows.filter(r => r.inadimplente && Number(r.inadimplente) > 0);
-  const section = document.getElementById(sectionId);
-  const totalEl = document.getElementById(totalId);
-  const listEl  = document.getElementById(listId);
-  if(!inadRows.length){
-    section.style.display='none';
+function renderInad(allRows, boxId, summaryId, bodyId){
+  const today = new Date(); today.setHours(0,0,0,0);
+  const rows = allRows.filter(r => r.inadimplente && Number(r.inadimplente) > 0);
+  const box  = document.getElementById(boxId);
+
+  if(!rows.length){
+    document.getElementById(summaryId).innerHTML='<span class="inad-pill green">✅ Nenhum inadimplente</span>';
+    document.getElementById(bodyId).innerHTML='<div class="inad-empty"><span>🎉</span>Sem inadimplências registradas!</div>';
+    box.style.borderColor='#00d4a840';
+    box.style.background='linear-gradient(135deg,#0a1e0f 0%,#0d1b2e 100%)';
     return;
   }
-  section.style.display='block';
-  const totalDev = inadRows.reduce((s,r)=>s+Number(r.inadimplente),0);
-  totalEl.textContent = inadRows.length + ' cliente' + (inadRows.length>1?'s':'') + ' · ' + brl(totalDev) + ' em aberto';
-  const today = new Date();
-  const rows_html = inadRows.map(r => {
-    const ret = r.retorno;
-    let retStr = '—';
-    let retClass = '';
-    if(ret){
-      retStr = ret.toLocaleDateString('pt-BR');
-      retClass = ret < today ? 'inad-vencido' : 'inad-ok';
-    }
-    return `<tr>
-      <td><strong>${r.nome}</strong></td>
-      <td class="inad-valor">${brl(r.inadimplente)}</td>
-      <td class="${retClass}">${retStr}${ret && ret < today ? ' ⚠️' : ''}</td>
-    </tr>`;
-  }).join('');
-  listEl.innerHTML = `<table class="inad-table">
-    <thead><tr><th>Cliente</th><th>Valor em Aberto</th><th>Data de Retorno/Pagamento</th></tr></thead>
-    <tbody>${rows_html}</tbody>
-  </table>`;
+
+  box.style.borderColor='';
+  box.style.background='';
+
+  const total = rows.reduce((s,r)=>s+Number(r.inadimplente),0);
+  const vencidos = rows.filter(r=>r.retorno && r.retorno<today).length;
+
+  document.getElementById(summaryId).innerHTML=`
+    <span class="inad-pill">${rows.length} cliente${rows.length>1?'s':''}</span>
+    <span class="inad-pill">${brl(total)} em aberto</span>
+    ${vencidos>0?`<span class="inad-pill">${vencidos} vencido${vencidos>1?'s':''} ⚠️</span>`:''}
+  `;
+
+  const rowsSorted = [...rows].sort((a,b)=>{
+    // vencidos primeiro, depois por data
+    const av = a.retorno&&a.retorno<today?0:1;
+    const bv = b.retorno&&b.retorno<today?0:1;
+    if(av!==bv) return av-bv;
+    return (a.retorno||new Date(9999,0))-(b.retorno||new Date(9999,0));
+  });
+
+  document.getElementById(bodyId).innerHTML=`
+    <table class="inad-table">
+      <thead><tr>
+        <th>Cliente</th>
+        <th>Valor em Aberto</th>
+        <th>Data de Retorno / Pagamento</th>
+        <th>Status</th>
+      </tr></thead>
+      <tbody>${rowsSorted.map(r=>{
+        let tagClass='sem-data', tagTxt='Sem data';
+        if(r.retorno){
+          const d=new Date(r.retorno); d.setHours(0,0,0,0);
+          if(d<today){tagClass='vencido';tagTxt='Vencido ⚠️';}
+          else if(d.getTime()===today.getTime()){tagClass='hoje';tagTxt='Vence hoje ⏰';}
+          else{tagClass='futuro';tagTxt='Pendente';}
+        }
+        return `<tr>
+          <td class="inad-nome">${r.nome}</td>
+          <td class="inad-valor">${brl(r.inadimplente)}</td>
+          <td style="color:var(--muted);font-size:.78rem">${r.retorno?r.retorno.toLocaleDateString('pt-BR'):'—'}</td>
+          <td><span class="inad-tag ${tagClass}">${tagTxt}</span></td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table>`;
 }
 
 function render2026(mk){
@@ -547,6 +583,10 @@ function render2026(mk){
     <div class="card warn"><div class="cn">Total Vendido</div><div class="cv" style="color:${WN}">${brl(d.colet+d.impl)}</div><div class="cp">Mens. coletada + Consultoria</div></div>
   `;
 
+  // Inadimplentes
+  const _allRows26=MONTHS26.flatMap(m=>d26[m.key]?.rows||[]);
+  renderInad(_allRows26,'inad-box-26','inad-summary-26','inad-body-26');
+
   // Chart receita
   mkChart('ch-rec26','bar',{
     labels:MONTHS26.map(m=>m.label),
@@ -555,6 +595,10 @@ function render2026(mk){
       {label:'Mensalidade',data:MONTHS26.map(m=>d26[m.key]?.mens||0),backgroundColor:GD+'77',borderColor:GD,borderWidth:2,borderRadius:5},
     ]
   },{scales:{y:{ticks:{callback:v=>'R$'+Math.round(v/1000)+'k',color:'#5a8ab0',font:{size:8,family:'Montserrat'}},grid:{color:'#0a408020'}},x:{grid:{color:'#0a408020'},ticks:{color:'#5a8ab0',font:{size:8,family:'Montserrat',weight:'600'}}}}});
+
+  // Inadimplentes
+  const _allRows25=MONTHS25.flatMap(m=>d25[m.key]?.rows||[]);
+  renderInad(_allRows25,'inad-box-25','inad-summary-25','inad-body-25');
 
   // Chart fonte
   const fontes=Object.entries(d.src).sort((a,b)=>b[1]-a[1]);
@@ -635,10 +679,6 @@ function render2026(mk){
   `;
 
   // Table
-  // Inadimplentes 2026 — usa todos os dados do ano
-  const allRows26 = MONTHS26.flatMap(m=>d26[m.key]?.rows||[]);
-  renderInad(d.rows, allRows26, 'inad-section-26', 'inad-total-26', 'inad-list-26');
-
   document.getElementById('tbl-title26').textContent=`📋 Clientes — ${d.label} 2026 (${d.rows.length})`;
   const sorted=[...d.rows].sort((a,b)=>(a.data||0)-(b.data||0));
   document.getElementById('tbl-26').innerHTML=`<table>
@@ -684,6 +724,10 @@ function renderTotal2026(){
     <div class="card neutral"><div class="cn">Coletado</div><div class="cv" style="color:${AC}">${brl(tot.colet)}</div><div class="cp">Total recebido</div></div>
     <div class="card warn"><div class="cn">Total Vendido</div><div class="cv" style="color:${WN}">${brl(tot.colet+tot.impl)}</div><div class="cp">Mens. coletada + Consultoria</div></div>
   `;
+
+  // Inadimplentes (total)
+  const _allRows26t=MONTHS26.flatMap(m=>d26[m.key]?.rows||[]);
+  renderInad(_allRows26t,'inad-box-26','inad-summary-26','inad-body-26');
 
   // Destroy old charts
   Object.keys(charts).forEach(k=>{if(k.includes('26')){charts[k]?.destroy();delete charts[k];}});
@@ -881,6 +925,10 @@ function render2025(mk){
   `;
 
   // Charts
+  // Inadimplentes (total)
+  const _allRows25t=MONTHS25.flatMap(m=>d25[m.key]?.rows||[]);
+  renderInad(_allRows25t,'inad-box-25','inad-summary-25','inad-body-25');
+
   Object.keys(charts).forEach(k=>{if(k.includes('25')&&!k.includes('26')){charts[k]?.destroy();delete charts[k];}});
 
   mkChart('ch-ltv25','bar',{
@@ -928,10 +976,6 @@ function render2025(mk){
   `;
 
   // Table
-  // Inadimplentes 2025 — usa todos os dados do ano
-  const allRows25 = MONTHS25.flatMap(m=>d25[m.key]?.rows||[]);
-  renderInad(d.rows, allRows25, 'inad-section-25', 'inad-total-25', 'inad-list-25');
-
   document.getElementById('tbl-title25').textContent=`📋 Clientes — ${d.label} 2025 (${d.rows.length})`;
   const sorted=[...d.rows].sort((a,b)=>(a.data||0)-(b.data||0));
   document.getElementById('tbl-25').innerHTML=`<table>
