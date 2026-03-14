@@ -536,16 +536,18 @@ function renderInad(allRows, boxId, summaryId, bodyId, titleId, label){
       <thead><tr>
         <th>Cliente</th>
         <th>Valor em Aberto</th>
-        <th>Data de Retorno / Pagamento</th>
-        <th>Status</th>
+        <th>Data de Retorno</th>
+        <th>Status do Contato</th>
       </tr></thead>
       <tbody>${rowsSorted.map(r=>{
-        let tagClass='sem-data', tagTxt='Sem data';
+        // Status: baseado na data de retorno (contato), não de pagamento
+        // Pagamento só é quitado quando inadimplente = 0 (não aparece aqui)
+        let tagClass='sem-data', tagTxt='Aguardando contato';
         if(r.retorno){
           const d=new Date(r.retorno); d.setHours(0,0,0,0);
-          if(d<today){tagClass='vencido';tagTxt='Vencido ⚠️';}
-          else if(d.getTime()===today.getTime()){tagClass='hoje';tagTxt='Vence hoje ⏰';}
-          else{tagClass='futuro';tagTxt='Pendente';}
+          if(d<today){tagClass='vencido';tagTxt='Retorno atrasado ⚠️';}
+          else if(d.getTime()===today.getTime()){tagClass='hoje';tagTxt='Retornar hoje ⏰';}
+          else{tagClass='futuro';tagTxt='Retornar em '+d.toLocaleDateString('pt-BR');}
         }
         return `<tr>
           <td class="inad-nome">${r.nome}</td>
