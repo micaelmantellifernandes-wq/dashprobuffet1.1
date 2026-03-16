@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Relatório Financeiro — Micael Fernandes</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  :root {
+    --bg:#F7F7F5;--white:#FFF;--text:#1A1A1A;--text2:#666;--text3:#AAA;
+    --border:#E8E8E4;--border2:#D0D0CA;
+    --buffet:#1A5C3A;--buffet-bg:#EEF6F1;--buffet-accent:#2E8B57;
+    --agencia:#1A3A6B;--agencia-bg:#EEF2F9;--agencia-accent:#2E5FA8;
+    --castelo:#6B3A1A;--castelo-bg:#F9F2EE;--castelo-accent:#A85F2E;
+    --pessoal:#5A1A5A;--pessoal-bg:#F6EEF6;--pessoal-accent:#8B2E8B;
+    --receita:#0D4A2E;--receita-bg:#E8F5EE;--receita-accent:#1A7A4A;
+    --radius:10px;--shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);font-size:13px;font-weight:400;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .page{max-width:1140px;margin:0 auto;padding:0 32px 80px}
+
+  .header{padding:48px 0 36px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px}
+  .header h1{font-size:28px;font-weight:700;letter-spacing:-.5px;line-height:1.25}
+  .header h1 span{color:var(--text3);font-weight:300;display:block;font-size:22px}
+  .header-meta{text-align:right;font-size:11px;color:var(--text3);line-height:2}
+  .header-meta strong{color:var(--text2);font-weight:600}
+  .header-badge{display:inline-block;background:#EEF6F1;color:#1A7A4A;font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;border:1px solid #B8DDC8;margin-top:4px}
+
+  .mes-bar{display:flex;align-items:center;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+  .mes-bar label{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-right:4px}
+  .mes-btn{padding:7px 18px;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:600;cursor:pointer;color:var(--text3);border-radius:20px;border:1px solid var(--border);background:var(--white);transition:all .15s;box-shadow:var(--shadow)}
+  .mes-btn:hover{color:var(--text2);border-color:var(--border2)}
+  .mes-btn.active{background:var(--text);color:var(--white);border-color:var(--text)}
+
+  .nav{display:flex;gap:2px;margin-bottom:32px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:4px;width:fit-content;overflow-x:auto;box-shadow:var(--shadow)}
+  .nav-tab{padding:8px 16px;font-family:'Montserrat',sans-serif;font-size:11.5px;font-weight:500;cursor:pointer;color:var(--text3);border-radius:7px;transition:all .15s;white-space:nowrap;background:none;border:none}
+  .nav-tab:hover{color:var(--text2);background:var(--bg)}
+  .nav-tab.active{background:var(--text);color:var(--white)}
+
+  .content{display:none}.content.active{display:block}
+
+  .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:28px}
+  .kpi{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow)}
+  .kpi-label{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:10px}
+  .kpi-value{font-size:24px;font-weight:700;color:var(--text);letter-spacing:-.5px;line-height:1}
+  .kpi-sub{font-size:11px;color:var(--text3);margin-top:6px}
+  .kpi.featured{background:var(--text);border-color:var(--text)}
+  .kpi.featured .kpi-label{color:#888}.kpi.featured .kpi-value{color:#fff}.kpi.featured .kpi-sub{color:#777}
+  .kpi.green{background:var(--receita-bg);border-color:#B8DDC8}
+  .kpi.green .kpi-label{color:var(--receita-accent)}.kpi.green .kpi-value{color:var(--receita)}.kpi.green .kpi-sub{color:var(--receita-accent)}
+  .kpi.red{background:#FEF0F0;border-color:#F5C0C0}
+  .kpi.red .kpi-label{color:#A33030}.kpi.red .kpi-value{color:#C03030}.kpi.red .kpi-sub{color:#A33030}
+
+  .section-title{font-size:10px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--text3);margin-bottom:14px;margin-top:36px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+  .section-title:first-of-type{margin-top:0}
+
+  .card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:12px}
+  .card-pad{padding:22px 24px}
+
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+  @media(max-width:800px){.two-col{grid-template-columns:1fr}}
+
+  .chart-label{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--text3);margin-bottom:18px}
+  .chart-container{position:relative}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:16px}
+  .legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);font-weight:500}
+  .legend-sq{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+
+  .data-table{width:100%;border-collapse:collapse;font-size:12px}
+  .data-table th{text-align:left;padding:10px 18px;font-size:10px;letter-spacing:.8px;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);font-weight:600;background:var(--bg)}
+  .data-table td{padding:11px 18px;border-bottom:1px solid var(--border);color:var(--text2);font-weight:400}
+  .data-table tr:last-child td{border-bottom:none}
+  .data-table td.name{color:var(--text);font-weight:500}
+  .data-table td.val{color:var(--text);font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .data-table td.pos{color:var(--receita);font-weight:600}
+  .data-table td.neg{color:#C03030;font-weight:600}
+  .data-table tr:hover td{background:var(--bg)}
+
+  .badge{display:inline-block;font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;letter-spacing:.3px}
+  .cdot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:9px;flex-shrink:0;vertical-align:middle;position:relative;top:-1px}
+
+  .cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+  @media(max-width:700px){.cat-grid{grid-template-columns:1fr}}
+  .cat-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+  .cat-header{padding:14px 18px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
+  .cat-name{font-size:12px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px}
+  .cat-total{font-size:15px;font-weight:700}
+  .cat-row{display:flex;justify-content:space-between;align-items:center;padding:8px 18px;border-bottom:1px solid var(--border);font-size:12px}
+  .cat-row:last-child{border-bottom:none}
+  .cat-row-label{color:var(--text2)}.cat-row-val{color:var(--text);font-weight:600}
+
+  .insight-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+  @media(max-width:700px){.insight-grid{grid-template-columns:1fr}}
+  .insight{background:var(--white);border:1px solid var(--border);border-left:3px solid;border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow)}
+  .insight-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:5px}
+  .insight-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:7px;line-height:1.3}
+  .insight-text{font-size:12px;color:var(--text2);line-height:1.7}
+  .insight.alert{border-left-color:#D94F4F}.insight.alert .insight-label{color:#D94F4F}
+  .insight.warn{border-left-color:#D98A4F}.insight.warn .insight-label{color:#D98A4F}
+  .insight.ok{border-left-color:var(--buffet-accent)}.insight.ok .insight-label{color:var(--buffet-accent)}
+  .insight.info{border-left-color:var(--agencia-accent)}.insight.info .insight-label{color:var(--agencia-accent)}
+
+  .up{color:#D94F4F;font-size:11px;font-weight:600}
+  .dn{color:var(--buffet-accent);font-size:11px;font-weight:600}
+  .note{border-radius:var(--radius);padding:14px 18px;font-size:12px;line-height:1.7;margin-bottom:12px}
+  .note strong{font-weight:600}
+
+  .src-tag{font-size:9px;font-weight:600;padding:2px 6px;border-radius:4px;letter-spacing:.4px;margin-left:6px;vertical-align:middle}
+  .src-cartao{background:#E8F0FB;color:#2E5FA8}
+  .src-extrato{background:#EEF6F1;color:#1A7A4A}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div>
+      <h1>Relatório Financeiro<span>Conta Corrente + Cartão · Jan – Mar 2026</span></h1>
+    </div>
+    <div class="header-meta">
+      <div><strong>Micael M. Fernandes</strong></div>
+      <div>Sicoob Cocred — Conta 85.116-7</div>
+      <div>Sicoob Mastercard Black</div>
+      <div><span class="header-badge">✓ Extrato + Cartão integrados</span></div>
+    </div>
+  </div>
+
+  <div class="mes-bar">
+    <label>Período</label>
+    <button class="mes-btn active" onclick="setMes('todos',this)">Todos</button>
+    <button class="mes-btn" onclick="setMes('jan',this)">Janeiro</button>
+    <button class="mes-btn" onclick="setMes('fev',this)">Fevereiro</button>
+    <button class="mes-btn" onclick="setMes('mar',this)">Março*</button>
+  </div>
+
+  <div class="nav">
+    <button class="nav-tab active" onclick="showTab('visao-geral',this)">Visão Geral</button>
+    <button class="nav-tab" onclick="showTab('receitas',this)">Receitas</button>
+    <button class="nav-tab" onclick="showTab('pro-buffet',this)">Pro Buffet</button>
+    <button class="nav-tab" onclick="showTab('agencia',this)">Agência</button>
+    <button class="nav-tab" onclick="showTab('castelo',this)">Castelo</button>
+    <button class="nav-tab" onclick="showTab('pessoal',this)">Pessoal</button>
+    <button class="nav-tab" onclick="showTab('insights',this)">Insights</button>
+  </div>
+
+  <!-- ===== VISÃO GERAL ===== -->
+  <div id="visao-geral" class="content active">
+
+    <div class="kpi-grid" id="kpi-geral"></div>
+
+    <div class="section-title">Fluxo de caixa — entradas vs saídas</div>
+    <div class="two-col">
+      <div class="card card-pad">
+        <div class="chart-label" id="fluxoLabel">Fluxo mensal (R$)</div>
+        <div class="chart-container" style="height:230px"><canvas id="chartFluxo"></canvas></div>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-sq" style="background:#1A7A4A"></div>Entradas</div>
+          <div class="legend-item"><div class="legend-sq" style="background:#C03030"></div>Saídas (extrato)</div>
+          <div class="legend-item"><div class="legend-sq" style="background:#2E5FA8"></div>Saídas (cartão)</div>
+        </div>
+      </div>
+      <div class="card card-pad">
+        <div class="chart-label">Composição das saídas (%)</div>
+        <div class="chart-container" style="height:230px"><canvas id="chartPizza"></canvas></div>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-sq" style="background:#2E8B57"></div>Tráfego Pago (Buffet+Agência)</div>
+          <div class="legend-item"><div class="legend-sq" style="background:#2E5FA8"></div>Agência (SaaS+Folha)</div>
+          <div class="legend-item"><div class="legend-sq" style="background:#A85F2E"></div>Castelo</div>
+          <div class="legend-item"><div class="legend-sq" style="background:#8B2E8B"></div>Pessoal</div>
+          <div class="legend-item"><div class="legend-sq" style="background:#DDDDDD"></div>Outros</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">Resumo consolidado — todas as fontes</div>
+    <div class="card">
+      <table class="data-table" id="tabelaGeral"></table>
+    </div>
+    <p style="font-size:11px;color:var(--text3);margin-top:8px">
+      * Março parcial (1–16/mar). &nbsp;
+      <span class="src-tag src-cartao">CARTÃO</span> = Sicoob Mastercard &nbsp;
+      <span class="src-tag src-extrato">EXTRATO</span> = Conta corrente
+    </p>
+  </div>
+
+  <!-- ===== RECEITAS ===== -->
+  <div id="receitas" class="content">
+    <div class="kpi-grid" id="kpi-receitas"></div>
+
+    <div class="section-title">Entradas identificadas no extrato</div>
+    <div class="card card-pad">
+      <div class="chart-label" id="receitaChartLabel">Receitas por categoria — mensal (R$)</div>
+      <div class="chart-container" style="height:220px"><canvas id="chartReceitas"></canvas></div>
+    </div>
+
+    <div class="section-title">Detalhamento por fonte</div>
+    <div class="card">
+      <table class="data-table" id="tabelaReceitas"></table>
+    </div>
+
+    <div class="note" style="background:#FEF9EE;border:1px solid #F0DDA0;margin-top:8px">
+      <strong style="color:#7A5500">Atenção:</strong>
+      <span style="color:#9A6800"> Os recebimentos do ProBuffet e Castelo dos Sonhos para esta conta pessoal são "pró-labore informal" — retiradas das empresas. Não representam receita nova, mas sim capital transitando entre contas.</span>
+    </div>
+  </div>
+
+  <!-- ===== PRO BUFFET ===== -->
+  <div id="pro-buffet" class="content">
+    <div class="kpi-grid" id="kpi-buffet"></div>
+
+    <div class="section-title">Gastos Pro Buffet — cartão + extrato</div>
+    <div class="card card-pad">
+      <div class="chart-label">Investimento em tráfego pago — Meta Ads (R$)</div>
+      <div class="chart-container" style="height:200px"><canvas id="chartBuffet"></canvas></div>
+    </div>
+
+    <div class="section-title">Detalhamento de custos — Meta Ads</div>
+    <div class="card"><table class="data-table" id="tabelaBuffet"></table></div>
+
+    <div class="section-title">Ferramentas e plataformas do sistema</div>
+    <div class="card"><table class="data-table" id="tabelaBuffetTools"></table></div>
+
+    <div class="note" style="background:#FEF9EE;border:1px solid #F0DDA0;margin-top:8px">
+      <strong style="color:#7A5500">⚠ Atenção — separação pendente:</strong>
+      <span style="color:#9A6800"> Os lançamentos FACEBK* no cartão Sicoob 4338 incluem anúncios do Pro Buffet <em>e</em> da Agência misturados. O cartão 4817 é exclusivo do Pro Buffet (nota fiscal no CNPJ 51.898.745 — R$ 25.957 confirmados pela Meta). Para ver a separação exata por negócio, solicite o relatório de cobrança da Meta do cartão 4338.</span>
+    </div>
+  </div>
+
+  <!-- ===== AGÊNCIA ===== -->
+  <div id="agencia" class="content">
+    <div class="kpi-grid" id="kpi-agencia"></div>
+
+    <div class="section-title">Stack de ferramentas (cartão)</div>
+    <div class="card"><table class="data-table" id="tabelaAgencia"></table></div>
+
+    <div class="section-title">Folha de pagamento (extrato)</div>
+    <div class="card"><table class="data-table" id="tabelaFolha"></table></div>
+
+    <div class="note" style="background:var(--agencia-bg);border:1px solid #C0CCE0;margin-top:8px">
+      <strong style="color:var(--agencia)">Bubble = 63% do SaaS.</strong>
+      <span style="color:var(--agencia-accent)"> Plano Starter em USD oscilou entre R$ 1.700–2.218/mês por variação cambial.</span>
+    </div>
+  </div>
+
+  <!-- ===== CASTELO ===== -->
+  <div id="castelo" class="content">
+    <div class="kpi-grid" id="kpi-castelo"></div>
+
+    <div class="section-title">Custos do Castelo dos Sonhos — cartão + extrato</div>
+    <div class="card"><table class="data-table" id="tabelaCastelo"></table></div>
+
+    <div class="note" style="background:var(--castelo-bg);border:1px solid #DFC8B4;margin-top:8px">
+      <strong style="color:var(--castelo)">Atenção:</strong>
+      <span style="color:var(--castelo-accent)"> O Castelo teve custos muito variáveis no período — Jan R$ 9.087, Fev R$ 6.825, Mar R$ 3.203. Janeiro foi o mês mais pesado. Importante separar o que é custo operacional do que é repasse à franquia.</span>
+    </div>
+  </div>
+
+  <!-- ===== PESSOAL ===== -->
+  <div id="pessoal" class="content">
+    <div class="kpi-grid" id="kpi-pessoal"></div>
+
+    <div class="section-title">Gastos pessoais — cartão + extrato</div>
+    <div class="cat-grid" id="catPessoal"></div>
+
+    <div class="section-title">Detalhes extrato pessoal</div>
+    <div class="card"><table class="data-table" id="tabelaPessoal"></table></div>
+
+    <div class="note" style="background:var(--pessoal-bg);border:1px solid #D8C0D8">
+      <strong style="color:var(--pessoal)">Atenção:</strong>
+      <span style="color:var(--pessoal-accent)"> Nubank da Jaque e cartão Inter da Jaque são pagos via extrato (~R$ 5.800 nos 3 meses). Somados aos gastos pessoais do cartão Sicoob, o total pessoal é relevante.</span>
+    </div>
+  </div>
+
+  <!-- ===== INSIGHTS ===== -->
+  <div id="insights" class="content">
+    <div class="section-title">Alertas e observações — visão consolidada</div>
+    <div class="insight-grid">
+      <div class="insight alert">
+        <div class="insight-label">Atenção</div>
+        <div class="insight-title">Saldo médio muito baixo na conta</div>
+        <div class="insight-text">A conta operou com saldo entre R$ 266 e R$ 7.681 ao longo dos meses — muito baixo para o volume que transita (~R$ 50k+/mês). Qualquer atraso de recebimento coloca a conta no limite. Reserva operacional recomendada: R$ 15–20k.</div>
+      </div>
+      <div class="insight alert">
+        <div class="insight-label">Atenção</div>
+        <div class="insight-title">Fatura do cartão crescendo todo mês</div>
+        <div class="insight-text">Jan R$ 22.675 → Fev R$ 27.995 (+23%) → Mar R$ 30.753 (+10%). O débito automático da fatura é o maior lançamento único da conta todo mês — e está crescendo.</div>
+      </div>
+      <div class="insight warn">
+        <div class="insight-label">Atenção</div>
+        <div class="insight-title">Tudo misturado na mesma conta</div>
+        <div class="insight-text">Pro Buffet, Agência, Castelo dos Sonhos e despesas pessoais transitam pela mesma conta corrente pessoal. Isso dificulta o DRE de cada empresa, a apuração de impostos e a visão real do que cada negócio gera e consome.</div>
+      </div>
+      <div class="insight warn">
+        <div class="insight-label">Monitorar</div>
+        <div class="insight-title">Nubank Micael + Inter Jaqueline pagos pelo extrato</div>
+        <div class="insight-text">O Nubank do Micael (~R$ 2.341–2.685/mês) e o Inter da Jaqueline (~R$ 2.119–2.586/mês) são pagos por esta conta corrente. Nos 3 meses isso representou ~R$ 7.144 em pagamentos de faturas — gastos que não aparecem no cartão Sicoob e precisam ser rastreados separadamente.</div>
+      </div>
+      <div class="insight ok">
+        <div class="insight-label">Positivo</div>
+        <div class="insight-title">Zero rotativo — cartão pago integralmente</div>
+        <div class="insight-text">Nos 3 meses o rotativo foi R$ 0, confirmando que a fatura foi quitada no vencimento. Considerando os 8,5% a.m. do rotativo Sicoob, isso representa uma economia significativa.</div>
+      </div>
+      <div class="insight ok">
+        <div class="insight-label">Positivo</div>
+        <div class="insight-title">Receita de mentoria recorrente e crescente</div>
+        <div class="insight-text">Entradas de mentoria identificadas nos 3 meses: Dom Festas (2x/mês), Garden Kids, Casa de Festas Vem Brincar, Zpelin, S F C Sales, A L G Eventos, entre outros. Sinal de carteira de clientes ativa.</div>
+      </div>
+      <div class="insight info">
+        <div class="insight-label">Oportunidade</div>
+        <div class="insight-title">Meta Ads misturados em dois cartões pessoais</div>
+        <div class="insight-text">O cartão 4817 paga Meta Ads exclusivos do Pro Buffet (nota fiscal no CNPJ — R$ 25.957 confirmados). O cartão 4338 mistura anúncios do Pro Buffet e da Agência. Para separar com precisão, solicite o relatório da Meta do cartão 4338. Idealmente ambos migram para cartões PJ separados por empresa.</div>
+      </div>
+      <div class="insight info">
+        <div class="insight-label">Oportunidade</div>
+        <div class="insight-title">Consórcio R$ 1.278–1.393/mês</div>
+        <div class="insight-text">Cobrança automática mensal significativa. Vale confirmar o prazo restante e o bem contemplado — pode ser uma alavanca patrimonial ou uma saída de caixa que merece revisão dependendo da situação atual.</div>
+      </div>
+    </div>
+
+    <div class="section-title">Recomendações</div>
+    <div class="card">
+      <table class="data-table">
+        <thead><tr><th>#</th><th>Recomendação</th><th>Impacto</th><th>Prazo</th></tr></thead>
+        <tbody>
+          <tr><td class="val">01</td><td class="name">Criar conta PJ para Pro Buffet e migrar Meta Ads + outros custos da empresa</td><td><span class="badge" style="background:var(--buffet-bg);color:var(--buffet)">Alto</span></td><td style="color:var(--text3)">Curto prazo</td></tr>
+          <tr><td class="val">02</td><td class="name">Manter reserva operacional mínima de R$ 15k na conta corrente</td><td><span class="badge" style="background:#FEF0F0;color:#A33030">Alto</span></td><td style="color:var(--text3)">Imediato</td></tr>
+          <tr><td class="val">03</td><td class="name">Separar recebimentos de mentoria em conta ou centro de custo próprio</td><td><span class="badge" style="background:var(--agencia-bg);color:var(--agencia)">Médio</span></td><td style="color:var(--text3)">Curto prazo</td></tr>
+          <tr><td class="val">04</td><td class="name">Revisar plano do Bubble — 63% do SaaS da agência (~R$ 2k/mês)</td><td><span class="badge" style="background:var(--castelo-bg);color:var(--castelo)">Médio</span></td><td style="color:var(--text3)">Curto prazo</td></tr>
+          <tr><td class="val">05</td><td class="name">Definir limite mensal de gastos pessoais e da Jaque nesta conta</td><td><span class="badge" style="background:var(--castelo-bg);color:var(--castelo)">Médio</span></td><td style="color:var(--text3)">Imediato</td></tr>
+          <tr><td class="val">06</td><td class="name">Avaliar prazo e situação do consórcio (~R$ 1.350/mês fixo)</td><td><span class="badge" style="background:var(--pessoal-bg);color:var(--pessoal)">Baixo</span></td><td style="color:var(--text3)">Médio prazo</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ─── DADOS COMPLETOS ──────────────────────────────────────────────────────────
+const MESES = ['jan','fev','mar'];
+const LABELS = {todos:'Todos',jan:'Janeiro',fev:'Fevereiro',mar:'Março*'};
+
+// EXTRATO — ENTRADAS
+const ENT = {
+  // Recebimentos do ProBuffet para esta conta
+  entProBuffet:   {jan: 8000,   fev: 21020, mar: 1000},
+  // Recebimentos do Castelo para esta conta
+  entCastelo:     {jan: 12983,  fev: 7000,  mar: 0},
+  // Mentoria (buffets/eventos pagando)
+  entMentoria:    {jan: 13772,  fev: 9074,  mar: 8525},
+  // Agência (mkt patrocinado, propaganda)
+  entAgencia:     {jan: 3460,   fev: 1000,  mar: 3000},
+  // Outros créditos (boletos, depósitos)
+  entOutros:      {jan: 4052,   fev: 3764,  mar: 2662},
+};
+
+// EXTRATO — SAÍDAS
+const SAI = {
+  // João Victor (salário agência)
+  joao:           {jan: 1500,   fev: 3000,  mar: 1500},
+  // Castelo dos Sonhos (custos operacionais)
+  casteloCusto:   {jan: 8660,   fev: 6398,  mar: 2776},
+  // Fatura Mastercard (débito automático)
+  mastercard:     {jan: 22675,  fev: 27995,  mar: 0}, // mar ainda não debitou
+  // Consórcio
+  consorcio:      {jan: 1278,   fev: 1262,  mar: 1304},
+  // Colégio Izabela
+  colegio:        {jan: 0,      fev: 874,   mar: 874},
+  // Cartões Jaqueline (Nubank + Inter)
+  cartoesJaque:   {jan: 4926,   fev: 4804,  mar: 0},
+  // ProBuffet (pix direto — ex: R$1.110 jan, R$425 fev)
+  buffetPix:      {jan: 1110,   fev: 425,   mar: 0},
+  // Energia (rancho + barracão)
+  energia:        {jan: 1951,   fev: 364,   mar: 0},
+  // Outros saídas extrato
+  outrosExtrato:  {jan: 3100,   fev: 3850,  mar: 3000},
+};
+
+// CARTÃO — SAÍDAS (já do relatório anterior)
+// NOTA: buffetAds = Meta Ads misturados (Pro Buffet + Agência) no cartão 4338
+// Cartão 4817 exclusivo Pro Buffet: R$25.957 confirmados pela Meta (jan–17mar)
+// agenciaSaas = apenas ferramentas da agência (sem Bubble, ManyChat, Respondi, Make, WhatsApp)
+// buffetSaas  = ferramentas do Pro Buffet (Bubble, ManyChat, Respondi, Make, WhatsApp)
+const CART = {
+  buffetAds:  {jan:14359, fev:12533, mar:16237},
+  buffetSaas: {jan:1834+149+237+58+55, fev:2218+149+187+55+55, mar:2163+149+187+56+55}, // Bubble+ManyChat+Respondi+Make+WhatsApp
+  agenciaSaas:{jan:696+202+167+108+109+98, fev:0+196+167+104+104+156, mar:0+0+167+105+106+252},
+  casteloCrt: {jan:427,   fev:427,   mar:427},
+  pessoalCrt: {jan:2487,  fev:2790,  mar:3524},
+  familiaCrt: {jan:1532,  fev:750,   mar:1102},
+};
+
+// AGÊNCIA TOOLS (ferramentas exclusivas da agência)
+const TOOLS = [
+  {name:'Notion Labs',           key:'notion', tipo:'Gestão',      jan:696,  fev:0,    mar:0},
+  {name:'Pipedrive (CRM)',       key:'pipe',   tipo:'CRM',         jan:202,  fev:196,  mar:0},
+  {name:'Reportei',              key:'rep',    tipo:'Relatórios',  jan:167,  fev:167,  mar:167},
+  {name:'Twilio SendGrid',       key:'sndg',   tipo:'Email',       jan:108,  fev:104,  mar:105},
+  {name:'OpenAI ChatGPT',        key:'ai',     tipo:'IA',          jan:109,  fev:104,  mar:106},
+  {name:'Google Workspace+Cloud',key:'gws',    tipo:'Produt.',     jan:98,   fev:156,  mar:252},
+];
+
+// PRO BUFFET TOOLS (ferramentas do sistema do buffet)
+const TOOLS_BUFFET = [
+  {name:'Bubble (Starter Plan)', key:'bubble', tipo:'No-code',     jan:1834, fev:2218, mar:2163},
+  {name:'ManyChat',              key:'many',   tipo:'Automação',   jan:149,  fev:149,  mar:149},
+  {name:'Respondi.app',          key:'rsp',    tipo:'Formulários', jan:237,  fev:187,  mar:187},
+  {name:'Make.com',              key:'make',   tipo:'Automação',   jan:58,   fev:55,   mar:56},
+  {name:'WhatsApp Business',     key:'wpp',    tipo:'Comunic.',    jan:55,   fev:55,   mar:55},
+];
+
+// ─── UTILS ────────────────────────────────────────────────────────────────────
+let mesSel = 'todos';
+
+function v(obj, key, mes) {
+  if (mes === 'todos') return MESES.reduce((s,m) => s + (obj[key]?obj[key][m]:obj[m]), 0);
+  return obj[key] ? obj[key][mes] : obj[mes];
+}
+function vd(obj, mes) {
+  if (mes==='todos') return MESES.reduce((s,m)=>s+obj[m],0);
+  return obj[mes];
+}
+function brl(n) {
+  if(n===0) return '—';
+  return 'R$ ' + Math.round(n).toLocaleString('pt-BR');
+}
+function brlFull(n) {
+  return 'R$ ' + n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function pct(part,total){ return total>0?(part/total*100).toFixed(1)+'%':'—'; }
+
+function totalEntradas(mes) {
+  return Object.values(ENT).reduce((s,obj)=>s+vd(obj,mes),0);
+}
+function totalSaidasExtrato(mes) {
+  return Object.values(SAI).reduce((s,obj)=>s+vd(obj,mes),0);
+}
+function totalSaidasCartao(mes) {
+  return Object.values(CART).reduce((s,obj)=>s+vd(obj,mes),0);
+}
+function totalCastelo(mes) {
+  return vd(SAI.casteloCusto,mes) + vd(CART.casteloCrt,mes);
+}
+function totalAgencia(mes) {
+  return vd(SAI.joao,mes) + vd(CART.agenciaSaas,mes);
+}
+function totalBuffet(mes) {
+  return vd(CART.buffetAds,mes) + vd(SAI.buffetPix,mes) + vd(CART.buffetSaas,mes);
+}
+function totalPessoal(mes) {
+  return vd(CART.pessoalCrt,mes) + vd(CART.familiaCrt,mes) +
+         vd(SAI.cartoesJaque,mes) + vd(SAI.consorcio,mes) +
+         vd(SAI.colegio,mes) + vd(SAI.energia,mes);
+}
+
+// ─── CHARTS ──────────────────────────────────────────────────────────────────
+let fluxoChart, pizzaChart, buffetChart, receitasChart;
+const gc='#EEEEEA', tc='#AAAAAA', mf={family:'Montserrat',size:11};
+
+function buildCharts() {
+  fluxoChart = new Chart(document.getElementById('chartFluxo'), {
+    type:'bar',
+    data:{
+      labels:['Jan','Fev','Mar'],
+      datasets:[
+        {label:'Entradas',data:[totalEntradas('jan'),totalEntradas('fev'),totalEntradas('mar')],backgroundColor:'#1A7A4A',borderRadius:3},
+        {label:'Saídas extrato',data:[totalSaidasExtrato('jan'),totalSaidasExtrato('fev'),totalSaidasExtrato('mar')],backgroundColor:'#C03030',borderRadius:3},
+        {label:'Saídas cartão',data:[totalSaidasCartao('jan'),totalSaidasCartao('fev'),totalSaidasCartao('mar')],backgroundColor:'#2E5FA8',borderRadius:3},
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      scales:{x:{ticks:{color:tc,font:mf},grid:{color:gc}},y:{ticks:{color:tc,font:mf,callback:v=>'R$'+(v/1000).toFixed(0)+'k'},grid:{color:gc}}},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${brlFull(ctx.parsed.y)}`}}}}
+  });
+
+  pizzaChart = new Chart(document.getElementById('chartPizza'), {
+    type:'doughnut',
+    data:{
+      labels:['Tráfego Pago (Buffet+Ag.)','Agência (SaaS+Folha)','Castelo','Pessoal','Outros'],
+      datasets:[{data:[53,9,10,20,8],backgroundColor:['#2E8B57','#2E5FA8','#A85F2E','#8B2E8B','#DDDDDD'],borderColor:'#FFF',borderWidth:3,hoverOffset:6}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,cutout:'65%',
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${ctx.parsed}%`}}}}
+  });
+
+  buffetChart = new Chart(document.getElementById('chartBuffet'), {
+    type:'bar',
+    data:{
+      labels:['Jan','Fev','Mar'],
+      datasets:[
+        {label:'Meta Ads (cartão)',data:[14359,12533,16237],backgroundColor:'#2E8B57',borderRadius:3},
+        {label:'Pix direto',data:[1110,425,0],backgroundColor:'#6ABE8A',borderRadius:3},
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      scales:{x:{stacked:true,ticks:{color:tc,font:mf},grid:{color:gc}},y:{stacked:true,ticks:{color:tc,font:mf,callback:v=>'R$ '+v.toLocaleString('pt-BR')},grid:{color:gc}}},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${brlFull(ctx.parsed.y)}`}}}}
+  });
+
+  receitasChart = new Chart(document.getElementById('chartReceitas'), {
+    type:'bar',
+    data:{
+      labels:['Jan','Fev','Mar'],
+      datasets:[
+        {label:'Mentoria',data:[13772,9074,8525],backgroundColor:'#1A7A4A',borderRadius:3},
+        {label:'Agência',data:[3460,1000,3000],backgroundColor:'#2E5FA8',borderRadius:3},
+        {label:'ProBuffet → conta',data:[8000,21020,1000],backgroundColor:'#6ABE8A',borderRadius:3},
+        {label:'Castelo → conta',data:[12983,7000,0],backgroundColor:'#A85F2E',borderRadius:3},
+        {label:'Outros',data:[4052,3764,2662],backgroundColor:'#CCCCCC',borderRadius:3},
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      scales:{x:{stacked:true,ticks:{color:tc,font:mf},grid:{color:gc}},y:{stacked:true,ticks:{color:tc,font:mf,callback:v=>'R$'+(v/1000).toFixed(0)+'k'},grid:{color:gc}}},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${brlFull(ctx.parsed.y)}`}}}}
+  });
+}
+
+function updateCharts(mes) {
+  if(mes==='todos'){
+    fluxoChart.data.labels=['Jan','Fev','Mar'];
+    fluxoChart.data.datasets[0].data=[totalEntradas('jan'),totalEntradas('fev'),totalEntradas('mar')];
+    fluxoChart.data.datasets[1].data=[totalSaidasExtrato('jan'),totalSaidasExtrato('fev'),totalSaidasExtrato('mar')];
+    fluxoChart.data.datasets[2].data=[totalSaidasCartao('jan'),totalSaidasCartao('fev'),totalSaidasCartao('mar')];
+    buffetChart.data.labels=['Jan','Fev','Mar'];
+    buffetChart.data.datasets[0].data=[14359,12533,16237];
+    buffetChart.data.datasets[1].data=[1110,425,0];
+    receitasChart.data.labels=['Jan','Fev','Mar'];
+    receitasChart.data.datasets[0].data=[13772,9074,8525];
+    receitasChart.data.datasets[1].data=[3460,1000,3000];
+    receitasChart.data.datasets[2].data=[8000,21020,1000];
+    receitasChart.data.datasets[3].data=[12983,7000,0];
+    receitasChart.data.datasets[4].data=[4052,3764,2662];
+    document.getElementById('fluxoLabel').textContent='Fluxo mensal (R$)';
+    document.getElementById('receitaChartLabel').textContent='Receitas por categoria — mensal (R$)';
+  } else {
+    const l = LABELS[mes];
+    fluxoChart.data.labels=['Entradas','Saídas extrato','Saídas cartão'];
+    fluxoChart.data.datasets[0].data=[totalEntradas(mes),0,0];
+    fluxoChart.data.datasets[1].data=[0,totalSaidasExtrato(mes),0];
+    fluxoChart.data.datasets[2].data=[0,0,totalSaidasCartao(mes)];
+    buffetChart.data.labels=[l];
+    buffetChart.data.datasets[0].data=[CART.buffetAds[mes]];
+    buffetChart.data.datasets[1].data=[SAI.buffetPix[mes]];
+    receitasChart.data.labels=[l];
+    receitasChart.data.datasets[0].data=[ENT.entMentoria[mes]];
+    receitasChart.data.datasets[1].data=[ENT.entAgencia[mes]];
+    receitasChart.data.datasets[2].data=[ENT.entProBuffet[mes]];
+    receitasChart.data.datasets[3].data=[ENT.entCastelo[mes]];
+    receitasChart.data.datasets[4].data=[ENT.entOutros[mes]];
+    document.getElementById('fluxoLabel').textContent='Fluxo — '+l;
+    document.getElementById('receitaChartLabel').textContent='Receitas — '+l+' (R$)';
+  }
+  // Pizza sempre total relativo
+  const mList = mes==='todos'?MESES:[mes];
+  const tot = mList.reduce((s,m)=>s+totalSaidasCartao(m)+totalSaidasExtrato(m),0);
+  const bp = mList.reduce((s,m)=>s+totalBuffet(m),0);
+  const ap = mList.reduce((s,m)=>s+totalAgencia(m),0);
+  const cp = mList.reduce((s,m)=>s+totalCastelo(m),0);
+  const pp = mList.reduce((s,m)=>s+totalPessoal(m),0);
+  const op = tot-bp-ap-cp-pp;
+  pizzaChart.data.datasets[0].data=[
+    Math.round(bp/tot*1000)/10,
+    Math.round(ap/tot*1000)/10,
+    Math.round(cp/tot*1000)/10,
+    Math.round(pp/tot*1000)/10,
+    Math.round(Math.max(0,op)/tot*1000)/10
+  ];
+  fluxoChart.update(); pizzaChart.update(); buffetChart.update(); receitasChart.update();
+}
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
+function renderAll(mes) {
+  renderGeralKPI(mes); renderGeralTabela(mes);
+  renderReceitasKPI(mes); renderReceitasTabela(mes);
+  renderBuffetKPI(mes); renderBuffetTabela(mes); renderBuffetToolsTable(mes);
+  renderAgenciaKPI(mes); renderAgenciaTabelas(mes);
+  renderCasteloKPI(mes); renderCasteloTabela(mes);
+  renderPessoalKPI(mes); renderPessoalCats(mes); renderPessoalTabela(mes);
+  updateCharts(mes);
+}
+
+function renderGeralKPI(mes) {
+  const ent = totalEntradas(mes);
+  const saiExt = totalSaidasExtrato(mes);
+  const saiCrt = totalSaidasCartao(mes);
+  const saldo = ent - saiExt - saiCrt;
+  document.getElementById('kpi-geral').innerHTML = `
+    <div class="kpi green"><div class="kpi-label">Total entradas</div><div class="kpi-value">${brl(ent)}</div><div class="kpi-sub">Extrato — ${mes==='todos'?'3 meses':LABELS[mes]}</div></div>
+    <div class="kpi red"><div class="kpi-label">Saídas extrato</div><div class="kpi-value">${brl(saiExt)}</div><div class="kpi-sub">Débitos conta corrente</div></div>
+    <div class="kpi red"><div class="kpi-label">Saídas cartão</div><div class="kpi-value">${brl(saiCrt)}</div><div class="kpi-sub">Fatura Mastercard</div></div>
+    <div class="kpi ${saldo>=0?'featured':'red'}"><div class="kpi-label">Resultado líquido</div><div class="kpi-value">${saldo>=0?'+':''}${brl(saldo)}</div><div class="kpi-sub">${saldo>=0?'Superávit':'Déficit'} no período</div></div>`;
+}
+
+function renderGeralTabela(mes) {
+  const mList = mes==='todos'?MESES:[mes];
+  const showCols = mes==='todos';
+  let html = '<thead><tr><th>Categoria</th><th>Fonte</th>';
+  if(showCols) html+='<th>Janeiro</th><th>Fevereiro</th><th>Março*</th>';
+  html+='<th>Total</th></tr></thead><tbody>';
+
+  const row = (label, color, srcTag, janV, fevV, marV) => {
+    const tot = janV+fevV+marV;
+    const sel = mes==='todos'?tot: mes==='jan'?janV:mes==='fev'?fevV:marV;
+    if(sel===0) return '';
+    let r=`<tr><td class="name"><span class="cdot" style="background:${color}"></span>${label}</td><td>${srcTag}</td>`;
+    if(showCols) r+=`<td class="val">${brl(janV)}</td><td class="val">${brl(fevV)}</td><td class="val">${brl(marV)}</td>`;
+    r+=`<td class="val">${brl(sel)}</td></tr>`;
+    return r;
+  };
+
+  const ct='<span class="src-tag src-cartao">CARTÃO</span>';
+  const ex='<span class="src-tag src-extrato">EXTRATO</span>';
+  const bx='<span class="src-tag src-cartao">CARTÃO</span><span class="src-tag src-extrato">EXTRATO</span>';
+
+  html += row('Tráfego Pago — Meta Ads (Buffet+Agência) <span class="src-tag src-cartao" style="font-weight:400">4338</span>','#2E8B57',bx, 14359+1110, 12533+425, 16237+0);
+  html += row('Agência — SaaS + João','#2E5FA8',bx, 3403+1500, 3175+3000, 3272+1500);
+  html += row('Castelo dos Sonhos','#A85F2E',bx, 427+8660, 427+6398, 427+2776);
+  html += row('Pessoal + Família (cartão)','#8B2E8B',ct, CART.pessoalCrt.jan+CART.familiaCrt.jan, CART.pessoalCrt.fev+CART.familiaCrt.fev, CART.pessoalCrt.mar+CART.familiaCrt.mar);
+  html += row('Cartões Jaqueline (Nubank+Inter)','#9E5A9E',ex, SAI.cartoesJaque.jan, SAI.cartoesJaque.fev, SAI.cartoesJaque.mar);
+  html += row('Consórcio','#BBBBBB',ex, SAI.consorcio.jan, SAI.consorcio.fev, SAI.consorcio.mar);
+  html += row('Colégio Izabela','#BBBBBB',ex, SAI.colegio.jan, SAI.colegio.fev, SAI.colegio.mar);
+  html += row('Energia (rancho + barracão)','#CCCCCC',ex, SAI.energia.jan, SAI.energia.fev, SAI.energia.mar);
+  html += row('Outros débitos extrato','#DDDDDD',ex, SAI.outrosExtrato.jan, SAI.outrosExtrato.fev, SAI.outrosExtrato.mar);
+  document.getElementById('tabelaGeral').innerHTML = html+'</tbody>';
+}
+
+function renderReceitasKPI(mes) {
+  const ment = vd(ENT.entMentoria,mes);
+  const ag = vd(ENT.entAgencia,mes);
+  const pb = vd(ENT.entProBuffet,mes);
+  const cs = vd(ENT.entCastelo,mes);
+  const tot = totalEntradas(mes);
+  document.getElementById('kpi-receitas').innerHTML=`
+    <div class="kpi featured"><div class="kpi-label">Total entradas</div><div class="kpi-value">${brl(tot)}</div><div class="kpi-sub">${mes==='todos'?'3 meses':LABELS[mes]}</div></div>
+    <div class="kpi green"><div class="kpi-label">Mentoria</div><div class="kpi-value" style="font-size:20px">${brl(ment)}</div><div class="kpi-sub">${pct(ment,tot)} do total</div></div>
+    <div class="kpi green"><div class="kpi-label">ProBuffet → conta</div><div class="kpi-value" style="font-size:20px">${brl(pb)}</div><div class="kpi-sub">Retiradas da empresa</div></div>
+    <div class="kpi"><div class="kpi-label">Castelo → conta</div><div class="kpi-value" style="font-size:20px">${brl(cs)}</div><div class="kpi-sub">Retiradas da empresa</div></div>`;
+}
+
+function renderReceitasTabela(mes) {
+  const mList = mes==='todos'?MESES:[mes];
+  const showCols = mes==='todos';
+  let html='<thead><tr><th>Origem</th><th>Tipo</th>';
+  if(showCols) html+='<th>Janeiro</th><th>Fevereiro</th><th>Março*</th>';
+  html+='<th>Total / Valor</th></tr></thead><tbody>';
+
+  const rows = [
+    {name:'Mentoria — Dom Festas (2x/mês)', tipo:'Mentoria', jan:4000, fev:4000, mar:2000},
+    {name:'Mentoria — diversos buffets/eventos', tipo:'Mentoria', jan:9772, fev:5074, mar:6525},
+    {name:'Agência — mkt patrocinado (Gisele, outros)', tipo:'Agência', jan:3460, fev:1000, mar:3000},
+    {name:'ProBuffet Tecnologia Ltda → conta', tipo:'Retirada', jan:8000, fev:21020, mar:1000},
+    {name:'Castelo dos Sonhos → conta', tipo:'Retirada', jan:12983, fev:7000, mar:0},
+    {name:'Boletos / depósitos / outros', tipo:'Outros', jan:4052, fev:3764, mar:2662},
+  ];
+
+  rows.forEach(r => {
+    const sel = mes==='todos'?r.jan+r.fev+r.mar: mes==='jan'?r.jan:mes==='fev'?r.fev:r.mar;
+    if(sel===0) return;
+    const cor = r.tipo==='Mentoria'?'var(--receita-bg);color:var(--receita)':r.tipo==='Agência'?'var(--agencia-bg);color:var(--agencia)':r.tipo==='Retirada'?'#FEF9EE;color:#7A5500':'var(--bg);color:var(--text3)';
+    html+=`<tr><td class="name">${r.name}</td><td><span class="badge" style="background:${cor}">${r.tipo}</span></td>`;
+    if(showCols) html+=`<td class="val">${brl(r.jan)}</td><td class="val">${brl(r.fev)}</td><td class="val">${brl(r.mar)}</td>`;
+    html+=`<td class="pos">${brl(sel)}</td></tr>`;
+  });
+  document.getElementById('tabelaReceitas').innerHTML=html+'</tbody>';
+}
+
+function renderBuffetKPI(mes) {
+  const ads = vd(CART.buffetAds,mes);
+  const pix = vd(SAI.buffetPix,mes);
+  // Cartão 4817 exclusivo ProBuffet: R$25.957 em 2.5 meses (~R$10.383/mês)
+  const ads4817 = {jan:8304, fev:8492, mar:9161};
+  const c4817 = mes==='todos'?8304+8492+9161:ads4817[mes];
+  const tot = ads+pix+c4817;
+  document.getElementById('kpi-buffet').innerHTML=`
+    <div class="kpi featured"><div class="kpi-label">Total ${mes==='todos'?'3 meses':LABELS[mes]}</div><div class="kpi-value">${brl(tot)}</div><div class="kpi-sub">Cartões 4338+4817 + Pix</div></div>
+    <div class="kpi"><div class="kpi-label">Meta Ads 4338 (Buffet+Ag.)</div><div class="kpi-value" style="font-size:18px">${brl(ads)}</div><div class="kpi-sub">Misturado com agência</div></div>
+    <div class="kpi"><div class="kpi-label">Meta Ads 4817 (só Buffet)</div><div class="kpi-value" style="font-size:18px">${brl(c4817)}</div><div class="kpi-sub">CNPJ 51.898.745 — confirmado</div></div>
+    <div class="kpi"><div class="kpi-label">Pix direto extrato</div><div class="kpi-value" style="font-size:18px">${brl(pix)}</div><div class="kpi-sub">ProBuffet → conta pessoal</div></div>`;
+}
+
+function renderBuffetTabela(mes) {
+  const mList = mes==='todos'?MESES:[mes];
+  let html='<thead><tr><th>Item</th><th>Fonte</th>';
+  const showCols=mes==='todos';
+  if(showCols) html+='<th>Jan</th><th>Fev</th><th>Mar</th>';
+  html+='<th>Total</th></tr></thead><tbody>';
+  const ct='<span class="src-tag src-cartao">CARTÃO</span>';
+  const ex='<span class="src-tag src-extrato">EXTRATO</span>';
+  const rows=[
+    {name:'Meta Ads FACEBK* — Pro Buffet + Agência (cartão 4338)', src:ct, jan:14359, fev:12533, mar:16237},
+    {name:'Meta Ads cartão 4817 — Pro Buffet exclusivo (CNPJ 51.898.745)', src:'<span class="src-tag" style="background:#F5F0FF;color:#5A35A0">4817</span>', jan:8304, fev:8492, mar:9161},
+    {name:'Pix direto ProBuffet → conta (extrato)', src:ex, jan:1110, fev:425, mar:0},
+  ];
+  rows.forEach(r=>{
+    const sel=mes==='todos'?r.jan+r.fev+r.mar:mes==='jan'?r.jan:mes==='fev'?r.fev:r.mar;
+    if(sel===0)return;
+    html+=`<tr><td class="name">${r.name}</td><td>${r.src}</td>`;
+    if(showCols) html+=`<td class="val">${brl(r.jan)}</td><td class="val">${brl(r.fev)}</td><td class="val">${brl(r.mar)}</td>`;
+    html+=`<td class="val" style="color:var(--buffet)">${brl(sel)}</td></tr>`;
+  });
+  // Linha de total
+  if(showCols){
+    const totJan = 14359+8304+1110, totFev = 12533+8492+425, totMar = 16237+9161+0;
+    html+=`<tr style="background:var(--bg);font-weight:600">
+      <td class="name" colspan="2" style="color:var(--text3);font-size:11px;letter-spacing:.5px;text-transform:uppercase">Total</td>
+      <td class="val">${brl(totJan)}</td>
+      <td class="val">${brl(totFev)}</td>
+      <td class="val">${brl(totMar)}</td>
+      <td class="val" style="color:var(--buffet)">${brl(totJan+totFev+totMar)}</td>
+    </tr>`;
+  } else {
+    const vals={jan:14359+8304+1110, fev:12533+8492+425, mar:16237+9161+0};
+    const sel=mes==='jan'?vals.jan:mes==='fev'?vals.fev:vals.mar;
+    html+=`<tr style="background:var(--bg)">
+      <td class="name" style="color:var(--text3);font-size:11px;letter-spacing:.5px;text-transform:uppercase">Total</td>
+      <td></td>
+      <td class="val" style="color:var(--buffet)">${brl(sel)}</td>
+    </tr>`;
+  }
+  document.getElementById('tabelaBuffet').innerHTML=html+'</tbody>';
+}
+
+function renderAgenciaKPI(mes) {
+  const saas = vd(CART.agenciaSaas,mes);
+  const joao = vd(SAI.joao,mes);
+  const tot = saas+joao;
+  document.getElementById('kpi-agencia').innerHTML=`
+    <div class="kpi featured"><div class="kpi-label">Total ${mes==='todos'?'3 meses':LABELS[mes]}</div><div class="kpi-value">${brl(tot)}</div><div class="kpi-sub">SaaS + Folha</div></div>
+    <div class="kpi"><div class="kpi-label">SaaS / Ferramentas</div><div class="kpi-value" style="font-size:20px">${brl(saas)}</div><div class="kpi-sub">${pct(saas,tot)} do total</div></div>
+    <div class="kpi"><div class="kpi-label">João Victor (salário)</div><div class="kpi-value" style="font-size:20px">${brl(joao)}</div><div class="kpi-sub">${pct(joao,tot)} do total</div></div>`;
+}
+
+function renderAgenciaTabelas(mes) {
+  const showCols=mes==='todos';
+  let html='<thead><tr><th>Ferramenta</th><th>Tipo</th>';
+  if(showCols) html+='<th>Jan</th><th>Fev</th><th>Mar</th>';
+  html+='<th>'+(showCols?'Média/mês':LABELS[mes])+'</th></tr></thead><tbody>';
+  TOOLS.forEach(t=>{
+    const tot=(t.jan+t.fev+t.mar);
+    const sel=mes==='todos'?tot:mes==='jan'?t.jan:mes==='fev'?t.fev:t.mar;
+    if(sel===0)return;
+    const avg=mes==='todos'?brl(Math.round(tot/3)):brl(sel);
+    html+=`<tr><td class="name">${t.name}</td><td><span class="badge" style="background:var(--agencia-bg);color:var(--agencia)">${t.tipo}</span></td>`;
+    if(showCols) html+=`<td class="val">${brl(t.jan)}</td><td class="val">${brl(t.fev)}</td><td class="val">${brl(t.mar)}</td>`;
+    html+=`<td class="val" style="color:var(--agencia)">${avg}</td></tr>`;
+  });
+  // Total row
+  const totJan=TOOLS.reduce((s,t)=>s+t.jan,0), totFev=TOOLS.reduce((s,t)=>s+t.fev,0), totMar=TOOLS.reduce((s,t)=>s+t.mar,0);
+  const totSel=mes==='todos'?totJan+totFev+totMar:mes==='jan'?totJan:mes==='fev'?totFev:totMar;
+  html+=`<tr style="background:var(--bg)"><td class="name" style="color:var(--text3);font-size:11px;letter-spacing:.5px;text-transform:uppercase" colspan="2">Total SaaS Agência</td>`;
+  if(showCols) html+=`<td class="val">${brl(totJan)}</td><td class="val">${brl(totFev)}</td><td class="val">${brl(totMar)}</td>`;
+  html+=`<td class="val" style="color:var(--agencia)">${brl(mes==='todos'?Math.round((totJan+totFev+totMar)/3):totSel)}</td></tr>`;
+  document.getElementById('tabelaAgencia').innerHTML=html+'</tbody>';
+
+  // folha
+  let fhtml='<thead><tr><th>Funcionário</th><th>Fonte</th><th>Jan</th><th>Fev</th><th>Mar*</th><th>Total</th></tr></thead><tbody>';
+  fhtml+=`<tr><td class="name">João Victor — salário</td><td><span class="src-tag src-extrato">EXTRATO</span></td><td class="val">R$ 1.500</td><td class="val">R$ 3.000</td><td class="val">R$ 1.500</td><td class="val" style="color:var(--agencia)">R$ 6.000</td></tr>`;
+  fhtml+=`</tbody>`;
+  document.getElementById('tabelaFolha').innerHTML=fhtml;
+}
+
+function renderBuffetToolsTable(mes) {
+  const showCols=mes==='todos';
+  let html='<thead><tr><th>Ferramenta</th><th>Tipo</th>';
+  if(showCols) html+='<th>Jan</th><th>Fev</th><th>Mar</th>';
+  html+='<th>'+(showCols?'Média/mês':LABELS[mes])+'</th></tr></thead><tbody>';
+  TOOLS_BUFFET.forEach(t=>{
+    const tot=(t.jan+t.fev+t.mar);
+    const sel=mes==='todos'?tot:mes==='jan'?t.jan:mes==='fev'?t.fev:t.mar;
+    if(sel===0)return;
+    const avg=mes==='todos'?brl(Math.round(tot/3)):brl(sel);
+    html+=`<tr><td class="name">${t.name}</td><td><span class="badge" style="background:var(--buffet-bg);color:var(--buffet)">${t.tipo}</span></td>`;
+    if(showCols) html+=`<td class="val">${brl(t.jan)}</td><td class="val">${brl(t.fev)}</td><td class="val">${brl(t.mar)}</td>`;
+    html+=`<td class="val" style="color:var(--buffet)">${avg}</td></tr>`;
+  });
+  const totJan=TOOLS_BUFFET.reduce((s,t)=>s+t.jan,0), totFev=TOOLS_BUFFET.reduce((s,t)=>s+t.fev,0), totMar=TOOLS_BUFFET.reduce((s,t)=>s+t.mar,0);
+  const totSel=mes==='todos'?totJan+totFev+totMar:mes==='jan'?totJan:mes==='fev'?totFev:totMar;
+  html+=`<tr style="background:var(--bg)"><td class="name" style="color:var(--text3);font-size:11px;letter-spacing:.5px;text-transform:uppercase" colspan="2">Total SaaS Pro Buffet</td>`;
+  if(showCols) html+=`<td class="val">${brl(totJan)}</td><td class="val">${brl(totFev)}</td><td class="val">${brl(totMar)}</td>`;
+  html+=`<td class="val" style="color:var(--buffet)">${brl(mes==='todos'?Math.round((totJan+totFev+totMar)/3):totSel)}</td></tr>`;
+  document.getElementById('tabelaBuffetTools').innerHTML=html+'</tbody>';
+}
+
+function renderCasteloKPI(mes) {
+  const crt = vd(CART.casteloCrt,mes);
+  const ext = vd(SAI.casteloCusto,mes);
+  const tot=crt+ext;
+  document.getElementById('kpi-castelo').innerHTML=`
+    <div class="kpi featured"><div class="kpi-label">Total ${mes==='todos'?'3 meses':LABELS[mes]}</div><div class="kpi-value">${brl(tot)}</div><div class="kpi-sub">Cartão + Extrato</div></div>
+    <div class="kpi"><div class="kpi-label">Astronpay (cartão)</div><div class="kpi-value" style="font-size:20px">${brl(crt)}</div><div class="kpi-sub">R$ 427/mês fixo</div></div>
+    <div class="kpi"><div class="kpi-label">Custos operacionais (extrato)</div><div class="kpi-value" style="font-size:20px">${brl(ext)}</div><div class="kpi-sub">Variável — via Pix</div></div>`;
+}
+
+function renderCasteloTabela(mes) {
+  const showCols=mes==='todos';
+  let html='<thead><tr><th>Item</th><th>Fonte</th>';
+  if(showCols) html+='<th>Jan</th><th>Fev</th><th>Mar*</th>';
+  html+='<th>Total</th></tr></thead><tbody>';
+  const rows=[
+    {name:'Astronpay (PG *ASTRONPAY ASTRON)', src:'<span class="src-tag src-cartao">CARTÃO</span>', jan:427, fev:427, mar:427},
+    {name:'CASTELO DOS SONHOS FRANCHISING LTD (Pix)', src:'<span class="src-tag src-extrato">EXTRATO</span>', jan:8660, fev:6398, mar:2776},
+  ];
+  rows.forEach(r=>{
+    const sel=mes==='todos'?r.jan+r.fev+r.mar:mes==='jan'?r.jan:mes==='fev'?r.fev:r.mar;
+    html+=`<tr><td class="name">${r.name}</td><td>${r.src}</td>`;
+    if(showCols) html+=`<td class="val">${brl(r.jan)}</td><td class="val">${brl(r.fev)}</td><td class="val">${brl(r.mar)}</td>`;
+    html+=`<td class="val" style="color:var(--castelo)">${brl(sel)}</td></tr>`;
+  });
+  document.getElementById('tabelaCastelo').innerHTML=html+'</tbody>';
+}
+
+function renderPessoalKPI(mes) {
+  const crt=vd(CART.pessoalCrt,mes)+vd(CART.familiaCrt,mes);
+  const jaque=vd(SAI.cartoesJaque,mes);
+  const fixos=vd(SAI.consorcio,mes)+vd(SAI.colegio,mes);
+  const tot=crt+jaque+fixos+vd(SAI.energia,mes);
+  document.getElementById('kpi-pessoal').innerHTML=`
+    <div class="kpi featured"><div class="kpi-label">Total pessoal ${mes==='todos'?'3 meses':LABELS[mes]}</div><div class="kpi-value">${brl(tot)}</div><div class="kpi-sub">Cartão + Extrato</div></div>
+    <div class="kpi"><div class="kpi-label">Cartão (Micael+Família)</div><div class="kpi-value" style="font-size:20px">${brl(crt)}</div><div class="kpi-sub">Sicoob Mastercard</div></div>
+    <div class="kpi"><div class="kpi-label">Nubank Micael + Inter Jaqueline</div><div class="kpi-value" style="font-size:20px">${brl(jaque)}</div><div class="kpi-sub">Faturas pagas pelo extrato</div></div>
+    <div class="kpi"><div class="kpi-label">Fixos (consórcio+escola)</div><div class="kpi-value" style="font-size:20px">${brl(fixos)}</div><div class="kpi-sub">Débitos automáticos</div></div>`;
+}
+
+function renderPessoalCats(mes) {
+  const cats=[
+    {name:'Marketplace (Micael)', color:'var(--pessoal-accent)', jan:1832, fev:1652, mar:1746, src:'cartão'},
+    {name:'Assinaturas Apple', color:'#7A7AAA', jan:154, fev:154, mar:154, src:'cartão'},
+    {name:'G40 Treinamentos', color:'#5A5AAA', jan:166, fev:166, mar:166, src:'cartão'},
+    {name:'Nubank Micael (pessoal)', color:'#5A5A9E', jan:2341, fev:2685, mar:0, src:'extrato'},
+    {name:'Inter Jaqueline', color:'#9E5A9E', jan:2586, fev:2119, mar:0, src:'extrato'},
+    {name:'Consórcio', color:'#AAAAAA', jan:1278, fev:1262, mar:1304, src:'extrato'},
+    {name:'Colégio Izabela', color:'#888888', jan:0, fev:874, mar:874, src:'extrato'},
+  ];
+  let html='';
+  cats.forEach(c=>{
+    const sel=mes==='todos'?c.jan+c.fev+c.mar:mes==='jan'?c.jan:mes==='fev'?c.fev:c.mar;
+    if(sel===0)return;
+    const tag=c.src==='cartão'?'<span class="src-tag src-cartao">CARTÃO</span>':'<span class="src-tag src-extrato">EXTRATO</span>';
+    html+=`<div class="cat-card">
+      <div class="cat-header">
+        <div class="cat-name"><span class="cdot" style="background:${c.color}"></span>${c.name} ${tag}</div>
+        <div class="cat-total" style="color:var(--pessoal)">${brl(sel)}</div>
+      </div>`;
+    if(mes==='todos'){
+      if(c.jan) html+=`<div class="cat-row"><span class="cat-row-label">Janeiro</span><span class="cat-row-val">${brl(c.jan)}</span></div>`;
+      if(c.fev) html+=`<div class="cat-row"><span class="cat-row-label">Fevereiro</span><span class="cat-row-val">${brl(c.fev)}</span></div>`;
+      if(c.mar) html+=`<div class="cat-row"><span class="cat-row-label">Março*</span><span class="cat-row-val">${brl(c.mar)}</span></div>`;
+    } else {
+      html+=`<div class="cat-row"><span class="cat-row-label">${LABELS[mes]}</span><span class="cat-row-val">${brl(sel)}</span></div>`;
+    }
+    html+=`</div>`;
+  });
+  document.getElementById('catPessoal').innerHTML=html;
+}
+
+function renderPessoalTabela(mes) {
+  const showCols=mes==='todos';
+  let html='<thead><tr><th>Item</th><th>Fonte</th>';
+  if(showCols) html+='<th>Jan</th><th>Fev</th><th>Mar*</th>';
+  html+='<th>Total</th></tr></thead><tbody>';
+  const rows=[
+    {name:'Nubank Micael (pessoal)', src:'extrato', jan:2341, fev:2685, mar:0},
+    {name:'Inter Jaqueline', src:'extrato', jan:2586, fev:2119, mar:0},
+    {name:'Consórcio (débito automático)', src:'extrato', jan:1278, fev:1262, mar:1304},
+    {name:'Colégio Izabela', src:'extrato', jan:0, fev:874, mar:874},
+    {name:'Energia rancho + barracão', src:'extrato', jan:1951, fev:364, mar:0},
+    {name:'MercadoLivre/Pago (cartão)', src:'cartão', jan:1832, fev:1652, mar:1746},
+    {name:'Apple assinaturas (cartão)', src:'cartão', jan:154, fev:154, mar:154},
+    {name:'G40 Treinamentos (cartão)', src:'cartão', jan:166, fev:166, mar:166},
+    {name:'Outros pessoal (cartão+extrato)', src:'ambos', jan:1017, fev:1308, mar:2574},
+  ];
+  rows.forEach(r=>{
+    const sel=mes==='todos'?r.jan+r.fev+r.mar:mes==='jan'?r.jan:mes==='fev'?r.fev:r.mar;
+    if(sel===0)return;
+    const tag=r.src==='extrato'?'<span class="src-tag src-extrato">EXTRATO</span>':r.src==='cartão'?'<span class="src-tag src-cartao">CARTÃO</span>':'<span class="src-tag src-cartao">CARTÃO</span><span class="src-tag src-extrato">EXTRATO</span>';
+    html+=`<tr><td class="name">${r.name}</td><td>${tag}</td>`;
+    if(showCols) html+=`<td class="val">${brl(r.jan)}</td><td class="val">${brl(r.fev)}</td><td class="val">${brl(r.mar)}</td>`;
+    html+=`<td class="neg">${brl(sel)}</td></tr>`;
+  });
+  document.getElementById('tabelaPessoal').innerHTML=html+'</tbody>';
+}
+
+// ─── CONTROLES ────────────────────────────────────────────────────────────────
+function setMes(mes, el) {
+  mesSel=mes;
+  document.querySelectorAll('.mes-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderAll(mes);
+}
+function showTab(id, el) {
+  document.querySelectorAll('.content').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  el.classList.add('active');
+}
+
+buildCharts();
+renderAll('todos');
+</script>
+</body>
+</html>
