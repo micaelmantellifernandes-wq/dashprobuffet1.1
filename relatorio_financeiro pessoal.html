@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Relatório Financeiro — Micael Fernandes</title>
+<title>Relatório Financeiro Detalhado — Micael Fernandes</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
   :root {
-    --bg:#F7F7F5;--white:#FFF;--text:#1A1A1A;--text2:#666;--text3:#AAA;
+    --bg:#F7F7F5;--white:#FFF;--text:#1A1A1A;--text2:#555;--text3:#999;
     --border:#E8E8E4;--border2:#D0D0CA;
     --buffet:#1A5C3A;--buffet-bg:#EEF6F1;--buffet-accent:#2E8B57;
     --agencia:#1A3A6B;--agencia-bg:#EEF2F9;--agencia-accent:#2E5FA8;
@@ -19,11 +19,11 @@
   }
   *{margin:0;padding:0;box-sizing:border-box}
   body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);font-size:13px;font-weight:400;line-height:1.6;-webkit-font-smoothing:antialiased}
-  .page{max-width:1140px;margin:0 auto;padding:0 32px 80px}
+  .page{max-width:1200px;margin:0 auto;padding:0 32px 80px}
 
   .header{padding:48px 0 36px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px}
-  .header h1{font-size:28px;font-weight:700;letter-spacing:-.5px;line-height:1.25}
-  .header h1 span{color:var(--text3);font-weight:300;display:block;font-size:22px}
+  .header h1{font-size:26px;font-weight:700;letter-spacing:-.5px;line-height:1.25}
+  .header h1 span{color:var(--text3);font-weight:300;display:block;font-size:18px}
   .header-meta{text-align:right;font-size:11px;color:var(--text3);line-height:2}
   .header-meta strong{color:var(--text2);font-weight:600}
   .header-badge{display:inline-block;background:#EEF6F1;color:#1A7A4A;font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;border:1px solid #B8DDC8;margin-top:4px}
@@ -34,17 +34,17 @@
   .mes-btn:hover{color:var(--text2);border-color:var(--border2)}
   .mes-btn.active{background:var(--text);color:var(--white);border-color:var(--text)}
 
-  .nav{display:flex;gap:2px;margin-bottom:32px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:4px;width:fit-content;overflow-x:auto;box-shadow:var(--shadow)}
-  .nav-tab{padding:8px 16px;font-family:'Montserrat',sans-serif;font-size:11.5px;font-weight:500;cursor:pointer;color:var(--text3);border-radius:7px;transition:all .15s;white-space:nowrap;background:none;border:none}
+  .nav{display:flex;gap:2px;margin-bottom:32px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:4px;width:100%;overflow-x:auto;box-shadow:var(--shadow)}
+  .nav-tab{padding:8px 14px;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:500;cursor:pointer;color:var(--text3);border-radius:7px;transition:all .15s;white-space:nowrap;background:none;border:none}
   .nav-tab:hover{color:var(--text2);background:var(--bg)}
   .nav-tab.active{background:var(--text);color:var(--white)}
 
   .content{display:none}.content.active{display:block}
 
-  .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:28px}
-  .kpi{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow)}
-  .kpi-label{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:10px}
-  .kpi-value{font-size:24px;font-weight:700;color:var(--text);letter-spacing:-.5px;line-height:1}
+  .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:28px}
+  .kpi{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow)}
+  .kpi-label{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:8px}
+  .kpi-value{font-size:22px;font-weight:700;color:var(--text);letter-spacing:-.5px;line-height:1}
   .kpi-sub{font-size:11px;color:var(--text3);margin-top:6px}
   .kpi.featured{background:var(--text);border-color:var(--text)}
   .kpi.featured .kpi-label{color:#888}.kpi.featured .kpi-value{color:#fff}.kpi.featured .kpi-sub{color:#777}
@@ -53,63 +53,87 @@
   .kpi.red{background:#FEF0F0;border-color:#F5C0C0}
   .kpi.red .kpi-label{color:#A33030}.kpi.red .kpi-value{color:#C03030}.kpi.red .kpi-sub{color:#A33030}
 
-  .section-title{font-size:10px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--text3);margin-bottom:14px;margin-top:36px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+  .section-title{font-size:10px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--text3);margin-bottom:14px;margin-top:32px;padding-bottom:10px;border-bottom:1px solid var(--border)}
   .section-title:first-of-type{margin-top:0}
 
   .card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:12px}
-  .card-pad{padding:22px 24px}
+  .card-pad{padding:20px 22px}
 
   .two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
-  @media(max-width:800px){.two-col{grid-template-columns:1fr}}
+  .three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px}
+  @media(max-width:900px){.two-col,.three-col{grid-template-columns:1fr}}
 
-  .chart-label{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--text3);margin-bottom:18px}
+  .chart-label{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--text3);margin-bottom:16px}
   .chart-container{position:relative}
-  .legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:16px}
+  .legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:14px}
   .legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);font-weight:500}
   .legend-sq{width:8px;height:8px;border-radius:2px;flex-shrink:0}
 
-  .data-table{width:100%;border-collapse:collapse;font-size:12px}
-  .data-table th{text-align:left;padding:10px 18px;font-size:10px;letter-spacing:.8px;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);font-weight:600;background:var(--bg)}
-  .data-table td{padding:11px 18px;border-bottom:1px solid var(--border);color:var(--text2);font-weight:400}
-  .data-table tr:last-child td{border-bottom:none}
-  .data-table td.name{color:var(--text);font-weight:500}
-  .data-table td.val{color:var(--text);font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
-  .data-table td.pos{color:var(--receita);font-weight:600}
-  .data-table td.neg{color:#C03030;font-weight:600}
-  .data-table tr:hover td{background:var(--bg)}
+  /* TABELA DETALHADA */
+  .det-table{width:100%;border-collapse:collapse;font-size:12px}
+  .det-table th{text-align:left;padding:9px 14px;font-size:9px;letter-spacing:.8px;text-transform:uppercase;color:var(--text3);border-bottom:2px solid var(--border);font-weight:700;background:var(--bg);white-space:nowrap}
+  .det-table td{padding:9px 14px;border-bottom:1px solid var(--border);color:var(--text2);font-weight:400;font-size:12px}
+  .det-table tr:last-child td{border-bottom:none}
+  .det-table td.desc{color:var(--text);font-weight:500;max-width:280px}
+  .det-table td.val{font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}
+  .det-table td.val.pos{color:var(--receita)}
+  .det-table td.val.neg{color:#C03030}
+  .det-table td.val.neutro{color:var(--text)}
+  .det-table td.dat{color:var(--text3);white-space:nowrap;font-size:11px}
+  .det-table tr:hover td{background:#FAFAF8}
+  .det-table tr.subtotal td{background:var(--bg);font-weight:600;font-size:11px;border-top:2px solid var(--border)}
+  .det-table tr.group-header td{background:var(--bg);padding:6px 14px;font-size:9px;letter-spacing:1px;text-transform:uppercase;font-weight:700;border-bottom:1px solid var(--border);border-top:2px solid var(--border2)}
 
-  .badge{display:inline-block;font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;letter-spacing:.3px}
-  .cdot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:9px;flex-shrink:0;vertical-align:middle;position:relative;top:-1px}
+  .badge{display:inline-block;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;letter-spacing:.4px;white-space:nowrap}
+  .b-buffet{background:var(--buffet-bg);color:var(--buffet)}
+  .b-agencia{background:var(--agencia-bg);color:var(--agencia)}
+  .b-castelo{background:var(--castelo-bg);color:var(--castelo)}
+  .b-pessoal{background:var(--pessoal-bg);color:var(--pessoal)}
+  .b-familia{background:#F5F0FF;color:#5A35A0}
+  .b-fixo{background:#F5F5F0;color:#666}
+  .b-receita{background:var(--receita-bg);color:var(--receita)}
+  .b-ads{background:#FFF3E0;color:#E65100}
 
+  .src-tag{font-size:9px;font-weight:600;padding:2px 6px;border-radius:4px;letter-spacing:.4px;margin-left:4px;vertical-align:middle;white-space:nowrap}
+  .src-c{background:#E8F0FB;color:#2E5FA8}
+  .src-e{background:#EEF6F1;color:#1A7A4A}
+
+  .note{border-radius:var(--radius);padding:14px 18px;font-size:12px;line-height:1.7;margin-bottom:12px}
+  .note strong{font-weight:600}
+
+  .bar-mini{height:4px;border-radius:2px;margin-top:6px;background:var(--border)}
+  .bar-mini-fill{height:100%;border-radius:2px}
+
+  .cdot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:8px;flex-shrink:0;vertical-align:middle;position:relative;top:-1px}
+
+  /* CAT GRID */
   .cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
   @media(max-width:700px){.cat-grid{grid-template-columns:1fr}}
   .cat-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
-  .cat-header{padding:14px 18px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
+  .cat-header{padding:13px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
   .cat-name{font-size:12px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px}
-  .cat-total{font-size:15px;font-weight:700}
-  .cat-row{display:flex;justify-content:space-between;align-items:center;padding:8px 18px;border-bottom:1px solid var(--border);font-size:12px}
+  .cat-total{font-size:14px;font-weight:700}
+  .cat-row{display:flex;justify-content:space-between;align-items:baseline;padding:7px 16px;border-bottom:1px solid var(--border);font-size:12px}
   .cat-row:last-child{border-bottom:none}
-  .cat-row-label{color:var(--text2)}.cat-row-val{color:var(--text);font-weight:600}
+  .cat-row-label{color:var(--text2);max-width:220px;line-height:1.4}.cat-row-val{color:var(--text);font-weight:600;white-space:nowrap;margin-left:12px}
+  .cat-row.sub-item{padding-left:28px;font-size:11px;background:#FAFAF8}
+  .cat-row.sub-item .cat-row-label{color:var(--text3)}
+  .cat-row.sub-item .cat-row-val{font-weight:500;color:var(--text2)}
 
+  /* INSIGHT */
   .insight-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
   @media(max-width:700px){.insight-grid{grid-template-columns:1fr}}
-  .insight{background:var(--white);border:1px solid var(--border);border-left:3px solid;border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow)}
+  .insight{background:var(--white);border:1px solid var(--border);border-left:3px solid;border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow)}
   .insight-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:5px}
-  .insight-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:7px;line-height:1.3}
+  .insight-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;line-height:1.3}
   .insight-text{font-size:12px;color:var(--text2);line-height:1.7}
   .insight.alert{border-left-color:#D94F4F}.insight.alert .insight-label{color:#D94F4F}
   .insight.warn{border-left-color:#D98A4F}.insight.warn .insight-label{color:#D98A4F}
   .insight.ok{border-left-color:var(--buffet-accent)}.insight.ok .insight-label{color:var(--buffet-accent)}
   .insight.info{border-left-color:var(--agencia-accent)}.insight.info .insight-label{color:var(--agencia-accent)}
 
-  .up{color:#D94F4F;font-size:11px;font-weight:600}
-  .dn{color:var(--buffet-accent);font-size:11px;font-weight:600}
-  .note{border-radius:var(--radius);padding:14px 18px;font-size:12px;line-height:1.7;margin-bottom:12px}
-  .note strong{font-weight:600}
-
-  .src-tag{font-size:9px;font-weight:600;padding:2px 6px;border-radius:4px;letter-spacing:.4px;margin-left:6px;vertical-align:middle}
-  .src-cartao{background:#E8F0FB;color:#2E5FA8}
-  .src-extrato{background:#EEF6F1;color:#1A7A4A}
+  /* TOTALIZADOR */
+  .total-row{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--text);color:white;border-radius:0 0 var(--radius) var(--radius);font-weight:700;font-size:13px}
 </style>
 </head>
 <body>
@@ -117,19 +141,19 @@
 
   <div class="header">
     <div>
-      <h1>Relatório Financeiro<span>Conta Corrente + Cartão · Jan – Mar 2026</span></h1>
+      <h1>Relatório Financeiro Detalhado<span>Todos os lançamentos categorizados · Jan – Mar 2026</span></h1>
     </div>
     <div class="header-meta">
       <div><strong>Micael M. Fernandes</strong></div>
       <div>Sicoob Cocred — Conta 85.116-7</div>
-      <div>Sicoob Mastercard Black</div>
-      <div><span class="header-badge">✓ Extrato + Cartão integrados</span></div>
+      <div>Sicoob Mastercard Black (4338 · 4861 · 5881)</div>
+      <div><span class="header-badge">✓ Fatura + Extrato · Item a item</span></div>
     </div>
   </div>
 
   <div class="mes-bar">
     <label>Período</label>
-    <button class="mes-btn active" onclick="setMes('todos',this)">Todos</button>
+    <button class="mes-btn active" onclick="setMes('todos',this)">Todos (Jan–Mar)</button>
     <button class="mes-btn" onclick="setMes('jan',this)">Janeiro</button>
     <button class="mes-btn" onclick="setMes('fev',this)">Fevereiro</button>
     <button class="mes-btn" onclick="setMes('mar',this)">Março*</button>
@@ -137,763 +161,1157 @@
 
   <div class="nav">
     <button class="nav-tab active" onclick="showTab('visao-geral',this)">Visão Geral</button>
-    <button class="nav-tab" onclick="showTab('receitas',this)">Receitas</button>
-    <button class="nav-tab" onclick="showTab('pro-buffet',this)">Pro Buffet</button>
-    <button class="nav-tab" onclick="showTab('agencia',this)">Agência</button>
-    <button class="nav-tab" onclick="showTab('castelo',this)">Castelo</button>
-    <button class="nav-tab" onclick="showTab('pessoal',this)">Pessoal</button>
-    <button class="nav-tab" onclick="showTab('insights',this)">Insights</button>
+    <button class="nav-tab" onclick="showTab('tab-receitas',this)">Receitas</button>
+    <button class="nav-tab" onclick="showTab('tab-traffego',this)">Tráfego Pago</button>
+    <button class="nav-tab" onclick="showTab('tab-ferramentas',this)">Ferramentas (SaaS)</button>
+    <button class="nav-tab" onclick="showTab('tab-castelo',this)">Castelo dos Sonhos</button>
+    <button class="nav-tab" onclick="showTab('tab-pessoal',this)">Pessoal & Família</button>
+    <button class="nav-tab" onclick="showTab('tab-fixos',this)">Fixos & Obrigações</button>
+    <button class="nav-tab" onclick="showTab('tab-extrato',this)">Extrato Completo</button>
   </div>
 
   <!-- ===== VISÃO GERAL ===== -->
   <div id="visao-geral" class="content active">
-
     <div class="kpi-grid" id="kpi-geral"></div>
 
-    <div class="section-title">Fluxo de caixa — entradas vs saídas</div>
     <div class="two-col">
       <div class="card card-pad">
-        <div class="chart-label" id="fluxoLabel">Fluxo mensal (R$)</div>
-        <div class="chart-container" style="height:230px"><canvas id="chartFluxo"></canvas></div>
+        <div class="chart-label">Entradas vs Saídas (R$)</div>
+        <div class="chart-container" style="height:240px"><canvas id="chartFluxo"></canvas></div>
         <div class="legend">
           <div class="legend-item"><div class="legend-sq" style="background:#1A7A4A"></div>Entradas</div>
-          <div class="legend-item"><div class="legend-sq" style="background:#C03030"></div>Saídas (extrato)</div>
-          <div class="legend-item"><div class="legend-sq" style="background:#2E5FA8"></div>Saídas (cartão)</div>
+          <div class="legend-item"><div class="legend-sq" style="background:#C03030"></div>Saídas extrato</div>
+          <div class="legend-item"><div class="legend-sq" style="background:#2E5FA8"></div>Fatura cartão</div>
         </div>
       </div>
       <div class="card card-pad">
-        <div class="chart-label">Composição das saídas (%)</div>
-        <div class="chart-container" style="height:230px"><canvas id="chartPizza"></canvas></div>
+        <div class="chart-label">Composição das Despesas (%)</div>
+        <div class="chart-container" style="height:240px"><canvas id="chartPizza"></canvas></div>
         <div class="legend">
-          <div class="legend-item"><div class="legend-sq" style="background:#2E8B57"></div>Tráfego Pago (Buffet+Agência)</div>
-          <div class="legend-item"><div class="legend-sq" style="background:#2E5FA8"></div>Agência (SaaS+Folha)</div>
+          <div class="legend-item"><div class="legend-sq" style="background:#E65100"></div>Tráfego Pago</div>
+          <div class="legend-item"><div class="legend-sq" style="background:#2E5FA8"></div>SaaS / Ferramentas</div>
           <div class="legend-item"><div class="legend-sq" style="background:#A85F2E"></div>Castelo</div>
-          <div class="legend-item"><div class="legend-sq" style="background:#8B2E8B"></div>Pessoal</div>
-          <div class="legend-item"><div class="legend-sq" style="background:#DDDDDD"></div>Outros</div>
+          <div class="legend-item"><div class="legend-sq" style="background:#8B2E8B"></div>Pessoal+Família</div>
+          <div class="legend-item"><div class="legend-sq" style="background:#666"></div>Fixos</div>
+          <div class="legend-item"><div class="legend-sq" style="background:#BBBBBB"></div>Outros</div>
         </div>
       </div>
     </div>
 
-    <div class="section-title">Resumo consolidado — todas as fontes</div>
+    <div class="section-title">Resumo por categoria</div>
     <div class="card">
-      <table class="data-table" id="tabelaGeral"></table>
+      <table class="det-table" id="tabelaResumo"></table>
     </div>
+
     <p style="font-size:11px;color:var(--text3);margin-top:8px">
-      * Março parcial (1–16/mar). &nbsp;
-      <span class="src-tag src-cartao">CARTÃO</span> = Sicoob Mastercard &nbsp;
-      <span class="src-tag src-extrato">EXTRATO</span> = Conta corrente
+      * Março parcial (01–16/mar). &nbsp;
+      <span class="src-tag src-c">CARTÃO</span> = Sicoob Mastercard (4338/4861/5881) &nbsp;
+      <span class="src-tag src-e">EXTRATO</span> = Conta corrente Sicoob
     </p>
   </div>
 
   <!-- ===== RECEITAS ===== -->
-  <div id="receitas" class="content">
+  <div id="tab-receitas" class="content">
     <div class="kpi-grid" id="kpi-receitas"></div>
-
-    <div class="section-title">Entradas identificadas no extrato</div>
-    <div class="card card-pad">
-      <div class="chart-label" id="receitaChartLabel">Receitas por categoria — mensal (R$)</div>
-      <div class="chart-container" style="height:220px"><canvas id="chartReceitas"></canvas></div>
-    </div>
-
-    <div class="section-title">Detalhamento por fonte</div>
+    <div class="section-title">Todas as entradas identificadas — extrato</div>
     <div class="card">
-      <table class="data-table" id="tabelaReceitas"></table>
-    </div>
-
-    <div class="note" style="background:#FEF9EE;border:1px solid #F0DDA0;margin-top:8px">
-      <strong style="color:#7A5500">Atenção:</strong>
-      <span style="color:#9A6800"> Os recebimentos do ProBuffet e Castelo dos Sonhos para esta conta pessoal são "pró-labore informal" — retiradas das empresas. Não representam receita nova, mas sim capital transitando entre contas.</span>
+      <table class="det-table" id="tabelaReceitas"></table>
     </div>
   </div>
 
-  <!-- ===== PRO BUFFET ===== -->
-  <div id="pro-buffet" class="content">
-    <div class="kpi-grid" id="kpi-buffet"></div>
-
-    <div class="section-title">Gastos Pro Buffet — cartão + extrato</div>
-    <div class="card card-pad">
-      <div class="chart-label">Investimento em tráfego pago — Meta Ads (R$)</div>
-      <div class="chart-container" style="height:200px"><canvas id="chartBuffet"></canvas></div>
+  <!-- ===== TRÁFEGO PAGO ===== -->
+  <div id="tab-traffego" class="content">
+    <div class="kpi-grid" id="kpi-traffego"></div>
+    <div class="section-title">Meta Ads — todos os lançamentos FACEBK* no cartão 4338</div>
+    <div class="card">
+      <table class="det-table" id="tabelaFacebk"></table>
     </div>
-
-    <div class="section-title">Detalhamento de custos — Meta Ads</div>
-    <div class="card"><table class="data-table" id="tabelaBuffet"></table></div>
-
-    <div class="section-title">Ferramentas e plataformas do sistema</div>
-    <div class="card"><table class="data-table" id="tabelaBuffetTools"></table></div>
-
-    <div class="note" style="background:#FEF9EE;border:1px solid #F0DDA0;margin-top:8px">
-      <strong style="color:#7A5500">⚠ Atenção — separação pendente:</strong>
-      <span style="color:#9A6800"> Os lançamentos FACEBK* no cartão Sicoob 4338 incluem anúncios do Pro Buffet <em>e</em> da Agência misturados. O cartão 4817 é exclusivo do Pro Buffet (nota fiscal no CNPJ 51.898.745 — R$ 25.957 confirmados pela Meta). Para ver a separação exata por negócio, solicite o relatório de cobrança da Meta do cartão 4338.</span>
+    <div class="note" style="background:#FFF3E0;border:1px solid #FFCC80;margin-top:8px">
+      <strong style="color:#E65100">⚠ Atenção:</strong>
+      <span style="color:#BF360C"> Os lançamentos FACEBK* no cartão 4338 misturam anúncios do Pro Buffet e da Agência. Para separação exata solicite o relatório de cobrança da Meta Ads por conta de anúncios.</span>
     </div>
   </div>
 
-  <!-- ===== AGÊNCIA ===== -->
-  <div id="agencia" class="content">
-    <div class="kpi-grid" id="kpi-agencia"></div>
-
-    <div class="section-title">Stack de ferramentas (cartão)</div>
-    <div class="card"><table class="data-table" id="tabelaAgencia"></table></div>
-
-    <div class="section-title">Folha de pagamento (extrato)</div>
-    <div class="card"><table class="data-table" id="tabelaFolha"></table></div>
-
-    <div class="note" style="background:var(--agencia-bg);border:1px solid #C0CCE0;margin-top:8px">
-      <strong style="color:var(--agencia)">Bubble = 63% do SaaS.</strong>
-      <span style="color:var(--agencia-accent)"> Plano Starter em USD oscilou entre R$ 1.700–2.218/mês por variação cambial.</span>
+  <!-- ===== FERRAMENTAS SAAS ===== -->
+  <div id="tab-ferramentas" class="content">
+    <div class="kpi-grid" id="kpi-ferramentas"></div>
+    <div class="section-title">Ferramentas Pro Buffet — detalhamento mensal</div>
+    <div class="card">
+      <table class="det-table" id="tabelaSaasBuffet"></table>
+    </div>
+    <div class="section-title">Ferramentas Agência — detalhamento mensal</div>
+    <div class="card">
+      <table class="det-table" id="tabelaSaasAgencia"></table>
     </div>
   </div>
 
   <!-- ===== CASTELO ===== -->
-  <div id="castelo" class="content">
+  <div id="tab-castelo" class="content">
     <div class="kpi-grid" id="kpi-castelo"></div>
-
-    <div class="section-title">Custos do Castelo dos Sonhos — cartão + extrato</div>
-    <div class="card"><table class="data-table" id="tabelaCastelo"></table></div>
-
-    <div class="note" style="background:var(--castelo-bg);border:1px solid #DFC8B4;margin-top:8px">
-      <strong style="color:var(--castelo)">Atenção:</strong>
-      <span style="color:var(--castelo-accent)"> O Castelo teve custos muito variáveis no período — Jan R$ 9.087, Fev R$ 6.825, Mar R$ 3.203. Janeiro foi o mês mais pesado. Importante separar o que é custo operacional do que é repasse à franquia.</span>
+    <div class="section-title">Castelo dos Sonhos — todos os lançamentos</div>
+    <div class="card">
+      <table class="det-table" id="tabelaCastelo"></table>
     </div>
   </div>
 
-  <!-- ===== PESSOAL ===== -->
-  <div id="pessoal" class="content">
+  <!-- ===== PESSOAL & FAMÍLIA ===== -->
+  <div id="tab-pessoal" class="content">
     <div class="kpi-grid" id="kpi-pessoal"></div>
 
-    <div class="section-title">Gastos pessoais — cartão + extrato</div>
-    <div class="cat-grid" id="catPessoal"></div>
-
-    <div class="section-title">Detalhes extrato pessoal</div>
-    <div class="card"><table class="data-table" id="tabelaPessoal"></table></div>
-
-    <div class="note" style="background:var(--pessoal-bg);border:1px solid #D8C0D8">
-      <strong style="color:var(--pessoal)">Atenção:</strong>
-      <span style="color:var(--pessoal-accent)"> Nubank da Jaque e cartão Inter da Jaque são pagos via extrato (~R$ 5.800 nos 3 meses). Somados aos gastos pessoais do cartão Sicoob, o total pessoal é relevante.</span>
-    </div>
-  </div>
-
-  <!-- ===== INSIGHTS ===== -->
-  <div id="insights" class="content">
-    <div class="section-title">Alertas e observações — visão consolidada</div>
-    <div class="insight-grid">
-      <div class="insight alert">
-        <div class="insight-label">Atenção</div>
-        <div class="insight-title">Saldo médio muito baixo na conta</div>
-        <div class="insight-text">A conta operou com saldo entre R$ 266 e R$ 7.681 ao longo dos meses — muito baixo para o volume que transita (~R$ 50k+/mês). Qualquer atraso de recebimento coloca a conta no limite. Reserva operacional recomendada: R$ 15–20k.</div>
-      </div>
-      <div class="insight alert">
-        <div class="insight-label">Atenção</div>
-        <div class="insight-title">Fatura do cartão crescendo todo mês</div>
-        <div class="insight-text">Jan R$ 22.675 → Fev R$ 27.995 (+23%) → Mar R$ 30.753 (+10%). O débito automático da fatura é o maior lançamento único da conta todo mês — e está crescendo.</div>
-      </div>
-      <div class="insight warn">
-        <div class="insight-label">Atenção</div>
-        <div class="insight-title">Tudo misturado na mesma conta</div>
-        <div class="insight-text">Pro Buffet, Agência, Castelo dos Sonhos e despesas pessoais transitam pela mesma conta corrente pessoal. Isso dificulta o DRE de cada empresa, a apuração de impostos e a visão real do que cada negócio gera e consome.</div>
-      </div>
-      <div class="insight warn">
-        <div class="insight-label">Monitorar</div>
-        <div class="insight-title">Nubank Micael + Inter Jaqueline pagos pelo extrato</div>
-        <div class="insight-text">O Nubank do Micael (~R$ 2.341–2.685/mês) e o Inter da Jaqueline (~R$ 2.119–2.586/mês) são pagos por esta conta corrente. Nos 3 meses isso representou ~R$ 7.144 em pagamentos de faturas — gastos que não aparecem no cartão Sicoob e precisam ser rastreados separadamente.</div>
-      </div>
-      <div class="insight ok">
-        <div class="insight-label">Positivo</div>
-        <div class="insight-title">Zero rotativo — cartão pago integralmente</div>
-        <div class="insight-text">Nos 3 meses o rotativo foi R$ 0, confirmando que a fatura foi quitada no vencimento. Considerando os 8,5% a.m. do rotativo Sicoob, isso representa uma economia significativa.</div>
-      </div>
-      <div class="insight ok">
-        <div class="insight-label">Positivo</div>
-        <div class="insight-title">Receita de mentoria recorrente e crescente</div>
-        <div class="insight-text">Entradas de mentoria identificadas nos 3 meses: Dom Festas (2x/mês), Garden Kids, Casa de Festas Vem Brincar, Zpelin, S F C Sales, A L G Eventos, entre outros. Sinal de carteira de clientes ativa.</div>
-      </div>
-      <div class="insight info">
-        <div class="insight-label">Oportunidade</div>
-        <div class="insight-title">Meta Ads misturados em dois cartões pessoais</div>
-        <div class="insight-text">O cartão 4817 paga Meta Ads exclusivos do Pro Buffet (nota fiscal no CNPJ — R$ 25.957 confirmados). O cartão 4338 mistura anúncios do Pro Buffet e da Agência. Para separar com precisão, solicite o relatório da Meta do cartão 4338. Idealmente ambos migram para cartões PJ separados por empresa.</div>
-      </div>
-      <div class="insight info">
-        <div class="insight-label">Oportunidade</div>
-        <div class="insight-title">Consórcio R$ 1.278–1.393/mês</div>
-        <div class="insight-text">Cobrança automática mensal significativa. Vale confirmar o prazo restante e o bem contemplado — pode ser uma alavanca patrimonial ou uma saída de caixa que merece revisão dependendo da situação atual.</div>
-      </div>
-    </div>
-
-    <div class="section-title">Recomendações</div>
+    <div class="section-title">Cartão Micael (4338) — gastos pessoais</div>
     <div class="card">
-      <table class="data-table">
-        <thead><tr><th>#</th><th>Recomendação</th><th>Impacto</th><th>Prazo</th></tr></thead>
-        <tbody>
-          <tr><td class="val">01</td><td class="name">Criar conta PJ para Pro Buffet e migrar Meta Ads + outros custos da empresa</td><td><span class="badge" style="background:var(--buffet-bg);color:var(--buffet)">Alto</span></td><td style="color:var(--text3)">Curto prazo</td></tr>
-          <tr><td class="val">02</td><td class="name">Manter reserva operacional mínima de R$ 15k na conta corrente</td><td><span class="badge" style="background:#FEF0F0;color:#A33030">Alto</span></td><td style="color:var(--text3)">Imediato</td></tr>
-          <tr><td class="val">03</td><td class="name">Separar recebimentos de mentoria em conta ou centro de custo próprio</td><td><span class="badge" style="background:var(--agencia-bg);color:var(--agencia)">Médio</span></td><td style="color:var(--text3)">Curto prazo</td></tr>
-          <tr><td class="val">04</td><td class="name">Revisar plano do Bubble — 63% do SaaS da agência (~R$ 2k/mês)</td><td><span class="badge" style="background:var(--castelo-bg);color:var(--castelo)">Médio</span></td><td style="color:var(--text3)">Curto prazo</td></tr>
-          <tr><td class="val">05</td><td class="name">Definir limite mensal de gastos pessoais e da Jaque nesta conta</td><td><span class="badge" style="background:var(--castelo-bg);color:var(--castelo)">Médio</span></td><td style="color:var(--text3)">Imediato</td></tr>
-          <tr><td class="val">06</td><td class="name">Avaliar prazo e situação do consórcio (~R$ 1.350/mês fixo)</td><td><span class="badge" style="background:var(--pessoal-bg);color:var(--pessoal)">Baixo</span></td><td style="color:var(--text3)">Médio prazo</td></tr>
-        </tbody>
-      </table>
+      <table class="det-table" id="tabelaCartaoMicael"></table>
+    </div>
+
+    <div class="section-title">Cartão Jaqueline (4861) — gastos família</div>
+    <div class="card">
+      <table class="det-table" id="tabelaCartaoJaque"></table>
+    </div>
+
+    <div class="section-title">Cartão Fernando (5881) — compras</div>
+    <div class="card">
+      <table class="det-table" id="tabelaCartaoFernando"></table>
+    </div>
+
+    <div class="section-title">Faturas Nubank (Micael) + Inter (Jaqueline) — pagas via extrato</div>
+    <div class="card">
+      <table class="det-table" id="tabelaFaturasExterno"></table>
     </div>
   </div>
 
-</div>
+  <!-- ===== FIXOS & OBRIGAÇÕES ===== -->
+  <div id="tab-fixos" class="content">
+    <div class="kpi-grid" id="kpi-fixos"></div>
+    <div class="section-title">Obrigações e débitos fixos — extrato</div>
+    <div class="card">
+      <table class="det-table" id="tabelaFixos"></table>
+    </div>
+  </div>
+
+  <!-- ===== EXTRATO COMPLETO ===== -->
+  <div id="tab-extrato" class="content">
+    <div class="section-title">Extrato conta corrente — todos os lançamentos</div>
+    <p style="font-size:12px;color:var(--text3);margin-bottom:16px">Cada linha do extrato bancário, com identificação de categoria.</p>
+
+    <div class="section-title" style="margin-top:0">Janeiro 2026</div>
+    <div class="card">
+      <table class="det-table" id="tabelaExtratoJan"></table>
+    </div>
+
+    <div class="section-title">Fevereiro 2026</div>
+    <div class="card">
+      <table class="det-table" id="tabelaExtratoFev"></table>
+    </div>
+
+    <div class="section-title">Março 2026 (01–16)</div>
+    <div class="card">
+      <table class="det-table" id="tabelaExtratoMar"></table>
+    </div>
+  </div>
+
+</div><!-- /page -->
 
 <script>
-// ─── DADOS COMPLETOS ──────────────────────────────────────────────────────────
-const MESES = ['jan','fev','mar'];
-const LABELS = {todos:'Todos',jan:'Janeiro',fev:'Fevereiro',mar:'Março*'};
-
-// EXTRATO — ENTRADAS
-const ENT = {
-  // Recebimentos do ProBuffet para esta conta
-  entProBuffet:   {jan: 8000,   fev: 21020, mar: 1000},
-  // Recebimentos do Castelo para esta conta
-  entCastelo:     {jan: 12983,  fev: 7000,  mar: 0},
-  // Mentoria (buffets/eventos pagando)
-  entMentoria:    {jan: 13772,  fev: 9074,  mar: 8525},
-  // Agência (mkt patrocinado, propaganda)
-  entAgencia:     {jan: 3460,   fev: 1000,  mar: 3000},
-  // Outros créditos (boletos, depósitos)
-  entOutros:      {jan: 4052,   fev: 3764,  mar: 2662},
-};
-
-// EXTRATO — SAÍDAS
-const SAI = {
-  // João Victor (salário agência)
-  joao:           {jan: 1500,   fev: 3000,  mar: 1500},
-  // Castelo dos Sonhos (custos operacionais)
-  casteloCusto:   {jan: 8660,   fev: 6398,  mar: 2776},
-  // Fatura Mastercard (débito automático)
-  mastercard:     {jan: 22675,  fev: 27995,  mar: 0}, // mar ainda não debitou
-  // Consórcio
-  consorcio:      {jan: 1278,   fev: 1262,  mar: 1304},
-  // Colégio Izabela
-  colegio:        {jan: 0,      fev: 874,   mar: 874},
-  // Cartões Jaqueline (Nubank + Inter)
-  cartoesJaque:   {jan: 4926,   fev: 4804,  mar: 0},
-  // ProBuffet (pix direto — ex: R$1.110 jan, R$425 fev)
-  buffetPix:      {jan: 1110,   fev: 425,   mar: 0},
-  // Energia (rancho + barracão)
-  energia:        {jan: 1951,   fev: 364,   mar: 0},
-  // Outros saídas extrato
-  outrosExtrato:  {jan: 3100,   fev: 3850,  mar: 3000},
-};
-
-// CARTÃO — SAÍDAS (já do relatório anterior)
-// NOTA: buffetAds = Meta Ads misturados (Pro Buffet + Agência) no cartão 4338
-// Cartão 4817 exclusivo Pro Buffet: R$25.957 confirmados pela Meta (jan–17mar)
-// agenciaSaas = apenas ferramentas da agência (sem Bubble, ManyChat, Respondi, Make, WhatsApp)
-// buffetSaas  = ferramentas do Pro Buffet (Bubble, ManyChat, Respondi, Make, WhatsApp)
-const CART = {
-  buffetAds:  {jan:14359, fev:12533, mar:16237},
-  buffetSaas: {jan:1834+149+237+58+55, fev:2218+149+187+55+55, mar:2163+149+187+56+55}, // Bubble+ManyChat+Respondi+Make+WhatsApp
-  agenciaSaas:{jan:696+202+167+108+109+98, fev:0+196+167+104+104+156, mar:0+0+167+105+106+252},
-  casteloCrt: {jan:427,   fev:427,   mar:427},
-  pessoalCrt: {jan:2487,  fev:2790,  mar:3524},
-  familiaCrt: {jan:1532,  fev:750,   mar:1102},
-};
-
-// AGÊNCIA TOOLS (ferramentas exclusivas da agência)
-const TOOLS = [
-  {name:'Notion Labs',           key:'notion', tipo:'Gestão',      jan:696,  fev:0,    mar:0},
-  {name:'Pipedrive (CRM)',       key:'pipe',   tipo:'CRM',         jan:202,  fev:196,  mar:0},
-  {name:'Reportei',              key:'rep',    tipo:'Relatórios',  jan:167,  fev:167,  mar:167},
-  {name:'Twilio SendGrid',       key:'sndg',   tipo:'Email',       jan:108,  fev:104,  mar:105},
-  {name:'OpenAI ChatGPT',        key:'ai',     tipo:'IA',          jan:109,  fev:104,  mar:106},
-  {name:'Google Workspace+Cloud',key:'gws',    tipo:'Produt.',     jan:98,   fev:156,  mar:252},
+// ═══════════════════════════════════════════════════════════════════
+//  DADOS — TRÁFEGO PAGO (Meta Ads FACEBK* cartão 4338)
+// ═══════════════════════════════════════════════════════════════════
+const ADS_JAN = [
+  {dt:'12/dez',desc:'FACEBK* L2RXC7RCA2V',v:100.12},{dt:'12/dez',desc:'FACEBK *WNVXQ95HQ2V',v:452.03},
+  {dt:'12/dez',desc:'FACEBK *BZ7SK9ZAS2V',v:46.07},{dt:'12/dez',desc:'FACEBK *2BMJ68DQ52V',v:100.08},
+  {dt:'13/dez',desc:'FACEBK* WP5T4AM3N2V',v:650.14},{dt:'13/dez',desc:'FACEBK* 8Y9W3A9FV2V',v:463.57},
+  {dt:'13/dez',desc:'FACEBK *SVTCPAV6M2V',v:2029.22},{dt:'13/dez',desc:'FACEBK *QSMY6AVSB2V',v:2952.49},
+  {dt:'13/dez',desc:'FACEBK *WY9NS95HQ2V',v:25.89},{dt:'13/dez',desc:'FACEBK *9YW9T79Q52V',v:7.60},
+  {dt:'13/dez',desc:'FACEBK *35DRG6HP92V',v:605.78},{dt:'13/dez',desc:'FACEBK *TWDVP65DA2V',v:50.11},
+  {dt:'13/dez',desc:'FACEBK *G2TPQ953V2V',v:999.35},{dt:'13/dez',desc:'FACEBK *VAWSACMAU2V',v:1487.07},
+  {dt:'14/dez',desc:'FACEBK *AV3LS6HDA2V',v:100.80},{dt:'14/dez',desc:'FACEBK *KETZU9RAS2V',v:14.05},
+  {dt:'14/dez',desc:'FACEBK *TK6EZ8VQ52V',v:100.68},{dt:'15/dez',desc:'FACEBK* 7KMTL89DA2V',v:100.27},
+  {dt:'15/dez',desc:'FACEBK *Y2VX77VP52V',v:100.12},{dt:'16/dez',desc:'FACEBK* PLLN87MCA2V',v:100.05},
+  {dt:'16/dez',desc:'FACEBK *7RX5P8HQ52V',v:100.12},{dt:'16/dez',desc:'FACEBK *GDDHK9MBS2V',v:60.62},
+  {dt:'17/dez',desc:'FACEBK* 4XMSR7RCA2V',v:100.04},{dt:'17/dez',desc:'FACEBK *92TL785Q52V',v:100.20},
+  {dt:'18/dez',desc:'FACEBK *Q8XH8BVAS2V',v:16.77},{dt:'18/dez',desc:'FACEBK *QXKKG7VP52V',v:106.51},
+  {dt:'19/dez',desc:'FACEBK *4SVFN9VHQ2V',v:452.17},{dt:'19/dez',desc:'FACEBK *PRE8E7VCA2V',v:100.04},
+  {dt:'20/dez',desc:'FACEBK *WA4DH7VCA2V',v:100.32},{dt:'20/dez',desc:'FACEBK *6BX28AZAS2V',v:37.18},
+  {dt:'20/dez',desc:'FACEBK *T2WWE85Q52V',v:100.10},{dt:'21/dez',desc:'FACEBK *92URK9VQ52V',v:100.10},
+  {dt:'21/dez',desc:'FACEBK* WHYXM7MCA2V',v:100.18},{dt:'22/dez',desc:'FACEBK *WL4JJBVAS2V',v:18.07},
+  {dt:'22/dez',desc:'FACEBK *CHSVW7MQ52V',v:100.29},{dt:'23/dez',desc:'FACEBK *M5RN899DA2V',v:100.24},
+  {dt:'24/dez',desc:'FACEBK *BP2DS9VQ52V',v:100.40},{dt:'24/dez',desc:'FACEBK *AKW2YA9BS2V',v:36.85},
+  {dt:'24/dez',desc:'FACEBK* MG5CB7MDA2V',v:100.06},{dt:'26/dez',desc:'FACEBK *TXKNFBDBS2V',v:27.78},
+  {dt:'26/dez',desc:'FACEBK* RDFGF7MDA2V',v:100.55},{dt:'26/dez',desc:'FACEBK *5P7E79DQ52V',v:100.58},
+  {dt:'29/dez',desc:'FACEBK* LYLNW75DA2V',v:100.02},{dt:'30/dez',desc:'FACEBK *85BN2B5HQ2V',v:452.05},
+  {dt:'01/jan',desc:'FACEBK *CHWJ68HDA2V',v:71.07},{dt:'01/jan',desc:'FACEBK *6YDSV99DA2V',v:28.94},
+  {dt:'03/jan',desc:'FACEBK *V7NAH8VCA2V',v:100.88},{dt:'05/jan',desc:'FACEBK *CXSA6A9DA2V',v:100.33},
+  {dt:'06/jan',desc:'FACEBK* KFLPH85DA2V',v:113.99},{dt:'08/jan',desc:'FACEBK *65532ARQ52V',v:30.15},
+  {dt:'08/jan',desc:'FACEBK *LUTTS99Q52V',v:73.75},{dt:'09/jan',desc:'FACEBK* UL7QFA9DA2V',v:113.88},
+  {dt:'09/jan',desc:'FACEBK *ADCYY8ZP52V',v:113.88},{dt:'11/jan',desc:'FACEBK *T3WB4BVQ52V',v:114.13},
+  {dt:'11/jan',desc:'FACEBK* Y43WL9RCA2V',v:113.93},
 ];
 
-// PRO BUFFET TOOLS (ferramentas do sistema do buffet)
-const TOOLS_BUFFET = [
-  {name:'Bubble (Starter Plan)', key:'bubble', tipo:'No-code',     jan:1834, fev:2218, mar:2163},
-  {name:'ManyChat',              key:'many',   tipo:'Automação',   jan:149,  fev:149,  mar:149},
-  {name:'Respondi.app',          key:'rsp',    tipo:'Formulários', jan:237,  fev:187,  mar:187},
-  {name:'Make.com',              key:'make',   tipo:'Automação',   jan:58,   fev:55,   mar:56},
-  {name:'WhatsApp Business',     key:'wpp',    tipo:'Comunic.',    jan:55,   fev:55,   mar:55},
+const ADS_FEV = [
+  {dt:'12/jan',desc:'FACEBK *XG9R3C5HQ2V',v:75.77},{dt:'12/jan',desc:'FACEBK *4J7VFADQ52V',v:113.99},
+  {dt:'12/jan',desc:'FACEBK *NMKAPBZHQ2V',v:428.33},{dt:'13/jan',desc:'FACEBK* 5EB7RA9DA2V',v:16.18},
+  {dt:'13/jan',desc:'FACEBK* RGNZNADFV2V',v:131.63},{dt:'13/jan',desc:'FACEBK* WN2ENAH4N2V',v:196.30},
+  {dt:'13/jan',desc:'FACEBK* P8X8RBH2V2V',v:137.81},{dt:'13/jan',desc:'FACEBK *EKC4UC54N2V',v:372.09},
+  {dt:'13/jan',desc:'FACEBK *YSJP2DV6M2V',v:310.14},{dt:'13/jan',desc:'FACEBK *MBKPYAD3V2V',v:166.26},
+  {dt:'13/jan',desc:'FACEBK *NC5NEC9FV2V',v:98.52},{dt:'13/jan',desc:'FACEBK *6AENQBZHQ2V',v:23.57},
+  {dt:'13/jan',desc:'FACEBK *GNQNCCDTB2V',v:1568.26},{dt:'13/jan',desc:'FACEBK *B59ZXARTB2V',v:598.20},
+  {dt:'13/jan',desc:'FACEBK *GMQ4KD5BU2V',v:285.45},{dt:'13/jan',desc:'FACEBK *LUXQ6BM2V2V',v:476.59},
+  {dt:'13/jan',desc:'FACEBK *DWKHD9MF32V',v:659.90},{dt:'13/jan',desc:'FACEBK *7VJBDB5G32V',v:2154.46},
+  {dt:'13/jan',desc:'FACEBK *76BNH9MQ52V',v:60.38},{dt:'14/jan',desc:'FACEBK *F2KPGARQ52V',v:113.93},
+  {dt:'14/jan',desc:'FACEBK *ASAZT8MDA2V',v:113.98},{dt:'15/jan',desc:'FACEBK *VHACYAHQ52V',v:114.22},
+  {dt:'17/jan',desc:'FACEBK *479Y4BHQ52V',v:113.86},{dt:'17/jan',desc:'FACEBK *TMZ4B9DDA2V',v:113.83},
+  {dt:'18/jan',desc:'FACEBK *68MDY9MQ52V',v:114.08},{dt:'19/jan',desc:'FACEBK *Z54SG9DDA2V',v:114.00},
+  {dt:'20/jan',desc:'FACEBK *VH7N3BDQ52V',v:113.86},{dt:'21/jan',desc:'FACEBK *LY6VT9ZF32V',v:3131.00},
+  {dt:'21/jan',desc:'FACEBK *A6WTP95DA2V',v:114.16},{dt:'21/jan',desc:'FACEBK *WNZ74BRQ52V',v:113.84},
+  {dt:'22/jan',desc:'FACEBK *S6Y9BBDQ52V',v:113.91},{dt:'23/jan',desc:'FACEBK* CPNFL9MDA2V',v:113.96},
+  {dt:'24/jan',desc:'FACEBK *Y6VJAAVP52V',v:113.85},{dt:'25/jan',desc:'FACEBK *9PKELAMQ52V',v:113.93},
+  {dt:'26/jan',desc:'FACEBK *JBVJ7AZCA2V',v:114.97},{dt:'27/jan',desc:'FACEBK *4VP8BAZCA2V',v:114.16},
+  {dt:'27/jan',desc:'FACEBK *FUA4PBDQ52V',v:114.48},{dt:'28/jan',desc:'FACEBK *8WEQMAVP52V',v:113.95},
+  {dt:'29/jan',desc:'FACEBK *PXPY9JRHQ2V',v:514.79},{dt:'29/jan',desc:'FACEBK *A8P5UBRQ52V',v:113.84},
+  {dt:'30/jan',desc:'FACEBK* T2QFSAMCA2V',v:113.86},{dt:'31/jan',desc:'FACEBK *ZZKQ3CDQ52V',v:114.13},
+  {dt:'01/fev',desc:'FACEBK *W9P7RAZCA2V',v:114.34},{dt:'01/fev',desc:'FACEBK *GKCB7CDQ52V',v:113.96},
+  {dt:'02/fev',desc:'FACEBK *WL6CYDDG32V',v:3891.10},{dt:'03/fev',desc:'FACEBK *9XVBCBMQ52V',v:114.04},
+  {dt:'04/fev',desc:'FACEBK *XF82CCRQ52V',v:113.84},{dt:'04/fev',desc:'FACEBK *HPQ4PBRCA2V',v:113.95},
+  {dt:'06/fev',desc:'FACEBK *N2VNMBMQ52V',v:113.84},{dt:'07/fev',desc:'FACEBK* 2CBK7B5DA2V',v:113.98},
+  {dt:'07/fev',desc:'FACEBK *F43RDE5JQ2V',v:514.51},{dt:'07/fev',desc:'FACEBK *MF4SEC5Q52V',v:113.96},
+  {dt:'09/fev',desc:'FACEBK *84W8TCRQ52V',v:113.99},{dt:'09/fev',desc:'FACEBK* 8YQMFBZCA2V',v:113.83},
+  {dt:'11/fev',desc:'FACEBK* M2TNABMDA2V',v:113.90},
 ];
 
-// ─── UTILS ────────────────────────────────────────────────────────────────────
+const ADS_MAR = [
+  {dt:'12/fev',desc:'FACEBK *MYCWVEDG32V',v:4161.83},{dt:'13/fev',desc:'FACEBK* 3LBKXBVCA2V',v:16.80},
+  {dt:'13/fev',desc:'FACEBK *4RXS3CMF32V',v:135.64},{dt:'13/fev',desc:'FACEBK *7LKE8EVHQ2V',v:293.60},
+  {dt:'13/fev',desc:'FACEBK *45RVJDREV2V',v:470.63},{dt:'13/fev',desc:'FACEBK *22YB9CMQ52V',v:19.99},
+  {dt:'13/fev',desc:'FACEBK *G6FE4EVTB2V',v:2449.95},{dt:'13/fev',desc:'FACEBK *9D8X7FM3N2V',v:865.43},
+  {dt:'14/fev',desc:'FACEBK* HU3MTBHDA2V',v:113.85},{dt:'16/fev',desc:'FACEBK* CNYLQCRCA2V',v:113.92},
+  {dt:'18/fev',desc:'FACEBK* 7BG6WCRCA2V',v:114.10},{dt:'20/fev',desc:'FACEBK* GBXKLCVCA2V',v:114.09},
+  {dt:'21/fev',desc:'FACEBK *VJEMNF5JQ2V',v:515.04},{dt:'23/fev',desc:'FACEBK* CK9YBCMDA2V',v:114.16},
+  {dt:'24/fev',desc:'FACEBK *HZ5K3F5G32V',v:4161.74},{dt:'25/fev',desc:'FACEBK *TEAQSC5DA2V',v:113.87},
+  {dt:'28/fev',desc:'FACEBK* RR433DHDA2V',v:113.96},{dt:'01/mar',desc:'FACEBK *WBB2HD9G32V',v:2696.41},
+  {dt:'02/mar',desc:'FACEBK* 5H9CKDMCA2V',v:114.26},{dt:'03/mar',desc:'FACEBK *BKYVBH9HQ2V',v:514.64},
+  {dt:'05/mar',desc:'FACEBK *NCLNRDMCA2V',v:113.83},{dt:'07/mar',desc:'FACEBK *XENWND5DA2V',v:114.12},
+  {dt:'09/mar',desc:'FACEBK *VKERKF9DA2V',v:113.95},{dt:'10/mar',desc:'FACEBK *SYF38EVCA2V',v:113.88},
+  {dt:'11/mar',desc:'FACEBK *TPH2DE9G32V',v:4161.98},
+];
+
+// SaaS Pro Buffet
+const SAAS_BUFFET = [
+  {nome:'Bubble (Starter Plan)',tipo:'No-code',jan:1834.17,fev:2218.56,mar:2162.56,obs:'USD 331 (jan) → USD 427.88 (fev/mar) — variação cambial'},
+  {nome:'ManyChat.com',tipo:'Automação WhatsApp',jan:149.00,fev:149.00,mar:149.00,obs:'R$ 149/mês — fixo'},
+  {nome:'Respondi.app',tipo:'Formulários',jan:236.55,fev:187.00,mar:187.00,obs:'2 cobranças em jan (R$49,55 + R$187)'},
+  {nome:'Make.com',tipo:'Automações',jan:57.58,fev:55.32,mar:55.99,obs:'USD 10,59/mês — variação cambial'},
+  {nome:'WhatsApp Business (Google)',tipo:'Comunicação',jan:55.00,fev:55.00,mar:55.00,obs:'R$ 55/mês — fixo'},
+];
+
+// SaaS Agência
+const SAAS_AGENCIA = [
+  {nome:'Notion Labs (anual)',tipo:'Gestão / Docs',jan:695.73,fev:631.02,mar:0,obs:'Jan: USD 12 (R$64,71) + Jan: USD 117,16 (R$631,02) — cobrança anual'},
+  {nome:'Pipedrive (CRM)',tipo:'CRM',jan:201.99,fev:195.66,mar:0,obs:'Cancelado ou não cobrado em mar'},
+  {nome:'Reportei.com',tipo:'Relatórios',jan:166.84,fev:166.84,mar:166.84,obs:'R$ 166,84/mês — fixo'},
+  {nome:'Twilio SendGrid',tipo:'Email marketing',jan:108.43,fev:104.21,mar:105.48,obs:'USD 19,95/mês — variação cambial'},
+  {nome:'OpenAI ChatGPT Plus',tipo:'IA',jan:108.74,fev:104.47,mar:105.74,obs:'USD 20/mês — variação cambial'},
+  {nome:'Google Workspace',tipo:'Produtividade',jan:98.00,fev:98.00,mar:98.00,obs:'R$ 98/mês — fixo'},
+  {nome:'Google Cloud',tipo:'Infraestrutura',jan:0,fev:58.14,mar:154.40,obs:'Aumentando conforme uso'},
+];
+
+// Marketplace (cartão Micael - pessoal)
+const MKT_JAN = [
+  {dt:'04/jun',desc:'MERCADOLIVRE*DANIELV 08/12',v:71.37},{dt:'06/jun',desc:'MERCADOLIVRE*4PRODUT 08/12',v:57.96},
+  {dt:'04/ago',desc:'MERCADOPAGO *SUPORTA 06/06',v:36.89},{dt:'04/ago',desc:'MERCADOPAGO *EBAZARC 06/10',v:99.80},
+  {dt:'06/ago',desc:'MERCADOPAGO *RASTREA 06/12',v:153.25},{dt:'14/ago',desc:'MERCADOPAGO *MERCADO 05/08',v:54.49},
+  {dt:'01/set',desc:'MERCADOLIVRE*MERCADO 05/06',v:38.66},{dt:'02/set',desc:'MERCADOLIVRE*MERCADO 05/12',v:82.50},
+  {dt:'03/out',desc:'MERCADOLIVRE*MERCADO 04/07',v:53.14},{dt:'07/out',desc:'MERCADOLIVRE*PAULOGO 04/12',v:179.91},
+  {dt:'13/nov',desc:'MERCADOLIVRE*PAULOGO 02/12',v:153.97},{dt:'13/nov',desc:'Vindi *LauthV 02/12',v:197.00},
+  {dt:'12/dez',desc:'MERCADOLIVRE*MERCADO',v:112.90},{dt:'18/dez',desc:'MERCADO*MERCADOLIVRE 01/05',v:31.40},
+  {dt:'06/jan',desc:'MERCADO*RASTREAMENTO 01/10',v:196.80},{dt:'08/jan',desc:'MERCADOLIVRE*MERCADO',v:182.00},
+  {dt:'08/jan',desc:'PG *ASTRONPAY ASTRON',v:427.00}, // CASTELO — incluído aqui mas categorizado separado
+];
+
+const MKT_FEV = [
+  {dt:'04/jun',desc:'MERCADOLIVRE*DANIELV 09/12',v:71.37},{dt:'06/jun',desc:'MERCADOLIVRE*4PRODUT 09/12',v:57.96},
+  {dt:'04/ago',desc:'MERCADOPAGO *EBAZARC 07/10',v:99.80},{dt:'06/ago',desc:'MERCADOPAGO *RASTREA 07/12',v:153.25},
+  {dt:'14/ago',desc:'MERCADOPAGO *MERCADO 06/08',v:54.49},{dt:'01/set',desc:'MERCADOLIVRE*MERCADO 06/06',v:38.65},
+  {dt:'02/set',desc:'MERCADOLIVRE*MERCADO 06/12',v:82.50},{dt:'03/out',desc:'MERCADOLIVRE*MERCADO 05/07',v:53.14},
+  {dt:'07/out',desc:'MERCADOLIVRE*PAULOGO 05/12',v:179.91},{dt:'13/nov',desc:'MERCADOLIVRE*PAULOGO 03/12',v:153.97},
+  {dt:'13/nov',desc:'Vindi *LauthV 03/12',v:197.00},{dt:'18/dez',desc:'MERCADO*MERCADOLIVRE 02/05',v:31.40},
+  {dt:'06/jan',desc:'MERCADO*RASTREAMENTO 02/10',v:196.80},{dt:'14/jan',desc:'MERCADO*MERCADOLIVRE SAO PAULO',v:23.89},
+  {dt:'14/jan',desc:'MERCADOLIVRE*MERCADO Osasco',v:23.89},{dt:'15/jan',desc:'MERCADO*MERCADOLIVRE CAJAMAR',v:163.00},
+  {dt:'22/jan',desc:'MERCADOLIVRE*MERCADO SAO PAULO',v:78.06},{dt:'22/jan',desc:'MERCADOLIVRE*MERCADO 01/02',v:67.89},
+  {dt:'29/jan',desc:'MERCADOLIVRE*MERCADO Osasco',v:302.52},{dt:'04/fev',desc:'MERCADO*BELKCOMPUTAC 01/10',v:160.00},
+  {dt:'06/fev',desc:'MERCADOLIVRE*NAKASAK OSASCO',v:439.00},{dt:'07/fev',desc:'PG *ASTRONPAY ASTRON',v:427.00},
+];
+
+const MKT_MAR = [
+  {dt:'04/jun',desc:'MERCADOLIVRE*DANIELV 10/12',v:71.37},{dt:'06/jun',desc:'MERCADOLIVRE*4PRODUT 10/12',v:57.96},
+  {dt:'04/ago',desc:'MERCADOPAGO *EBAZARC 08/10',v:99.80},{dt:'06/ago',desc:'MERCADOPAGO *RASTREA 08/12',v:153.25},
+  {dt:'14/ago',desc:'MERCADOPAGO *MERCADO 07/08',v:54.49},{dt:'02/set',desc:'MERCADOLIVRE*MERCADO 07/12',v:82.50},
+  {dt:'03/out',desc:'MERCADOLIVRE*MERCADO 06/07',v:53.14},{dt:'07/out',desc:'MERCADOLIVRE*PAULOGO 06/12',v:179.91},
+  {dt:'13/nov',desc:'MERCADOLIVRE*PAULOGO 04/12',v:153.97},{dt:'13/nov',desc:'Vindi *LauthV 04/12',v:197.00},
+  {dt:'18/dez',desc:'MERCADO*MERCADOLIVRE 03/05',v:31.40},{dt:'06/jan',desc:'MERCADO*RASTREAMENTO 03/10',v:196.80},
+  {dt:'13/jan',desc:'MERCADO*RASTREAMENTO 02/10',v:203.90},{dt:'20/jan',desc:'GMAD RIBEIRAO SUPRIM 02/06',v:518.50},
+  {dt:'22/jan',desc:'MERCADOLIVRE*MERCADO 02/02',v:67.89},{dt:'04/fev',desc:'MERCADO*BELKCOMPUTAC 02/10',v:160.00},
+  {dt:'24/fev',desc:'MERCADOLIVRE*MERCADO SAO PAULO',v:75.99},{dt:'06/mar',desc:'MERCADOLIVRE*MERCADO OSASCO',v:120.98},
+  {dt:'09/mar',desc:'PG *ASTRONPAY ASTRON',v:427.00},{dt:'11/mar',desc:'MERCADOLIVRE*ACERV 01/10 JUNDIAI',v:379.90},
+];
+
+// Extrato Janeiro
+const EXTRATO_JAN = [
+  {dt:'02/jan',h:'DEB PACOTE SERVIÇOS',v:-9.90,cat:'Fixos',obs:'Tarifa bancária'},
+  {dt:'02/jan',h:'Transferência para PARENTE AGROPEC.',v:-28.00,cat:'Pessoal',obs:'Mantovani Comercio'},
+  {dt:'02/jan',h:'PIX RECEB — JSVK BUFFET LTDA',v:1000.00,cat:'Receita Mentoria',obs:'Mentoria buffet'},
+  {dt:'02/jan',h:'Transferência para MANTOVANI COMERC.',v:-69.00,cat:'Pessoal',obs:''},
+  {dt:'05/jan',h:'PIX RECEB — LUCIELLEN SILVA MILEIB',v:1200.00,cat:'Receita Mentoria',obs:''},
+  {dt:'05/jan',h:'PIX RECEB — THIAGO DO PRADO RAMOS',v:800.00,cat:'Receita Mentoria',obs:''},
+  {dt:'05/jan',h:'PIX RECEB — GARDEN KIDS LONDRINA',v:800.00,cat:'Receita Mentoria',obs:''},
+  {dt:'05/jan',h:'PIX para 35.436.596 PPO',v:-160.00,cat:'Buffet/Agência',obs:''},
+  {dt:'05/jan',h:'PIX para 28.618.386',v:-17.00,cat:'Outros',obs:''},
+  {dt:'05/jan',h:'PIX RECEB — DAIANA LOPES DA CUNHA',v:997.00,cat:'Receita Mentoria',obs:''},
+  {dt:'05/jan',h:'PIX RECEB — MARIA CLARA',v:62.80,cat:'Outros',obs:''},
+  {dt:'05/jan',h:'Transferência MANTOVANI COMERCIO',v:-29.00,cat:'Pessoal',obs:''},
+  {dt:'05/jan',h:'PIX para 23.636.409',v:-100.00,cat:'Outros',obs:''},
+  {dt:'05/jan',h:'DÉB.CONV.DEM.EMPRES — CONSÓRCIOS',v:-1278.43,cat:'Fixos',obs:'Consórcio'},
+  {dt:'06/jan',h:'PIX RECEB — ELIFAZ TRINDADE',v:415.00,cat:'Outros',obs:'Devolução'},
+  {dt:'06/jan',h:'PIX para ***.630.628 — Izabela',v:-17.64,cat:'Pessoal',obs:''},
+  {dt:'07/jan',h:'PIX RECEB — ROBERTA MARA ALVES EVENTOS',v:1200.00,cat:'Receita Mentoria',obs:''},
+  {dt:'07/jan',h:'PIX para *** — Frete',v:-4500.00,cat:'Castelo',obs:'Frete'},
+  {dt:'07/jan',h:'PIX para *** — Fibra fachada RP',v:-1500.00,cat:'Castelo',obs:'Fibra'},
+  {dt:'07/jan',h:'PIX RECEB — KENNETH DE DEUS BORGES',v:1000.00,cat:'Receita Outros',obs:''},
+  {dt:'07/jan',h:'PIX RECEB — PAMELA DE LIMA',v:150.00,cat:'Receita Outros',obs:''},
+  {dt:'07/jan',h:'DÉB DEVOLUÇÃO PIX — 61.572.019',v:-1000.00,cat:'Outros',obs:'Devolução'},
+  {dt:'07/jan',h:'PIX para *** — 4.500 (Frete)',v:-1500.00,cat:'Castelo',obs:'Devolução somada acima'},
+  {dt:'08/jan',h:'PIX RECEB — PATRICIA FATIMA DALMAGO',v:800.00,cat:'Receita Agência',obs:'Propaganda Celebrare'},
+  {dt:'08/jan',h:'PIX RECEB — LEONARDO BARROS GUERRA',v:1000.00,cat:'Receita Outros',obs:''},
+  {dt:'08/jan',h:'PIX RECEB — DOM FESTAS E EVENTOS',v:2000.00,cat:'Receita Mentoria',obs:'2 parcelas mentoria'},
+  {dt:'08/jan',h:'PIX RECEB — ROBERTA DA CRUZ SOUZA',v:800.00,cat:'Receita Mentoria',obs:''},
+  {dt:'09/jan',h:'DEP.BOLETO',v:1700.00,cat:'Receita Outros',obs:'Depósito boleto'},
+  {dt:'09/jan',h:'PIX RECEB — Quintal D Casa',v:600.00,cat:'Receita Agência',obs:''},
+  {dt:'12/jan',h:'DEB.RECAR PRÉ-PAGA',v:-30.00,cat:'Pessoal',obs:'Recarga celular'},
+  {dt:'12/jan',h:'PIX RECEB — PATRICIA FATIMA DALMAGO',v:200.00,cat:'Receita Outros',obs:''},
+  {dt:'12/jan',h:'Transferência CASTELO DOS SONHOS',v:-300.00,cat:'Castelo',obs:'Op. castelo'},
+  {dt:'12/jan',h:'Transferência PARENTE AGROPEC.',v:-21.00,cat:'Pessoal',obs:''},
+  {dt:'12/jan',h:'PIX RECEB — IZABEL C GONCALVES',v:500.00,cat:'Receita Família',obs:''},
+  {dt:'12/jan',h:'Transferência CASTELO DOS SONHOS',v:-6900.00,cat:'Castelo',obs:'Repasse Castelo'},
+  {dt:'12/jan',h:'PIX RECEB — MARIA CLARA',v:10.00,cat:'Outros',obs:''},
+  {dt:'13/jan',h:'PIX RECEB — ESPACO INFANTIL ZPELIN',v:2200.00,cat:'Receita Agência',obs:''},
+  {dt:'13/jan',h:'PIX RECEB — FABRICIA & IAGO',v:997.00,cat:'Receita Mentoria',obs:''},
+  {dt:'13/jan',h:'PIX RECEB — KARINA APARECIDA',v:1575.00,cat:'Receita Mentoria',obs:''},
+  {dt:'13/jan',h:'PIX para Amazon',v:-169.83,cat:'Pessoal',obs:'Amazon'},
+  {dt:'14/jan',h:'DÉB.CONV.ORGÃOS GOV',v:-1393.35,cat:'Fixos',obs:'Imposto/INSS/DAS'},
+  {dt:'14/jan',h:'PIX — Cartão Nubank',v:-2585.77,cat:'Pessoal',obs:'Fatura Nubank Micael'},
+  {dt:'15/jan',h:'DEP.BOLETO',v:700.00,cat:'Receita Outros',obs:''},
+  {dt:'15/jan',h:'DEP.BOLETO',v:1200.00,cat:'Receita Outros',obs:''},
+  {dt:'15/jan',h:'PIX RECEB — BUFFET KIDS MARSHMALLOW',v:500.00,cat:'Receita Mentoria',obs:''},
+  {dt:'15/jan',h:'DEP.DINHEIRO',v:152.50,cat:'Receita Outros',obs:''},
+  {dt:'15/jan',h:'DÉB.TIT — Flash rancho',v:-100.00,cat:'Pessoal',obs:''},
+  {dt:'16/jan',h:'DÉB.CNV.EN.ELET.GAS — energia',v:-1950.74,cat:'Fixos',obs:'Energia rancho+barracão'},
+  {dt:'16/jan',h:'PIX RECEB — CECILIARTHUR FESTAS',v:600.00,cat:'Receita Mentoria',obs:''},
+  {dt:'19/jan',h:'PIX — Cartão Nubank (complemento)',v:-2340.54,cat:'Pessoal',obs:'Fatura Nubank Micael'},
+  {dt:'19/jan',h:'PIX RECEB — Alana Julia Pires',v:500.00,cat:'Receita Mentoria',obs:''},
+  {dt:'19/jan',h:'DÉB.TRANSF.POU — DAVID ALAN RIBEIRO',v:-35.00,cat:'Pessoal',obs:''},
+  {dt:'19/jan',h:'Transferência MANTOVANI COMERCIO',v:-29.00,cat:'Pessoal',obs:''},
+  {dt:'20/jan',h:'PIX RECEB — ANDRESSA GONCALVES',v:1500.00,cat:'Receita Outros',obs:''},
+  {dt:'20/jan',h:'PIX para ***',v:-25.00,cat:'Pessoal',obs:''},
+  {dt:'20/jan',h:'DÉB.SEG.PRESTAMISTA',v:-2.64,cat:'Fixos',obs:'Seguro'},
+  {dt:'22/jan',h:'PIX RECEB — CASA DE FESTAS VEM BRINCAR',v:2667.00,cat:'Receita Mentoria',obs:'Mentoria'},
+  {dt:'22/jan',h:'PIX RECEB — PROBUFFET TECNOLOGIA',v:1300.00,cat:'Receita ProBuffet',obs:''},
+  {dt:'22/jan',h:'PIX RECEB — CASTELO DOS SONHOS',v:2000.00,cat:'Receita Castelo',obs:'Repasse Castelo'},
+  {dt:'22/jan',h:'PIX RECEB — ProBuffet Tecnologia',v:6700.00,cat:'Receita ProBuffet',obs:''},
+  {dt:'22/jan',h:'PIX RECEB — CASTELO DOS SONHOS',v:10983.35,cat:'Receita Castelo',obs:'Repasse Castelo'},
+  {dt:'22/jan',h:'DÉB.CONV.DEM.EMPRES — MASTERCARD',v:-22675.14,cat:'Fixos',obs:'Fatura cartão jan'},
+  {dt:'23/jan',h:'Transferência CASTELO DOS SONHOS',v:-1460.00,cat:'Castelo',obs:''},
+  {dt:'23/jan',h:'PIX RECEB — IZABEL C GONCALVES',v:500.00,cat:'Receita Família',obs:''},
+  {dt:'23/jan',h:'PIX para *** — R$1.110',v:-1110.00,cat:'Buffet/Agência',obs:'ProBuffet PIX'},
+  {dt:'26/jan',h:'PIX RECEB — ARTE FESTA',v:1000.00,cat:'Receita Mentoria',obs:''},
+  {dt:'26/jan',h:'PIX RECEB — ERIC LEITE',v:2400.00,cat:'Receita Mentoria',obs:''},
+  {dt:'26/jan',h:'PIX RECEB — GISELE MAGALHAES (mkt patrocinado)',v:1000.00,cat:'Receita Agência',obs:'mkt patrocinado'},
+  {dt:'26/jan',h:'PIX RECEB — FELIPE F NOGUEIRA',v:2460.00,cat:'Receita Mentoria',obs:''},
+  {dt:'26/jan',h:'Transferência PARENTE AGROPEC.',v:-21.00,cat:'Pessoal',obs:''},
+  {dt:'26/jan',h:'PIX para *** — cartão',v:-350.00,cat:'Pessoal',obs:'Pag cartão'},
+  {dt:'27/jan',h:'PIX para 33.050.196',v:-650.06,cat:'Outros',obs:''},
+  {dt:'29/jan',h:'Transferência para *** cafe',v:-140.00,cat:'Pessoal',obs:'Café escritório'},
+  {dt:'29/jan',h:'PIX para *** ',v:-500.00,cat:'Outros',obs:''},
+  {dt:'30/jan',h:'PIX RECEB — DOM FESTAS E EVENTOS',v:2000.00,cat:'Receita Mentoria',obs:'2 parcelas mentoria'},
+  {dt:'30/jan',h:'Transferência RODRIGO DIAS BELUZO (café)',v:-93.75,cat:'Pessoal',obs:''},
+  {dt:'30/jan',h:'PIX para *** João Victor — salário',v:-1500.00,cat:'Agência',obs:'Salário João'},
+  {dt:'30/jan',h:'PIX para 00.394.460',v:-638.95,cat:'Pessoal',obs:''},
+  {dt:'30/jan',h:'PIX para 00.394.460',v:-210.87,cat:'Pessoal',obs:''},
+  {dt:'30/jan',h:'DÉB.TIT — Dr Diego',v:-1331.00,cat:'Pessoal',obs:'Médico/saúde'},
+];
+
+const EXTRATO_FEV = [
+  {dt:'02/fev',h:'DEB PACOTE SERVIÇOS',v:-9.90,cat:'Fixos',obs:'Tarifa bancária'},
+  {dt:'02/fev',h:'PIX RECEB — MDK KIDS BUFFET INFANTIL',v:1000.00,cat:'Receita Mentoria',obs:''},
+  {dt:'02/fev',h:'PIX RECEB — ALESSANDRA DE CASSIA',v:463.70,cat:'Receita Outros',obs:''},
+  {dt:'02/fev',h:'PIX RECEB — KARINA APARECIDA',v:3150.00,cat:'Receita Mentoria',obs:''},
+  {dt:'02/fev',h:'PIX para *** MARIA CLARA',v:-20.00,cat:'Outros',obs:''},
+  {dt:'02/fev',h:'PIX para *** IZABELA CRISTINA',v:-680.52,cat:'Pessoal',obs:''},
+  {dt:'03/fev',h:'Transferência WILCINEIA DE FATIMA',v:-45.00,cat:'Outros',obs:''},
+  {dt:'03/fev',h:'DÉB DEVOLUÇÃO PIX — JSVK BUFFET',v:-1000.00,cat:'Outros',obs:'Devolução'},
+  {dt:'03/fev',h:'DÉB.CNV.EN.ELET.GAS — Energia barracão',v:-96.54,cat:'Fixos',obs:'Energia barracão'},
+  {dt:'04/fev',h:'PIX RECEB — GARDEN KIDS LONDRINA',v:800.00,cat:'Receita Mentoria',obs:''},
+  {dt:'04/fev',h:'Transferência CASTELO DOS SONHOS',v:-2050.00,cat:'Castelo',obs:''},
+  {dt:'04/fev',h:'PIX RECEB — A L G EVENTOS mkt',v:1000.00,cat:'Receita Agência',obs:'mkt'},
+  {dt:'04/fev',h:'PIX RECEB — S F C SALES BUFFET',v:1000.00,cat:'Receita Mentoria',obs:''},
+  {dt:'04/fev',h:'PIX RECEB — S C SALES BUFFET',v:1000.00,cat:'Receita Mentoria',obs:''},
+  {dt:'05/fev',h:'DÉB.TIT — boleto 1',v:-1144.12,cat:'Outros',obs:'Boleto'},
+  {dt:'05/fev',h:'DÉB.TIT — boleto 2',v:-409.67,cat:'Outros',obs:'Boleto'},
+  {dt:'05/fev',h:'DÉB.PGTO — Colégio Izabela',v:-874.00,cat:'Fixos',obs:'Escola'},
+  {dt:'05/fev',h:'DÉB.CONV.DEM.EMPRES — CONSÓRCIOS',v:-1261.91,cat:'Fixos',obs:'Consórcio'},
+  {dt:'06/fev',h:'PIX RECEB — Roberta da Cruz Souza',v:800.00,cat:'Receita Mentoria',obs:''},
+  {dt:'09/fev',h:'DEP.BOLETO',v:700.00,cat:'Receita Outros',obs:''},
+  {dt:'09/fev',h:'PIX RECEB — Quintal D Casa',v:600.00,cat:'Receita Agência',obs:''},
+  {dt:'10/fev',h:'PIX para 18.281.826',v:-25.00,cat:'Outros',obs:''},
+  {dt:'11/fev',h:'DEB.RECAR PRÉ-PAGA',v:-30.00,cat:'Pessoal',obs:'Recarga celular'},
+  {dt:'12/fev',h:'PIX RECEB — Valdineia Ribeiro',v:2000.00,cat:'Receita Outros',obs:''},
+  {dt:'12/fev',h:'PIX para *** — Fatura própria',v:-3397.58,cat:'Pessoal',obs:'Autotransferência'},
+  {dt:'12/fev',h:'Transferência PARENTE AGROPEC.',v:-47.00,cat:'Pessoal',obs:''},
+  {dt:'12/fev',h:'PIX para 60.863.116',v:-46.85,cat:'Outros',obs:''},
+  {dt:'12/fev',h:'Transferência MANTOVANI COMERCIO',v:-69.00,cat:'Pessoal',obs:''},
+  {dt:'12/fev',h:'Transferência JOAO JOSE MINGATOS — FARMÁCIA',v:-37.00,cat:'Pessoal',obs:'Farmácia'},
+  {dt:'13/fev',h:'PIX RECEB — Leonardo Marques',v:200.00,cat:'Receita Outros',obs:''},
+  {dt:'13/fev',h:'PIX para *** — Izabela Cristina',v:-359.10,cat:'Pessoal',obs:''},
+  {dt:'13/fev',h:'PIX RECEB — IZABEL C GONCALVES',v:300.00,cat:'Receita Família',obs:''},
+  {dt:'13/fev',h:'PIX para *** — Devolução festa Rayssa',v:-300.00,cat:'Outros',obs:''},
+  {dt:'13/fev',h:'PIX para *** João Victor — salário',v:-1500.00,cat:'Agência',obs:'Salário João'},
+  {dt:'13/fev',h:'PIX — Água barracão',v:-25.92,cat:'Fixos',obs:'Água'},
+  {dt:'13/fev',h:'PIX — Água João Gibran',v:-97.68,cat:'Fixos',obs:'Água'},
+  {dt:'13/fev',h:'PIX — Água barracão 2',v:-48.11,cat:'Fixos',obs:'Água'},
+  {dt:'13/fev',h:'PIX — desinfetante',v:-26.50,cat:'Pessoal',obs:''},
+  {dt:'13/fev',h:'PIX para *** — 123,00',v:-123.00,cat:'Outros',obs:''},
+  {dt:'13/fev',h:'PIX para *** — 107,90',v:-107.90,cat:'Outros',obs:''},
+  {dt:'18/fev',h:'PIX RECEB — CECILIARTHUR FESTAS',v:600.00,cat:'Receita Mentoria',obs:''},
+  {dt:'18/fev',h:'PIX RECEB — BUFFET KIDS MARSHMALLOW',v:500.00,cat:'Receita Mentoria',obs:''},
+  {dt:'18/fev',h:'PIX RECEB — JOSIANE (aniversário)',v:100.00,cat:'Receita Outros',obs:''},
+  {dt:'18/fev',h:'PIX para *** — 220,00',v:-220.00,cat:'Outros',obs:''},
+  {dt:'18/fev',h:'DÉB.TIT',v:-100.00,cat:'Outros',obs:''},
+  {dt:'18/fev',h:'PIX para *** — 120,00',v:-120.00,cat:'Outros',obs:''},
+  {dt:'18/fev',h:'PIX para 41.867.225',v:-90.00,cat:'Outros',obs:''},
+  {dt:'18/fev',h:'PIX RECEB — IZABEL C GONCALVES',v:555.00,cat:'Receita Família',obs:''},
+  {dt:'19/fev',h:'DEP.BOLETO',v:1200.00,cat:'Receita Outros',obs:''},
+  {dt:'19/fev',h:'DEP.BOLETO',v:700.00,cat:'Receita Outros',obs:''},
+  {dt:'19/fev',h:'PIX — Cartão Nubank Jaque',v:-2685.11,cat:'Pessoal',obs:'Fatura Nubank Jaqueline'},
+  {dt:'20/fev',h:'PIX RECEB — DOM FESTAS E EVENTOS',v:2000.00,cat:'Receita Mentoria',obs:'2 parcelas mentoria'},
+  {dt:'20/fev',h:'Transferência CASTELO DOS SONHOS',v:-4347.83,cat:'Castelo',obs:''},
+  {dt:'20/fev',h:'PIX RECEB — Jaqueline Cristina',v:3000.00,cat:'Receita Família',obs:''},
+  {dt:'20/fev',h:'Transferência PARENTE AGROPEC.',v:-34.00,cat:'Pessoal',obs:''},
+  {dt:'20/fev',h:'DÉB.CONV.ORGÃOS GOV',v:-1393.35,cat:'Fixos',obs:'Imposto/DAS'},
+  {dt:'23/fev',h:'PIX RECEB — PROBUFFET TECNOLOGIA',v:18720.20,cat:'Receita ProBuffet',obs:'Repasse ProBuffet'},
+  {dt:'23/fev',h:'PIX RECEB — RODRIGO RIBEIRO',v:7000.00,cat:'Receita Agência',obs:''},
+  {dt:'23/fev',h:'PIX RECEB — ARTE FESTA',v:1000.00,cat:'Receita Mentoria',obs:''},
+  {dt:'23/fev',h:'PIX RECEB — Alana Julia Pires',v:250.00,cat:'Receita Outros',obs:''},
+  {dt:'23/fev',h:'DÉB.CONV.DEM.EMPRES — MASTERCARD',v:-27995.44,cat:'Fixos',obs:'Fatura cartão fev'},
+  {dt:'24/fev',h:'PIX para *** — cartão inter jaque',v:-2119.29,cat:'Pessoal',obs:'Fatura Inter Jaqueline'},
+  {dt:'25/fev',h:'PIX RECEB — ANDRESSA GONCALVES',v:1500.00,cat:'Receita Outros',obs:''},
+  {dt:'26/fev',h:'PIX RECEB — ERIC LEITE',v:2400.00,cat:'Receita Mentoria',obs:''},
+  {dt:'27/fev',h:'PIX para *** João Victor — salário',v:-1500.00,cat:'Agência',obs:'Salário João'},
+  {dt:'27/fev',h:'Transferência CASTELO DOS SONHOS',v:-354.00,cat:'Castelo',obs:''},
+  {dt:'27/fev',h:'Transferência JULIANA COUTO',v:-37.80,cat:'Outros',obs:''},
+];
+
+const EXTRATO_MAR = [
+  {dt:'02/mar',h:'DEB PACOTE SERVIÇOS',v:-9.90,cat:'Fixos',obs:'Tarifa bancária'},
+  {dt:'02/mar',h:'DÉB.IOF',v:-0.06,cat:'Fixos',obs:'IOF'},
+  {dt:'02/mar',h:'Transferência CASTELO DOS SONHOS',v:-576.00,cat:'Castelo',obs:''},
+  {dt:'02/mar',h:'PIX RECEB — GISELE MAGALHAES (mtk)',v:1000.00,cat:'Receita Agência',obs:'mkt patrocinado'},
+  {dt:'03/mar',h:'PIX RECEB — RAFAEL BOZVOLIEV',v:13.00,cat:'Outros',obs:''},
+  {dt:'04/mar',h:'DÉB.TIT — Mundo mineiro',v:-502.80,cat:'Outros',obs:''},
+  {dt:'04/mar',h:'PIX RECEB — GARDEN KIDS LONDRINA',v:800.00,cat:'Receita Mentoria',obs:''},
+  {dt:'04/mar',h:'PIX RECEB — CECILIARTHUR FESTAS',v:600.00,cat:'Receita Mentoria',obs:''},
+  {dt:'04/mar',h:'PIX para 60.142.809',v:-140.00,cat:'Outros',obs:''},
+  {dt:'04/mar',h:'PIX para 04.742.198',v:-96.32,cat:'Outros',obs:''},
+  {dt:'04/mar',h:'PIX para *** — 83,40',v:-83.40,cat:'Outros',obs:''},
+  {dt:'05/mar',h:'PIX RECEB — LSS CASA DE FESTAS',v:442.00,cat:'Receita Mentoria',obs:''},
+  {dt:'05/mar',h:'PIX RECEB — LSS CASA DE FESTAS',v:6.00,cat:'Receita Mentoria',obs:''},
+  {dt:'05/mar',h:'PIX RECEB — LUCIANA SILVA MILEIB',v:1200.00,cat:'Receita Mentoria',obs:''},
+  {dt:'05/mar',h:'DÉB.PGTO — Colégio Izabela',v:-874.00,cat:'Fixos',obs:'Escola'},
+  {dt:'05/mar',h:'PIX RECEB — DAIANA LOPES DA CUNHA',v:1000.00,cat:'Receita Mentoria',obs:''},
+  {dt:'05/mar',h:'DÉB.CONV.DEM.EMPRES — CONSÓRCIOS',v:-1303.72,cat:'Fixos',obs:'Consórcio'},
+  {dt:'06/mar',h:'PIX para 10.573.521',v:-155.68,cat:'Outros',obs:''},
+  {dt:'06/mar',h:'PIX RECEB — A L G EVENTOS',v:1000.00,cat:'Receita Agência',obs:''},
+  {dt:'06/mar',h:'PIX para 35.436.596 PPO',v:-160.00,cat:'Buffet/Agência',obs:''},
+  {dt:'06/mar',h:'PIX RECEB — S C SALES BUFFET',v:2000.00,cat:'Receita ProBuffet',obs:''},
+  {dt:'09/mar',h:'Transferência ANDRE PEREIRA BATISTA',v:-160.00,cat:'Outros',obs:''},
+  {dt:'09/mar',h:'PIX RECEB — IZABEL C GONCALVES',v:555.55,cat:'Receita Família',obs:''},
+  {dt:'10/mar',h:'DEP.BOLETO',v:700.00,cat:'Receita Outros',obs:''},
+  {dt:'10/mar',h:'PIX RECEB — LUCIANA SILVA MILEIB',v:200.00,cat:'Receita Mentoria',obs:''},
+  {dt:'10/mar',h:'PIX RECEB — Quintal D Casa',v:600.00,cat:'Receita Agência',obs:''},
+  {dt:'10/mar',h:'DÉB.CONV.SANEAMENTO — Água igreja',v:-48.75,cat:'Fixos',obs:'Água'},
+  {dt:'10/mar',h:'DÉB.CONV.SANEAMENTO — Água João Gibran',v:-105.55,cat:'Fixos',obs:'Água'},
+  {dt:'10/mar',h:'DÉB.CONV.SANEAMENTO — Água barracão',v:-26.26,cat:'Fixos',obs:'Água'},
+  {dt:'11/mar',h:'PIX RECEB — Diene Oliveira (mentoria)',v:2667.00,cat:'Receita Mentoria',obs:''},
+  {dt:'11/mar',h:'Transferência CASTELO DOS SONHOS',v:-2200.00,cat:'Castelo',obs:''},
+  {dt:'11/mar',h:'Transferência VIP DISTRIBUIDORA',v:-73.15,cat:'Outros',obs:''},
+  {dt:'12/mar',h:'DEB.RECAR PRÉ-PAGA',v:-30.00,cat:'Pessoal',obs:'Recarga celular'},
+  {dt:'12/mar',h:'Transferência RODRIGO DIAS BELUZO (café)',v:-112.00,cat:'Pessoal',obs:''},
+  {dt:'12/mar',h:'PIX — Estrelinhas Jaguariuna',v:-186.90,cat:'Outros',obs:''},
+  {dt:'13/mar',h:'PIX para 08.877.663',v:-74.50,cat:'Outros',obs:''},
+  {dt:'13/mar',h:'PIX para *** Lueny',v:-1026.57,cat:'Outros',obs:''},
+  {dt:'13/mar',h:'PIX RECEB — Micael Mantelli',v:461.13,cat:'Receita Outros',obs:'Autotransferência'},
+  {dt:'13/mar',h:'PIX para *** João Victor — salário',v:-1500.00,cat:'Agência',obs:'Salário João'},
+  {dt:'13/mar',h:'PIX para 60.274.669',v:-67.90,cat:'Outros',obs:''},
+  {dt:'13/mar',h:'PIX para ***',v:-5.00,cat:'Outros',obs:''},
+  {dt:'13/mar',h:'PIX para 10.573.521',v:-19.23,cat:'Outros',obs:''},
+  {dt:'16/mar',h:'DÉB.TIT',v:-100.00,cat:'Outros',obs:''},
+  {dt:'16/mar',h:'PIX para 44.904.921',v:-100.00,cat:'Outros',obs:''},
+  {dt:'16/mar',h:'PIX RECEB — MARIA CLARA (Pix)',v:61.05,cat:'Receita Outros',obs:''},
+];
+
+// Cartão Jaqueline (4861) — jan/fev/mar
+const CART_JAQUE_JAN = [
+  {dt:'17/abr',desc:'GREENN**FT BRANDING 09/10',v:11.60},{dt:'23/dez',desc:'THAMIRIS MORASCO BRU — Viradouro',v:28.00},
+  {dt:'23/dez',desc:'DISTRIBUIDORA VIRADO',v:73.90},{dt:'23/dez',desc:'MANIA DE MULHER',v:39.96},
+  {dt:'23/dez',desc:'CASINHA DO PAPEL',v:28.88},{dt:'23/dez',desc:'STYLLUS GUEDES 01/03',v:59.99},
+];
+const CART_JAQUE_FEV = [
+  {dt:'17/abr',desc:'GREENN**FT BRANDING 10/10',v:11.59},{dt:'23/dez',desc:'STYLLUS GUEDES 02/03',v:59.99},
+];
+const CART_JAQUE_MAR = [
+  {dt:'23/dez',desc:'STYLLUS GUEDES 03/03',v:60.00},
+];
+
+// Cartão Fernando (5881) — jan/fev/mar
+const CART_FERN_JAN = [
+  {dt:'29/jul',desc:'MERCADOPAGO *CHPRESE 06/10',v:70.80},{dt:'29/jul',desc:'MERCADOPAGO *KAMELPR 06/10',v:131.00},
+  {dt:'03/ago',desc:'LEROY MERLIN 06/06',v:130.77},{dt:'28/set',desc:'YOUCOM 04/04',v:44.96},
+  {dt:'05/dez',desc:'HNA*OBOTICARIO 02/03',v:30.97},{dt:'15/dez',desc:'MAURICIO GARCIA ROSA',v:110.00},
+  {dt:'20/dez',desc:'BmqDecoraTudoLtda',v:14.90},{dt:'20/dez',desc:'LUCCAS LANCHES — Ibiuna',v:20.00},
+  {dt:'20/dez',desc:'LucianaAugustoDe',v:173.60},{dt:'20/dez',desc:'BmqDecoraTudoLtda',v:36.80},
+  {dt:'20/dez',desc:'CasaDiIrene',v:36.40},{dt:'20/dez',desc:'CERAMICA ARTISTICA A',v:14.90},
+  {dt:'20/dez',desc:'LUCCAS LANCHES — Ibiuna',v:72.00},{dt:'20/dez',desc:'STYLO CASA 01/03',v:71.57},
+  {dt:'20/dez',desc:'BmqDecoraTudoLtda 01/03',v:105.80},{dt:'20/dez',desc:'SaraDecoracoes 01/03',v:130.56},
+  {dt:'21/dez',desc:'TERRA PRETA HOTEL — Ibiuna',v:10.00},{dt:'21/dez',desc:'RODOSNACK CASTELO LA',v:38.50},
+  {dt:'23/dez',desc:'SPAZIONATO 01/03',v:46.63},
+];
+const CART_FERN_FEV = [
+  {dt:'29/jul',desc:'MERCADOPAGO *CHPRESE 07/10',v:70.80},{dt:'29/jul',desc:'MERCADOPAGO *KAMELPR 07/10',v:131.00},
+  {dt:'05/dez',desc:'HNA*OBOTICARIO 03/03',v:30.96},{dt:'20/dez',desc:'STYLO CASA 02/03',v:71.57},
+  {dt:'20/dez',desc:'BmqDecoraTudoLtda 02/03',v:105.80},{dt:'20/dez',desc:'SaraDecoracoes 02/03',v:130.56},
+  {dt:'23/dez',desc:'SPAZIONATO 02/03',v:46.63},{dt:'11/fev',desc:'SUPERMERCADO AUGUSTO — Viradouro',v:53.97},
+  {dt:'11/fev',desc:'CASA DE CARNES BOM J — Viradouro',v:37.20},
+];
+const CART_FERN_MAR = [
+  {dt:'29/jul',desc:'MERCADOPAGO *CHPRESE 08/10',v:70.80},{dt:'29/jul',desc:'MERCADOPAGO *KAMELPR 08/10',v:131.00},
+  {dt:'20/dez',desc:'STYLO CASA 03/03',v:71.56},{dt:'20/dez',desc:'BmqDecoraTudoLtda 03/03',v:105.80},
+  {dt:'20/dez',desc:'SaraDecoracoes 03/03',v:130.57},{dt:'23/dez',desc:'SPAZIONATO 03/03',v:46.64},
+  {dt:'06/mar',desc:'SUPERMERCADO AUGUSTO — Viradouro',v:238.00},{dt:'10/mar',desc:'SUPERMERCADO AUGUSTO — Viradouro',v:247.44},
+];
+
+// Outros cartão Micael pessoal (Apple, G40, Wondershare, etc)
+const OUTROS_MICAEL_JAN = [
+  {dt:'24/dez',desc:'APPLE.COM/BILL',v:99.90,cat:'Assinatura'},{dt:'24/dez',desc:'APPLE.COM/BILL',v:53.90,cat:'Assinatura'},
+  {dt:'24/dez',desc:'APPLE.COM/BILL',v:3.50,cat:'Assinatura'},{dt:'04/set',desc:'MARE ALTA ESCOLA NAU 05/06',v:87.50,cat:'Educação'},
+  {dt:'16/dez',desc:'wondershare.com',v:129.00,cat:'Software'},{dt:'29/dez',desc:'PP *G40TREINAMEV 01/12',v:166.42,cat:'Treinamento'},
+  {dt:'31/dez',desc:'MP *ENTREARTESV — Ibitiva',v:480.00,cat:'Outros'},
+  {dt:'04/jan',desc:'OPENAI *CHATGPT SUBS',v:108.74,cat:'IA'},{dt:'04/jan',desc:'WWW.MAKE.COM',v:57.58,cat:'Automação'},
+  {dt:'05/jan',desc:'WWW.REPORTEI.COM',v:166.84,cat:'Relatórios'},{dt:'05/jan',desc:'TWILIO SENDGRID',v:108.43,cat:'Email'},
+  {dt:'08/jan',desc:'NOTION LABS',v:631.02,cat:'Gestão'},{dt:'08/jan',desc:'PG *ASTRONPAY ASTRON',v:427.00,cat:'Castelo'},
+  {dt:'09/jan',desc:'EBN*PIPEDRIVE',v:201.99,cat:'CRM'},{dt:'09/jan',desc:'Google WhatsApp Busi',v:55.00,cat:'Comunic.'},
+  {dt:'11/jan',desc:'MANYCHAT.COM',v:149.00,cat:'Automação'},
+];
+const OUTROS_MICAEL_FEV = [
+  {dt:'24/jan',desc:'APPLE.COM/BILL',v:99.90,cat:'Assinatura'},{dt:'24/jan',desc:'APPLE.COM/BILL',v:53.90,cat:'Assinatura'},
+  {dt:'01/fev',desc:'Google CLOUD 64Q3FW',v:58.14,cat:'Cloud'},{dt:'01/fev',desc:'DL *GOOGLE Workspace',v:98.00,cat:'Produtiv.'},
+  {dt:'04/fev',desc:'WWW.MAKE.COM',v:55.32,cat:'Automação'},{dt:'04/fev',desc:'TWILIO SENDGRID',v:104.21,cat:'Email'},
+  {dt:'04/fev',desc:'OPENAI *CHATGPT SUBS',v:104.47,cat:'IA'},{dt:'09/fev',desc:'Google WhatsApp Busi',v:55.00,cat:'Comunic.'},
+  {dt:'09/fev',desc:'EBN*PIPEDRIVE',v:195.66,cat:'CRM'},{dt:'11/fev',desc:'MANYCHAT.COM',v:149.00,cat:'Automação'},
+  {dt:'24/jan',desc:'WWW.REPORTEI.COM',v:166.84,cat:'Relatórios'},{dt:'28/jan',desc:'BUBBLE STARTER PLAN',v:1715.84,cat:'No-code'},
+  {dt:'28/jan',desc:'RESPONDI.APP',v:187.00,cat:'Formulários'},{dt:'31/jan',desc:'BUBBLE STARTER PLAN',v:502.72,cat:'No-code'},
+  {dt:'29/dez',desc:'PP *G40TREINAMEV 02/12',v:166.42,cat:'Treinamento'},{dt:'07/fev',desc:'PG *ASTRONPAY ASTRON',v:427.00,cat:'Castelo'},
+  {dt:'21/jan',desc:'GMAD RIBEIRAO SUPRIM 01/06',v:518.50,cat:'Outros'},
+];
+const OUTROS_MICAEL_MAR = [
+  {dt:'28/fev',desc:'BUBBLE STARTER PLAN (USD 331)',v:1700.74,cat:'No-code'},{dt:'28/fev',desc:'BUBBLE STARTER PLAN (USD 89,88)',v:461.82,cat:'No-code'},
+  {dt:'24/fev',desc:'APPLECOMBILL',v:53.90,cat:'Assinatura'},{dt:'24/fev',desc:'APPLECOMBILL',v:99.90,cat:'Assinatura'},
+  {dt:'01/mar',desc:'Google Workspace_cas',v:98.00,cat:'Produtiv.'},{dt:'01/mar',desc:'DL *GOOGLE CLOUD 5vK',v:154.40,cat:'Cloud'},
+  {dt:'03/mar',desc:'TWILIO SENDGRID',v:105.48,cat:'Email'},{dt:'04/mar',desc:'WWW.MAKE.COM',v:55.99,cat:'Automação'},
+  {dt:'04/mar',desc:'OPENAI *CHATGPT SUBS',v:105.74,cat:'IA'},{dt:'09/mar',desc:'Google WhatsApp Busi',v:55.00,cat:'Comunic.'},
+  {dt:'11/mar',desc:'MANYCHAT.COM',v:149.00,cat:'Automação'},{dt:'29/dez',desc:'PP *G40TREINAMEV 03/12',v:166.42,cat:'Treinamento'},
+  {dt:'09/mar',desc:'PG *ASTRONPAY ASTRON',v:427.00,cat:'Castelo'},{dt:'24/jan',desc:'WWW.REPORTEI.COM',v:166.84,cat:'Relatórios'},
+  {dt:'20/jan',desc:'GMAD RIBEIRAO SUPRIM 02/06',v:518.50,cat:'Outros'},
+  {dt:'27/fev',desc:'AIRBNB * HMJKCDR8EDV 01/06',v:76.41,cat:'Viagem'},
+  {dt:'06/mar',desc:'BUS SERVICOS*ONIBUS 01/04',v:55.22,cat:'Transporte'},
+  {dt:'21/fev',desc:'EvelynRafaelle 01/02 TERRA ROXA',v:750.00,cat:'Outros'},
+  {dt:'11/mar',desc:'MERCADOLIVRE*ACERV 01/10 JUNDIAI',v:379.90,cat:'Marketplace'},
+];
+
+// ═══════════════════════════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════════════════════════
 let mesSel = 'todos';
+const MESES = ['jan','fev','mar'];
 
-function v(obj, key, mes) {
-  if (mes === 'todos') return MESES.reduce((s,m) => s + (obj[key]?obj[key][m]:obj[m]), 0);
-  return obj[key] ? obj[key][mes] : obj[mes];
-}
-function vd(obj, mes) {
-  if (mes==='todos') return MESES.reduce((s,m)=>s+obj[m],0);
-  return obj[mes];
-}
 function brl(n) {
-  if(n===0) return '—';
-  return 'R$ ' + Math.round(n).toLocaleString('pt-BR');
+  if(n===0||n===undefined) return '—';
+  return 'R$\u00A0' + Math.abs(n).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 }
-function brlFull(n) {
-  return 'R$ ' + n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-}
-function pct(part,total){ return total>0?(part/total*100).toFixed(1)+'%':'—'; }
+function soma(arr) { return arr.reduce((s,x)=>s+(x.v||x.jan||0),0); }
+function somaKey(arr,k) { return arr.reduce((s,x)=>s+(x[k]||0),0); }
 
-function totalEntradas(mes) {
-  return Object.values(ENT).reduce((s,obj)=>s+vd(obj,mes),0);
+function getAds(mes) {
+  if(mes==='jan') return ADS_JAN;
+  if(mes==='fev') return ADS_FEV;
+  if(mes==='mar') return ADS_MAR;
+  return [...ADS_JAN,...ADS_FEV,...ADS_MAR];
 }
-function totalSaidasExtrato(mes) {
-  return Object.values(SAI).reduce((s,obj)=>s+vd(obj,mes),0);
+function totalAds(mes) { return getAds(mes).reduce((s,x)=>s+x.v,0); }
+
+function totalSaasBuffet(mes) {
+  return SAAS_BUFFET.reduce((s,x)=>s+(mes==='jan'?x.jan:mes==='fev'?x.fev:mes==='mar'?x.mar:x.jan+x.fev+x.mar),0);
 }
-function totalSaidasCartao(mes) {
-  return Object.values(CART).reduce((s,obj)=>s+vd(obj,mes),0);
-}
-function totalCastelo(mes) {
-  return vd(SAI.casteloCusto,mes) + vd(CART.casteloCrt,mes);
-}
-function totalAgencia(mes) {
-  return vd(SAI.joao,mes) + vd(CART.agenciaSaas,mes);
-}
-function totalBuffet(mes) {
-  return vd(CART.buffetAds,mes) + vd(SAI.buffetPix,mes) + vd(CART.buffetSaas,mes);
-}
-function totalPessoal(mes) {
-  return vd(CART.pessoalCrt,mes) + vd(CART.familiaCrt,mes) +
-         vd(SAI.cartoesJaque,mes) + vd(SAI.consorcio,mes) +
-         vd(SAI.colegio,mes) + vd(SAI.energia,mes);
+function totalSaasAgencia(mes) {
+  return SAAS_AGENCIA.reduce((s,x)=>s+(mes==='jan'?x.jan:mes==='fev'?x.fev:mes==='mar'?x.mar:x.jan+x.fev+x.mar),0);
 }
 
-// ─── CHARTS ──────────────────────────────────────────────────────────────────
-let fluxoChart, pizzaChart, buffetChart, receitasChart;
-const gc='#EEEEEA', tc='#AAAAAA', mf={family:'Montserrat',size:11};
-
-function buildCharts() {
-  fluxoChart = new Chart(document.getElementById('chartFluxo'), {
-    type:'bar',
-    data:{
-      labels:['Jan','Fev','Mar'],
-      datasets:[
-        {label:'Entradas',data:[totalEntradas('jan'),totalEntradas('fev'),totalEntradas('mar')],backgroundColor:'#1A7A4A',borderRadius:3},
-        {label:'Saídas extrato',data:[totalSaidasExtrato('jan'),totalSaidasExtrato('fev'),totalSaidasExtrato('mar')],backgroundColor:'#C03030',borderRadius:3},
-        {label:'Saídas cartão',data:[totalSaidasCartao('jan'),totalSaidasCartao('fev'),totalSaidasCartao('mar')],backgroundColor:'#2E5FA8',borderRadius:3},
-      ]
-    },
-    options:{responsive:true,maintainAspectRatio:false,
-      scales:{x:{ticks:{color:tc,font:mf},grid:{color:gc}},y:{ticks:{color:tc,font:mf,callback:v=>'R$'+(v/1000).toFixed(0)+'k'},grid:{color:gc}}},
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${brlFull(ctx.parsed.y)}`}}}}
-  });
-
-  pizzaChart = new Chart(document.getElementById('chartPizza'), {
-    type:'doughnut',
-    data:{
-      labels:['Tráfego Pago (Buffet+Ag.)','Agência (SaaS+Folha)','Castelo','Pessoal','Outros'],
-      datasets:[{data:[53,9,10,20,8],backgroundColor:['#2E8B57','#2E5FA8','#A85F2E','#8B2E8B','#DDDDDD'],borderColor:'#FFF',borderWidth:3,hoverOffset:6}]
-    },
-    options:{responsive:true,maintainAspectRatio:false,cutout:'65%',
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${ctx.parsed}%`}}}}
-  });
-
-  buffetChart = new Chart(document.getElementById('chartBuffet'), {
-    type:'bar',
-    data:{
-      labels:['Jan','Fev','Mar'],
-      datasets:[
-        {label:'Meta Ads (cartão)',data:[14359,12533,16237],backgroundColor:'#2E8B57',borderRadius:3},
-        {label:'Pix direto',data:[1110,425,0],backgroundColor:'#6ABE8A',borderRadius:3},
-      ]
-    },
-    options:{responsive:true,maintainAspectRatio:false,
-      scales:{x:{stacked:true,ticks:{color:tc,font:mf},grid:{color:gc}},y:{stacked:true,ticks:{color:tc,font:mf,callback:v=>'R$ '+v.toLocaleString('pt-BR')},grid:{color:gc}}},
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${brlFull(ctx.parsed.y)}`}}}}
-  });
-
-  receitasChart = new Chart(document.getElementById('chartReceitas'), {
-    type:'bar',
-    data:{
-      labels:['Jan','Fev','Mar'],
-      datasets:[
-        {label:'Mentoria',data:[13772,9074,8525],backgroundColor:'#1A7A4A',borderRadius:3},
-        {label:'Agência',data:[3460,1000,3000],backgroundColor:'#2E5FA8',borderRadius:3},
-        {label:'ProBuffet → conta',data:[8000,21020,1000],backgroundColor:'#6ABE8A',borderRadius:3},
-        {label:'Castelo → conta',data:[12983,7000,0],backgroundColor:'#A85F2E',borderRadius:3},
-        {label:'Outros',data:[4052,3764,2662],backgroundColor:'#CCCCCC',borderRadius:3},
-      ]
-    },
-    options:{responsive:true,maintainAspectRatio:false,
-      scales:{x:{stacked:true,ticks:{color:tc,font:mf},grid:{color:gc}},y:{stacked:true,ticks:{color:tc,font:mf,callback:v=>'R$'+(v/1000).toFixed(0)+'k'},grid:{color:gc}}},
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${brlFull(ctx.parsed.y)}`}}}}
-  });
+function totalExtrato(arr, filtCat) {
+  return arr.filter(x=>!filtCat||x.cat===filtCat).reduce((s,x)=>s+(x.v<0?Math.abs(x.v):0),0);
+}
+function totalEntExtrato(arr, filtCat) {
+  return arr.filter(x=>!filtCat||x.cat===filtCat).reduce((s,x)=>s+(x.v>0?x.v:0),0);
 }
 
-function updateCharts(mes) {
-  if(mes==='todos'){
-    fluxoChart.data.labels=['Jan','Fev','Mar'];
-    fluxoChart.data.datasets[0].data=[totalEntradas('jan'),totalEntradas('fev'),totalEntradas('mar')];
-    fluxoChart.data.datasets[1].data=[totalSaidasExtrato('jan'),totalSaidasExtrato('fev'),totalSaidasExtrato('mar')];
-    fluxoChart.data.datasets[2].data=[totalSaidasCartao('jan'),totalSaidasCartao('fev'),totalSaidasCartao('mar')];
-    buffetChart.data.labels=['Jan','Fev','Mar'];
-    buffetChart.data.datasets[0].data=[14359,12533,16237];
-    buffetChart.data.datasets[1].data=[1110,425,0];
-    receitasChart.data.labels=['Jan','Fev','Mar'];
-    receitasChart.data.datasets[0].data=[13772,9074,8525];
-    receitasChart.data.datasets[1].data=[3460,1000,3000];
-    receitasChart.data.datasets[2].data=[8000,21020,1000];
-    receitasChart.data.datasets[3].data=[12983,7000,0];
-    receitasChart.data.datasets[4].data=[4052,3764,2662];
-    document.getElementById('fluxoLabel').textContent='Fluxo mensal (R$)';
-    document.getElementById('receitaChartLabel').textContent='Receitas por categoria — mensal (R$)';
-  } else {
-    const l = LABELS[mes];
-    fluxoChart.data.labels=['Entradas','Saídas extrato','Saídas cartão'];
-    fluxoChart.data.datasets[0].data=[totalEntradas(mes),0,0];
-    fluxoChart.data.datasets[1].data=[0,totalSaidasExtrato(mes),0];
-    fluxoChart.data.datasets[2].data=[0,0,totalSaidasCartao(mes)];
-    buffetChart.data.labels=[l];
-    buffetChart.data.datasets[0].data=[CART.buffetAds[mes]];
-    buffetChart.data.datasets[1].data=[SAI.buffetPix[mes]];
-    receitasChart.data.labels=[l];
-    receitasChart.data.datasets[0].data=[ENT.entMentoria[mes]];
-    receitasChart.data.datasets[1].data=[ENT.entAgencia[mes]];
-    receitasChart.data.datasets[2].data=[ENT.entProBuffet[mes]];
-    receitasChart.data.datasets[3].data=[ENT.entCastelo[mes]];
-    receitasChart.data.datasets[4].data=[ENT.entOutros[mes]];
-    document.getElementById('fluxoLabel').textContent='Fluxo — '+l;
-    document.getElementById('receitaChartLabel').textContent='Receitas — '+l+' (R$)';
-  }
-  // Pizza sempre total relativo
-  const mList = mes==='todos'?MESES:[mes];
-  const tot = mList.reduce((s,m)=>s+totalSaidasCartao(m)+totalSaidasExtrato(m),0);
-  const bp = mList.reduce((s,m)=>s+totalBuffet(m),0);
-  const ap = mList.reduce((s,m)=>s+totalAgencia(m),0);
-  const cp = mList.reduce((s,m)=>s+totalCastelo(m),0);
-  const pp = mList.reduce((s,m)=>s+totalPessoal(m),0);
-  const op = tot-bp-ap-cp-pp;
-  pizzaChart.data.datasets[0].data=[
-    Math.round(bp/tot*1000)/10,
-    Math.round(ap/tot*1000)/10,
-    Math.round(cp/tot*1000)/10,
-    Math.round(pp/tot*1000)/10,
-    Math.round(Math.max(0,op)/tot*1000)/10
-  ];
-  fluxoChart.update(); pizzaChart.update(); buffetChart.update(); receitasChart.update();
+function getExtratoMes(mes) {
+  if(mes==='jan') return EXTRATO_JAN;
+  if(mes==='fev') return EXTRATO_FEV;
+  if(mes==='mar') return EXTRATO_MAR;
+  return [...EXTRATO_JAN,...EXTRATO_FEV,...EXTRATO_MAR];
 }
 
-// ─── RENDER ───────────────────────────────────────────────────────────────────
-function renderAll(mes) {
-  renderGeralKPI(mes); renderGeralTabela(mes);
-  renderReceitasKPI(mes); renderReceitasTabela(mes);
-  renderBuffetKPI(mes); renderBuffetTabela(mes); renderBuffetToolsTable(mes);
-  renderAgenciaKPI(mes); renderAgenciaTabelas(mes);
-  renderCasteloKPI(mes); renderCasteloTabela(mes);
-  renderPessoalKPI(mes); renderPessoalCats(mes); renderPessoalTabela(mes);
-  updateCharts(mes);
+function totalCartaoJaque(mes) {
+  const arr = mes==='jan'?CART_JAQUE_JAN:mes==='fev'?CART_JAQUE_FEV:mes==='mar'?CART_JAQUE_MAR:[...CART_JAQUE_JAN,...CART_JAQUE_FEV,...CART_JAQUE_MAR];
+  return arr.reduce((s,x)=>s+x.v,0);
+}
+function totalCartaoFernando(mes) {
+  const arr = mes==='jan'?CART_FERN_JAN:mes==='fev'?CART_FERN_FEV:mes==='mar'?CART_FERN_MAR:[...CART_FERN_JAN,...CART_FERN_FEV,...CART_FERN_MAR];
+  return arr.reduce((s,x)=>s+x.v,0);
 }
 
-function renderGeralKPI(mes) {
-  const ent = totalEntradas(mes);
-  const saiExt = totalSaidasExtrato(mes);
-  const saiCrt = totalSaidasCartao(mes);
-  const saldo = ent - saiExt - saiCrt;
-  document.getElementById('kpi-geral').innerHTML = `
-    <div class="kpi green"><div class="kpi-label">Total entradas</div><div class="kpi-value">${brl(ent)}</div><div class="kpi-sub">Extrato — ${mes==='todos'?'3 meses':LABELS[mes]}</div></div>
-    <div class="kpi red"><div class="kpi-label">Saídas extrato</div><div class="kpi-value">${brl(saiExt)}</div><div class="kpi-sub">Débitos conta corrente</div></div>
-    <div class="kpi red"><div class="kpi-label">Saídas cartão</div><div class="kpi-value">${brl(saiCrt)}</div><div class="kpi-sub">Fatura Mastercard</div></div>
-    <div class="kpi ${saldo>=0?'featured':'red'}"><div class="kpi-label">Resultado líquido</div><div class="kpi-value">${saldo>=0?'+':''}${brl(saldo)}</div><div class="kpi-sub">${saldo>=0?'Superávit':'Déficit'} no período</div></div>`;
-}
+// ═══════════════════════════════════════════════════════════════════
+//  RENDERS
+// ═══════════════════════════════════════════════════════════════════
 
-function renderGeralTabela(mes) {
-  const mList = mes==='todos'?MESES:[mes];
-  const showCols = mes==='todos';
-  let html = '<thead><tr><th>Categoria</th><th>Fonte</th>';
-  if(showCols) html+='<th>Janeiro</th><th>Fevereiro</th><th>Março*</th>';
-  html+='<th>Total</th></tr></thead><tbody>';
-
-  const row = (label, color, srcTag, janV, fevV, marV) => {
-    const tot = janV+fevV+marV;
-    const sel = mes==='todos'?tot: mes==='jan'?janV:mes==='fev'?fevV:marV;
-    if(sel===0) return '';
-    let r=`<tr><td class="name"><span class="cdot" style="background:${color}"></span>${label}</td><td>${srcTag}</td>`;
-    if(showCols) r+=`<td class="val">${brl(janV)}</td><td class="val">${brl(fevV)}</td><td class="val">${brl(marV)}</td>`;
-    r+=`<td class="val">${brl(sel)}</td></tr>`;
-    return r;
-  };
-
-  const ct='<span class="src-tag src-cartao">CARTÃO</span>';
-  const ex='<span class="src-tag src-extrato">EXTRATO</span>';
-  const bx='<span class="src-tag src-cartao">CARTÃO</span><span class="src-tag src-extrato">EXTRATO</span>';
-
-  html += row('Tráfego Pago — Meta Ads (Buffet+Agência) <span class="src-tag src-cartao" style="font-weight:400">4338</span>','#2E8B57',bx, 14359+1110, 12533+425, 16237+0);
-  html += row('Agência — SaaS + João','#2E5FA8',bx, 3403+1500, 3175+3000, 3272+1500);
-  html += row('Castelo dos Sonhos','#A85F2E',bx, 427+8660, 427+6398, 427+2776);
-  html += row('Pessoal + Família (cartão)','#8B2E8B',ct, CART.pessoalCrt.jan+CART.familiaCrt.jan, CART.pessoalCrt.fev+CART.familiaCrt.fev, CART.pessoalCrt.mar+CART.familiaCrt.mar);
-  html += row('Cartões Jaqueline (Nubank+Inter)','#9E5A9E',ex, SAI.cartoesJaque.jan, SAI.cartoesJaque.fev, SAI.cartoesJaque.mar);
-  html += row('Consórcio','#BBBBBB',ex, SAI.consorcio.jan, SAI.consorcio.fev, SAI.consorcio.mar);
-  html += row('Colégio Izabela','#BBBBBB',ex, SAI.colegio.jan, SAI.colegio.fev, SAI.colegio.mar);
-  html += row('Energia (rancho + barracão)','#CCCCCC',ex, SAI.energia.jan, SAI.energia.fev, SAI.energia.mar);
-  html += row('Outros débitos extrato','#DDDDDD',ex, SAI.outrosExtrato.jan, SAI.outrosExtrato.fev, SAI.outrosExtrato.mar);
-  document.getElementById('tabelaGeral').innerHTML = html+'</tbody>';
-}
-
-function renderReceitasKPI(mes) {
-  const ment = vd(ENT.entMentoria,mes);
-  const ag = vd(ENT.entAgencia,mes);
-  const pb = vd(ENT.entProBuffet,mes);
-  const cs = vd(ENT.entCastelo,mes);
-  const tot = totalEntradas(mes);
-  document.getElementById('kpi-receitas').innerHTML=`
-    <div class="kpi featured"><div class="kpi-label">Total entradas</div><div class="kpi-value">${brl(tot)}</div><div class="kpi-sub">${mes==='todos'?'3 meses':LABELS[mes]}</div></div>
-    <div class="kpi green"><div class="kpi-label">Mentoria</div><div class="kpi-value" style="font-size:20px">${brl(ment)}</div><div class="kpi-sub">${pct(ment,tot)} do total</div></div>
-    <div class="kpi green"><div class="kpi-label">ProBuffet → conta</div><div class="kpi-value" style="font-size:20px">${brl(pb)}</div><div class="kpi-sub">Retiradas da empresa</div></div>
-    <div class="kpi"><div class="kpi-label">Castelo → conta</div><div class="kpi-value" style="font-size:20px">${brl(cs)}</div><div class="kpi-sub">Retiradas da empresa</div></div>`;
-}
-
-function renderReceitasTabela(mes) {
-  const mList = mes==='todos'?MESES:[mes];
-  const showCols = mes==='todos';
-  let html='<thead><tr><th>Origem</th><th>Tipo</th>';
-  if(showCols) html+='<th>Janeiro</th><th>Fevereiro</th><th>Março*</th>';
-  html+='<th>Total / Valor</th></tr></thead><tbody>';
-
-  const rows = [
-    {name:'Mentoria — Dom Festas (2x/mês)', tipo:'Mentoria', jan:4000, fev:4000, mar:2000},
-    {name:'Mentoria — diversos buffets/eventos', tipo:'Mentoria', jan:9772, fev:5074, mar:6525},
-    {name:'Agência — mkt patrocinado (Gisele, outros)', tipo:'Agência', jan:3460, fev:1000, mar:3000},
-    {name:'ProBuffet Tecnologia Ltda → conta', tipo:'Retirada', jan:8000, fev:21020, mar:1000},
-    {name:'Castelo dos Sonhos → conta', tipo:'Retirada', jan:12983, fev:7000, mar:0},
-    {name:'Boletos / depósitos / outros', tipo:'Outros', jan:4052, fev:3764, mar:2662},
-  ];
-
-  rows.forEach(r => {
-    const sel = mes==='todos'?r.jan+r.fev+r.mar: mes==='jan'?r.jan:mes==='fev'?r.fev:r.mar;
-    if(sel===0) return;
-    const cor = r.tipo==='Mentoria'?'var(--receita-bg);color:var(--receita)':r.tipo==='Agência'?'var(--agencia-bg);color:var(--agencia)':r.tipo==='Retirada'?'#FEF9EE;color:#7A5500':'var(--bg);color:var(--text3)';
-    html+=`<tr><td class="name">${r.name}</td><td><span class="badge" style="background:${cor}">${r.tipo}</span></td>`;
-    if(showCols) html+=`<td class="val">${brl(r.jan)}</td><td class="val">${brl(r.fev)}</td><td class="val">${brl(r.mar)}</td>`;
-    html+=`<td class="pos">${brl(sel)}</td></tr>`;
-  });
-  document.getElementById('tabelaReceitas').innerHTML=html+'</tbody>';
-}
-
-function renderBuffetKPI(mes) {
-  const ads = vd(CART.buffetAds,mes);
-  const pix = vd(SAI.buffetPix,mes);
-  // Cartão 4817 exclusivo ProBuffet: R$25.957 em 2.5 meses (~R$10.383/mês)
-  const ads4817 = {jan:8304, fev:8492, mar:9161};
-  const c4817 = mes==='todos'?8304+8492+9161:ads4817[mes];
-  const tot = ads+pix+c4817;
-  document.getElementById('kpi-buffet').innerHTML=`
-    <div class="kpi featured"><div class="kpi-label">Total ${mes==='todos'?'3 meses':LABELS[mes]}</div><div class="kpi-value">${brl(tot)}</div><div class="kpi-sub">Cartões 4338+4817 + Pix</div></div>
-    <div class="kpi"><div class="kpi-label">Meta Ads 4338 (Buffet+Ag.)</div><div class="kpi-value" style="font-size:18px">${brl(ads)}</div><div class="kpi-sub">Misturado com agência</div></div>
-    <div class="kpi"><div class="kpi-label">Meta Ads 4817 (só Buffet)</div><div class="kpi-value" style="font-size:18px">${brl(c4817)}</div><div class="kpi-sub">CNPJ 51.898.745 — confirmado</div></div>
-    <div class="kpi"><div class="kpi-label">Pix direto extrato</div><div class="kpi-value" style="font-size:18px">${brl(pix)}</div><div class="kpi-sub">ProBuffet → conta pessoal</div></div>`;
-}
-
-function renderBuffetTabela(mes) {
-  const mList = mes==='todos'?MESES:[mes];
-  let html='<thead><tr><th>Item</th><th>Fonte</th>';
-  const showCols=mes==='todos';
-  if(showCols) html+='<th>Jan</th><th>Fev</th><th>Mar</th>';
-  html+='<th>Total</th></tr></thead><tbody>';
-  const ct='<span class="src-tag src-cartao">CARTÃO</span>';
-  const ex='<span class="src-tag src-extrato">EXTRATO</span>';
-  const rows=[
-    {name:'Meta Ads FACEBK* — Pro Buffet + Agência (cartão 4338)', src:ct, jan:14359, fev:12533, mar:16237},
-    {name:'Meta Ads cartão 4817 — Pro Buffet exclusivo (CNPJ 51.898.745)', src:'<span class="src-tag" style="background:#F5F0FF;color:#5A35A0">4817</span>', jan:8304, fev:8492, mar:9161},
-    {name:'Pix direto ProBuffet → conta (extrato)', src:ex, jan:1110, fev:425, mar:0},
-  ];
-  rows.forEach(r=>{
-    const sel=mes==='todos'?r.jan+r.fev+r.mar:mes==='jan'?r.jan:mes==='fev'?r.fev:r.mar;
-    if(sel===0)return;
-    html+=`<tr><td class="name">${r.name}</td><td>${r.src}</td>`;
-    if(showCols) html+=`<td class="val">${brl(r.jan)}</td><td class="val">${brl(r.fev)}</td><td class="val">${brl(r.mar)}</td>`;
-    html+=`<td class="val" style="color:var(--buffet)">${brl(sel)}</td></tr>`;
-  });
-  // Linha de total
-  if(showCols){
-    const totJan = 14359+8304+1110, totFev = 12533+8492+425, totMar = 16237+9161+0;
-    html+=`<tr style="background:var(--bg);font-weight:600">
-      <td class="name" colspan="2" style="color:var(--text3);font-size:11px;letter-spacing:.5px;text-transform:uppercase">Total</td>
-      <td class="val">${brl(totJan)}</td>
-      <td class="val">${brl(totFev)}</td>
-      <td class="val">${brl(totMar)}</td>
-      <td class="val" style="color:var(--buffet)">${brl(totJan+totFev+totMar)}</td>
-    </tr>`;
-  } else {
-    const vals={jan:14359+8304+1110, fev:12533+8492+425, mar:16237+9161+0};
-    const sel=mes==='jan'?vals.jan:mes==='fev'?vals.fev:vals.mar;
-    html+=`<tr style="background:var(--bg)">
-      <td class="name" style="color:var(--text3);font-size:11px;letter-spacing:.5px;text-transform:uppercase">Total</td>
-      <td></td>
-      <td class="val" style="color:var(--buffet)">${brl(sel)}</td>
-    </tr>`;
-  }
-  document.getElementById('tabelaBuffet').innerHTML=html+'</tbody>';
-}
-
-function renderAgenciaKPI(mes) {
-  const saas = vd(CART.agenciaSaas,mes);
-  const joao = vd(SAI.joao,mes);
-  const tot = saas+joao;
-  document.getElementById('kpi-agencia').innerHTML=`
-    <div class="kpi featured"><div class="kpi-label">Total ${mes==='todos'?'3 meses':LABELS[mes]}</div><div class="kpi-value">${brl(tot)}</div><div class="kpi-sub">SaaS + Folha</div></div>
-    <div class="kpi"><div class="kpi-label">SaaS / Ferramentas</div><div class="kpi-value" style="font-size:20px">${brl(saas)}</div><div class="kpi-sub">${pct(saas,tot)} do total</div></div>
-    <div class="kpi"><div class="kpi-label">João Victor (salário)</div><div class="kpi-value" style="font-size:20px">${brl(joao)}</div><div class="kpi-sub">${pct(joao,tot)} do total</div></div>`;
-}
-
-function renderAgenciaTabelas(mes) {
-  const showCols=mes==='todos';
-  let html='<thead><tr><th>Ferramenta</th><th>Tipo</th>';
-  if(showCols) html+='<th>Jan</th><th>Fev</th><th>Mar</th>';
-  html+='<th>'+(showCols?'Média/mês':LABELS[mes])+'</th></tr></thead><tbody>';
-  TOOLS.forEach(t=>{
-    const tot=(t.jan+t.fev+t.mar);
-    const sel=mes==='todos'?tot:mes==='jan'?t.jan:mes==='fev'?t.fev:t.mar;
-    if(sel===0)return;
-    const avg=mes==='todos'?brl(Math.round(tot/3)):brl(sel);
-    html+=`<tr><td class="name">${t.name}</td><td><span class="badge" style="background:var(--agencia-bg);color:var(--agencia)">${t.tipo}</span></td>`;
-    if(showCols) html+=`<td class="val">${brl(t.jan)}</td><td class="val">${brl(t.fev)}</td><td class="val">${brl(t.mar)}</td>`;
-    html+=`<td class="val" style="color:var(--agencia)">${avg}</td></tr>`;
-  });
-  // Total row
-  const totJan=TOOLS.reduce((s,t)=>s+t.jan,0), totFev=TOOLS.reduce((s,t)=>s+t.fev,0), totMar=TOOLS.reduce((s,t)=>s+t.mar,0);
-  const totSel=mes==='todos'?totJan+totFev+totMar:mes==='jan'?totJan:mes==='fev'?totFev:totMar;
-  html+=`<tr style="background:var(--bg)"><td class="name" style="color:var(--text3);font-size:11px;letter-spacing:.5px;text-transform:uppercase" colspan="2">Total SaaS Agência</td>`;
-  if(showCols) html+=`<td class="val">${brl(totJan)}</td><td class="val">${brl(totFev)}</td><td class="val">${brl(totMar)}</td>`;
-  html+=`<td class="val" style="color:var(--agencia)">${brl(mes==='todos'?Math.round((totJan+totFev+totMar)/3):totSel)}</td></tr>`;
-  document.getElementById('tabelaAgencia').innerHTML=html+'</tbody>';
-
-  // folha
-  let fhtml='<thead><tr><th>Funcionário</th><th>Fonte</th><th>Jan</th><th>Fev</th><th>Mar*</th><th>Total</th></tr></thead><tbody>';
-  fhtml+=`<tr><td class="name">João Victor — salário</td><td><span class="src-tag src-extrato">EXTRATO</span></td><td class="val">R$ 1.500</td><td class="val">R$ 3.000</td><td class="val">R$ 1.500</td><td class="val" style="color:var(--agencia)">R$ 6.000</td></tr>`;
-  fhtml+=`</tbody>`;
-  document.getElementById('tabelaFolha').innerHTML=fhtml;
-}
-
-function renderBuffetToolsTable(mes) {
-  const showCols=mes==='todos';
-  let html='<thead><tr><th>Ferramenta</th><th>Tipo</th>';
-  if(showCols) html+='<th>Jan</th><th>Fev</th><th>Mar</th>';
-  html+='<th>'+(showCols?'Média/mês':LABELS[mes])+'</th></tr></thead><tbody>';
-  TOOLS_BUFFET.forEach(t=>{
-    const tot=(t.jan+t.fev+t.mar);
-    const sel=mes==='todos'?tot:mes==='jan'?t.jan:mes==='fev'?t.fev:t.mar;
-    if(sel===0)return;
-    const avg=mes==='todos'?brl(Math.round(tot/3)):brl(sel);
-    html+=`<tr><td class="name">${t.name}</td><td><span class="badge" style="background:var(--buffet-bg);color:var(--buffet)">${t.tipo}</span></td>`;
-    if(showCols) html+=`<td class="val">${brl(t.jan)}</td><td class="val">${brl(t.fev)}</td><td class="val">${brl(t.mar)}</td>`;
-    html+=`<td class="val" style="color:var(--buffet)">${avg}</td></tr>`;
-  });
-  const totJan=TOOLS_BUFFET.reduce((s,t)=>s+t.jan,0), totFev=TOOLS_BUFFET.reduce((s,t)=>s+t.fev,0), totMar=TOOLS_BUFFET.reduce((s,t)=>s+t.mar,0);
-  const totSel=mes==='todos'?totJan+totFev+totMar:mes==='jan'?totJan:mes==='fev'?totFev:totMar;
-  html+=`<tr style="background:var(--bg)"><td class="name" style="color:var(--text3);font-size:11px;letter-spacing:.5px;text-transform:uppercase" colspan="2">Total SaaS Pro Buffet</td>`;
-  if(showCols) html+=`<td class="val">${brl(totJan)}</td><td class="val">${brl(totFev)}</td><td class="val">${brl(totMar)}</td>`;
-  html+=`<td class="val" style="color:var(--buffet)">${brl(mes==='todos'?Math.round((totJan+totFev+totMar)/3):totSel)}</td></tr>`;
-  document.getElementById('tabelaBuffetTools').innerHTML=html+'</tbody>';
-}
-
-function renderCasteloKPI(mes) {
-  const crt = vd(CART.casteloCrt,mes);
-  const ext = vd(SAI.casteloCusto,mes);
-  const tot=crt+ext;
-  document.getElementById('kpi-castelo').innerHTML=`
-    <div class="kpi featured"><div class="kpi-label">Total ${mes==='todos'?'3 meses':LABELS[mes]}</div><div class="kpi-value">${brl(tot)}</div><div class="kpi-sub">Cartão + Extrato</div></div>
-    <div class="kpi"><div class="kpi-label">Astronpay (cartão)</div><div class="kpi-value" style="font-size:20px">${brl(crt)}</div><div class="kpi-sub">R$ 427/mês fixo</div></div>
-    <div class="kpi"><div class="kpi-label">Custos operacionais (extrato)</div><div class="kpi-value" style="font-size:20px">${brl(ext)}</div><div class="kpi-sub">Variável — via Pix</div></div>`;
-}
-
-function renderCasteloTabela(mes) {
-  const showCols=mes==='todos';
-  let html='<thead><tr><th>Item</th><th>Fonte</th>';
-  if(showCols) html+='<th>Jan</th><th>Fev</th><th>Mar*</th>';
-  html+='<th>Total</th></tr></thead><tbody>';
-  const rows=[
-    {name:'Astronpay (PG *ASTRONPAY ASTRON)', src:'<span class="src-tag src-cartao">CARTÃO</span>', jan:427, fev:427, mar:427},
-    {name:'CASTELO DOS SONHOS FRANCHISING LTD (Pix)', src:'<span class="src-tag src-extrato">EXTRATO</span>', jan:8660, fev:6398, mar:2776},
-  ];
-  rows.forEach(r=>{
-    const sel=mes==='todos'?r.jan+r.fev+r.mar:mes==='jan'?r.jan:mes==='fev'?r.fev:r.mar;
-    html+=`<tr><td class="name">${r.name}</td><td>${r.src}</td>`;
-    if(showCols) html+=`<td class="val">${brl(r.jan)}</td><td class="val">${brl(r.fev)}</td><td class="val">${brl(r.mar)}</td>`;
-    html+=`<td class="val" style="color:var(--castelo)">${brl(sel)}</td></tr>`;
-  });
-  document.getElementById('tabelaCastelo').innerHTML=html+'</tbody>';
-}
-
-function renderPessoalKPI(mes) {
-  const crt=vd(CART.pessoalCrt,mes)+vd(CART.familiaCrt,mes);
-  const jaque=vd(SAI.cartoesJaque,mes);
-  const fixos=vd(SAI.consorcio,mes)+vd(SAI.colegio,mes);
-  const tot=crt+jaque+fixos+vd(SAI.energia,mes);
-  document.getElementById('kpi-pessoal').innerHTML=`
-    <div class="kpi featured"><div class="kpi-label">Total pessoal ${mes==='todos'?'3 meses':LABELS[mes]}</div><div class="kpi-value">${brl(tot)}</div><div class="kpi-sub">Cartão + Extrato</div></div>
-    <div class="kpi"><div class="kpi-label">Cartão (Micael+Família)</div><div class="kpi-value" style="font-size:20px">${brl(crt)}</div><div class="kpi-sub">Sicoob Mastercard</div></div>
-    <div class="kpi"><div class="kpi-label">Nubank Micael + Inter Jaqueline</div><div class="kpi-value" style="font-size:20px">${brl(jaque)}</div><div class="kpi-sub">Faturas pagas pelo extrato</div></div>
-    <div class="kpi"><div class="kpi-label">Fixos (consórcio+escola)</div><div class="kpi-value" style="font-size:20px">${brl(fixos)}</div><div class="kpi-sub">Débitos automáticos</div></div>`;
-}
-
-function renderPessoalCats(mes) {
-  const cats=[
-    {name:'Marketplace (Micael)', color:'var(--pessoal-accent)', jan:1832, fev:1652, mar:1746, src:'cartão'},
-    {name:'Assinaturas Apple', color:'#7A7AAA', jan:154, fev:154, mar:154, src:'cartão'},
-    {name:'G40 Treinamentos', color:'#5A5AAA', jan:166, fev:166, mar:166, src:'cartão'},
-    {name:'Nubank Micael (pessoal)', color:'#5A5A9E', jan:2341, fev:2685, mar:0, src:'extrato'},
-    {name:'Inter Jaqueline', color:'#9E5A9E', jan:2586, fev:2119, mar:0, src:'extrato'},
-    {name:'Consórcio', color:'#AAAAAA', jan:1278, fev:1262, mar:1304, src:'extrato'},
-    {name:'Colégio Izabela', color:'#888888', jan:0, fev:874, mar:874, src:'extrato'},
-  ];
-  let html='';
-  cats.forEach(c=>{
-    const sel=mes==='todos'?c.jan+c.fev+c.mar:mes==='jan'?c.jan:mes==='fev'?c.fev:c.mar;
-    if(sel===0)return;
-    const tag=c.src==='cartão'?'<span class="src-tag src-cartao">CARTÃO</span>':'<span class="src-tag src-extrato">EXTRATO</span>';
-    html+=`<div class="cat-card">
-      <div class="cat-header">
-        <div class="cat-name"><span class="cdot" style="background:${c.color}"></span>${c.name} ${tag}</div>
-        <div class="cat-total" style="color:var(--pessoal)">${brl(sel)}</div>
-      </div>`;
-    if(mes==='todos'){
-      if(c.jan) html+=`<div class="cat-row"><span class="cat-row-label">Janeiro</span><span class="cat-row-val">${brl(c.jan)}</span></div>`;
-      if(c.fev) html+=`<div class="cat-row"><span class="cat-row-label">Fevereiro</span><span class="cat-row-val">${brl(c.fev)}</span></div>`;
-      if(c.mar) html+=`<div class="cat-row"><span class="cat-row-label">Março*</span><span class="cat-row-val">${brl(c.mar)}</span></div>`;
-    } else {
-      html+=`<div class="cat-row"><span class="cat-row-label">${LABELS[mes]}</span><span class="cat-row-val">${brl(sel)}</span></div>`;
-    }
-    html+=`</div>`;
-  });
-  document.getElementById('catPessoal').innerHTML=html;
-}
-
-function renderPessoalTabela(mes) {
-  const showCols=mes==='todos';
-  let html='<thead><tr><th>Item</th><th>Fonte</th>';
-  if(showCols) html+='<th>Jan</th><th>Fev</th><th>Mar*</th>';
-  html+='<th>Total</th></tr></thead><tbody>';
-  const rows=[
-    {name:'Nubank Micael (pessoal)', src:'extrato', jan:2341, fev:2685, mar:0},
-    {name:'Inter Jaqueline', src:'extrato', jan:2586, fev:2119, mar:0},
-    {name:'Consórcio (débito automático)', src:'extrato', jan:1278, fev:1262, mar:1304},
-    {name:'Colégio Izabela', src:'extrato', jan:0, fev:874, mar:874},
-    {name:'Energia rancho + barracão', src:'extrato', jan:1951, fev:364, mar:0},
-    {name:'MercadoLivre/Pago (cartão)', src:'cartão', jan:1832, fev:1652, mar:1746},
-    {name:'Apple assinaturas (cartão)', src:'cartão', jan:154, fev:154, mar:154},
-    {name:'G40 Treinamentos (cartão)', src:'cartão', jan:166, fev:166, mar:166},
-    {name:'Outros pessoal (cartão+extrato)', src:'ambos', jan:1017, fev:1308, mar:2574},
-  ];
-  rows.forEach(r=>{
-    const sel=mes==='todos'?r.jan+r.fev+r.mar:mes==='jan'?r.jan:mes==='fev'?r.fev:r.mar;
-    if(sel===0)return;
-    const tag=r.src==='extrato'?'<span class="src-tag src-extrato">EXTRATO</span>':r.src==='cartão'?'<span class="src-tag src-cartao">CARTÃO</span>':'<span class="src-tag src-cartao">CARTÃO</span><span class="src-tag src-extrato">EXTRATO</span>';
-    html+=`<tr><td class="name">${r.name}</td><td>${tag}</td>`;
-    if(showCols) html+=`<td class="val">${brl(r.jan)}</td><td class="val">${brl(r.fev)}</td><td class="val">${brl(r.mar)}</td>`;
-    html+=`<td class="neg">${brl(sel)}</td></tr>`;
-  });
-  document.getElementById('tabelaPessoal').innerHTML=html+'</tbody>';
-}
-
-// ─── CONTROLES ────────────────────────────────────────────────────────────────
-function setMes(mes, el) {
+function setMes(mes,el) {
   mesSel=mes;
   document.querySelectorAll('.mes-btn').forEach(b=>b.classList.remove('active'));
   el.classList.add('active');
   renderAll(mes);
 }
-function showTab(id, el) {
+function showTab(id,el) {
   document.querySelectorAll('.content').forEach(c=>c.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   el.classList.add('active');
+}
+
+function renderAll(mes) {
+  renderGeralKPI(mes);
+  renderResumoTabela(mes);
+  renderReceitasKPI(mes);
+  renderReceitasTabela(mes);
+  renderTrafegoKPI(mes);
+  renderFacebkTabela(mes);
+  renderFerramentasKPI(mes);
+  renderSaasBuffetTable(mes);
+  renderSaasAgenciaTable(mes);
+  renderCasteloKPI(mes);
+  renderCasteloTabela(mes);
+  renderPessoalKPI(mes);
+  renderCartaoMicaelTabela(mes);
+  renderCartaoJaqueTabela(mes);
+  renderCartaoFernandoTabela(mes);
+  renderFaturasExternoTabela(mes);
+  renderFixosKPI(mes);
+  renderFixosTabela(mes);
+  renderExtratoTabelas(mes);
+  updateCharts(mes);
+}
+
+// ─── KPIs GERAL ────────────────────────────────────────────────────
+function renderGeralKPI(mes) {
+  const ext = getExtratoMes(mes);
+  const entradas = ext.filter(x=>x.v>0).reduce((s,x)=>s+x.v,0);
+  const saidasExt = ext.filter(x=>x.v<0).reduce((s,x)=>s+Math.abs(x.v),0);
+  const ads = totalAds(mes);
+  const saasB = totalSaasBuffet(mes);
+  const saasA = totalSaasAgencia(mes);
+  const saidasCrt = ads+saasB+saasA+totalCartaoJaque(mes)+totalCartaoFernando(mes);
+  const resultado = entradas - saidasExt - saidasCrt;
+  document.getElementById('kpi-geral').innerHTML=`
+    <div class="kpi green"><div class="kpi-label">Total Entradas</div><div class="kpi-value">${brl(entradas)}</div><div class="kpi-sub">Extrato — ${mes==='todos'?'Jan–Mar':mes}</div></div>
+    <div class="kpi red"><div class="kpi-label">Saídas Extrato</div><div class="kpi-value">${brl(saidasExt)}</div><div class="kpi-sub">Débitos conta corrente</div></div>
+    <div class="kpi red"><div class="kpi-label">Saídas Cartão</div><div class="kpi-value">${brl(saidasCrt)}</div><div class="kpi-sub">Estimado — fatura Mastercard</div></div>
+    <div class="kpi ${resultado>=0?'green':'red'}"><div class="kpi-label">Resultado Estimado</div><div class="kpi-value">${resultado>=0?'+':''}${brl(resultado)}</div><div class="kpi-sub">${resultado>=0?'Superávit':'Déficit'}</div></div>`;
+}
+
+// ─── RESUMO TABELA ──────────────────────────────────────────────────
+function renderResumoTabela(mes) {
+  const showCols = mes==='todos';
+  let html = `<thead><tr><th>Categoria</th><th>Fonte</th>${showCols?'<th>Janeiro</th><th>Fevereiro</th><th>Março*</th>':''}<th style="text-align:right">Total</th></tr></thead><tbody>`;
+
+  const ct = '<span class="src-tag src-c">CARTÃO</span>';
+  const ex = '<span class="src-tag src-e">EXTRATO</span>';
+  const bx = ct+' '+ex;
+
+  const cats = [
+    {name:'🔴 Meta Ads (FACEBK*)', color:'#E65100', src:ct,
+     jan:ADS_JAN.reduce((s,x)=>s+x.v,0), fev:ADS_FEV.reduce((s,x)=>s+x.v,0), mar:ADS_MAR.reduce((s,x)=>s+x.v,0), badge:'b-ads'},
+    {name:'🔵 SaaS Pro Buffet', color:'#1A5C3A', src:ct,
+     jan:totalSaasBuffet('jan'), fev:totalSaasBuffet('fev'), mar:totalSaasBuffet('mar'), badge:'b-buffet'},
+    {name:'🔵 SaaS Agência', color:'#1A3A6B', src:ct,
+     jan:totalSaasAgencia('jan'), fev:totalSaasAgencia('fev'), mar:totalSaasAgencia('mar'), badge:'b-agencia'},
+    {name:'🟤 Castelo dos Sonhos', color:'#A85F2E', src:bx,
+     jan:427+8660, fev:427+6398, mar:427+2776, badge:'b-castelo'},
+    {name:'🟣 Pessoal Micael (MKT+outros)', color:'#8B2E8B', src:ct,
+     jan: MKT_JAN.filter(x=>x.desc!=='PG *ASTRONPAY ASTRON').reduce((s,x)=>s+x.v,0),
+     fev: MKT_FEV.filter(x=>x.desc!=='PG *ASTRONPAY ASTRON').reduce((s,x)=>s+x.v,0),
+     mar: MKT_MAR.filter(x=>x.desc!=='PG *ASTRONPAY ASTRON').reduce((s,x)=>s+x.v,0), badge:'b-pessoal'},
+    {name:'🟣 Família — Cartão Jaqueline (4861)', color:'#8B2E8B', src:ct,
+     jan:totalCartaoJaque('jan'), fev:totalCartaoJaque('fev'), mar:totalCartaoJaque('mar'), badge:'b-familia'},
+    {name:'🟣 Família — Cartão Fernando (5881)', color:'#6B3A8B', src:ct,
+     jan:totalCartaoFernando('jan'), fev:totalCartaoFernando('fev'), mar:totalCartaoFernando('mar'), badge:'b-familia'},
+    {name:'🟣 Nubank Micael + Inter Jaque (ext.)', color:'#8B2E8B', src:ex,
+     jan:2586+2341, fev:2119+2685, mar:0, badge:'b-pessoal'},
+    {name:'⚫ Fatura Mastercard (débito auto)', color:'#444', src:ex,
+     jan:22675, fev:27995, mar:0, badge:'b-fixo'},
+    {name:'⚫ Consórcio', color:'#666', src:ex,
+     jan:1278, fev:1262, mar:1304, badge:'b-fixo'},
+    {name:'⚫ Colégio Izabela', color:'#666', src:ex,
+     jan:0, fev:874, mar:874, badge:'b-fixo'},
+    {name:'⚫ Energia (rancho+barracão)', color:'#888', src:ex,
+     jan:1951, fev:364, mar:0, badge:'b-fixo'},
+    {name:'⚫ João Victor — salário', color:'#444', src:ex,
+     jan:1500, fev:3000, mar:1500, badge:'b-agencia'},
+  ];
+
+  cats.forEach(c => {
+    const sel = mes==='todos'?c.jan+c.fev+c.mar:mes==='jan'?c.jan:mes==='fev'?c.fev:c.mar;
+    if(sel===0) return;
+    html += `<tr>
+      <td class="desc"><span class="cdot" style="background:${c.color}"></span>${c.name}</td>
+      <td>${c.src}</td>
+      ${showCols?`<td class="val neutro">${brl(c.jan)}</td><td class="val neutro">${brl(c.fev)}</td><td class="val neutro">${brl(c.mar)}</td>`:''}
+      <td class="val neg">${brl(sel)}</td>
+    </tr>`;
+  });
+
+  document.getElementById('tabelaResumo').innerHTML = html+'</tbody>';
+}
+
+// ─── RECEITAS ──────────────────────────────────────────────────────
+function renderReceitasKPI(mes) {
+  const ext = getExtratoMes(mes);
+  const tot = ext.filter(x=>x.v>0).reduce((s,x)=>s+x.v,0);
+  const mentoria = ext.filter(x=>x.cat==='Receita Mentoria'&&x.v>0).reduce((s,x)=>s+x.v,0);
+  const agencia = ext.filter(x=>x.cat==='Receita Agência'&&x.v>0).reduce((s,x)=>s+x.v,0);
+  const buffet = ext.filter(x=>x.cat==='Receita ProBuffet'&&x.v>0).reduce((s,x)=>s+x.v,0);
+  const castelo = ext.filter(x=>x.cat==='Receita Castelo'&&x.v>0).reduce((s,x)=>s+x.v,0);
+  const outros = ext.filter(x=>x.cat&&x.cat.startsWith('Receita')&&!['Receita Mentoria','Receita Agência','Receita ProBuffet','Receita Castelo'].includes(x.cat)&&x.v>0).reduce((s,x)=>s+x.v,0);
+  document.getElementById('kpi-receitas').innerHTML=`
+    <div class="kpi green"><div class="kpi-label">Total Entradas</div><div class="kpi-value">${brl(tot)}</div><div class="kpi-sub">Todas as fontes</div></div>
+    <div class="kpi"><div class="kpi-label">Mentoria</div><div class="kpi-value" style="font-size:18px;color:var(--receita)">${brl(mentoria)}</div><div class="kpi-sub">${tot>0?(mentoria/tot*100).toFixed(0):'0'}% do total</div></div>
+    <div class="kpi"><div class="kpi-label">Agência</div><div class="kpi-value" style="font-size:18px;color:var(--agencia-accent)">${brl(agencia)}</div><div class="kpi-sub">${tot>0?(agencia/tot*100).toFixed(0):'0'}% do total</div></div>
+    <div class="kpi"><div class="kpi-label">ProBuffet + Castelo</div><div class="kpi-value" style="font-size:18px;color:var(--castelo-accent)">${brl(buffet+castelo)}</div><div class="kpi-sub">Retiradas empresas</div></div>`;
+}
+
+function renderReceitasTabela(mes) {
+  const ext = getExtratoMes(mes);
+  const entradas = ext.filter(x=>x.v>0).sort((a,b)=>b.v-a.v);
+  const catCor = {
+    'Receita Mentoria':'#1A7A4A','Receita Agência':'#2E5FA8',
+    'Receita ProBuffet':'#2E8B57','Receita Castelo':'#A85F2E',
+    'Receita Família':'#8B2E8B','Receita Outros':'#888'
+  };
+  let html = `<thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Obs</th><th style="text-align:right">Valor</th></tr></thead><tbody>`;
+  let total = 0;
+  entradas.forEach(r => {
+    const cor = catCor[r.cat]||'#999';
+    html += `<tr>
+      <td class="dat">${r.dt}</td>
+      <td class="desc">${r.h}</td>
+      <td><span class="badge" style="background:${cor}22;color:${cor}">${r.cat||'Outros'}</span></td>
+      <td style="color:var(--text3);font-size:11px">${r.obs||''}</td>
+      <td class="val pos">${brl(r.v)}</td>
+    </tr>`;
+    total+=r.v;
+  });
+  html += `<tr class="subtotal"><td colspan="${4}">Total entradas</td><td class="val pos">${brl(total)}</td></tr>`;
+  document.getElementById('tabelaReceitas').innerHTML = html+'</tbody>';
+}
+
+// ─── TRÁFEGO PAGO ──────────────────────────────────────────────────
+function renderTrafegoKPI(mes) {
+  const tots = {jan:totalAds('jan'), fev:totalAds('fev'), mar:totalAds('mar')};
+  const sel = mes==='todos'?tots.jan+tots.fev+tots.mar:tots[mes];
+  document.getElementById('kpi-traffego').innerHTML=`
+    <div class="kpi featured"><div class="kpi-label">Total Meta Ads (4338)</div><div class="kpi-value">${brl(sel)}</div><div class="kpi-sub">FACEBK* — ${mes==='todos'?'Jan–Mar':mes}</div></div>
+    <div class="kpi"><div class="kpi-label">Janeiro</div><div class="kpi-value" style="font-size:18px">${brl(tots.jan)}</div><div class="kpi-sub">${ADS_JAN.length} lançamentos</div></div>
+    <div class="kpi"><div class="kpi-label">Fevereiro</div><div class="kpi-value" style="font-size:18px">${brl(tots.fev)}</div><div class="kpi-sub">${ADS_FEV.length} lançamentos</div></div>
+    <div class="kpi"><div class="kpi-label">Março*</div><div class="kpi-value" style="font-size:18px">${brl(tots.mar)}</div><div class="kpi-sub">${ADS_MAR.length} lançamentos</div></div>`;
+}
+
+function renderFacebkTabela(mes) {
+  const arr = getAds(mes);
+  let html = `<thead><tr><th>Data</th><th>Código Meta</th><th style="text-align:right">Valor</th></tr></thead><tbody>`;
+  let total = 0;
+  arr.forEach(r => {
+    html += `<tr><td class="dat">${r.dt}</td><td class="desc" style="font-family:monospace;font-size:11px">${r.desc}</td><td class="val neg">${brl(r.v)}</td></tr>`;
+    total+=r.v;
+  });
+  html+=`<tr class="subtotal"><td colspan="2">Total Meta Ads (${arr.length} lançamentos)</td><td class="val neg">${brl(total)}</td></tr>`;
+  document.getElementById('tabelaFacebk').innerHTML = html+'</tbody>';
+}
+
+// ─── FERRAMENTAS SAAS ──────────────────────────────────────────────
+function renderFerramentasKPI(mes) {
+  const sb = totalSaasBuffet(mes);
+  const sa = totalSaasAgencia(mes);
+  document.getElementById('kpi-ferramentas').innerHTML=`
+    <div class="kpi featured"><div class="kpi-label">Total SaaS</div><div class="kpi-value">${brl(sb+sa)}</div><div class="kpi-sub">Buffet + Agência</div></div>
+    <div class="kpi" style="border-left:3px solid var(--buffet)"><div class="kpi-label">Pro Buffet</div><div class="kpi-value" style="font-size:18px;color:var(--buffet)">${brl(sb)}</div><div class="kpi-sub">5 ferramentas</div></div>
+    <div class="kpi" style="border-left:3px solid var(--agencia-accent)"><div class="kpi-label">Agência</div><div class="kpi-value" style="font-size:18px;color:var(--agencia)">${brl(sa)}</div><div class="kpi-sub">7 ferramentas</div></div>`;
+}
+
+function renderSaasBuffetTable(mes) {
+  const showCols = mes==='todos';
+  let html = `<thead><tr><th>Ferramenta</th><th>Tipo</th>${showCols?'<th>Jan</th><th>Fev</th><th>Mar*</th>':''}<th style="text-align:right">Total/Mês</th><th>Observação</th></tr></thead><tbody>`;
+  let totJan=0,totFev=0,totMar=0;
+  SAAS_BUFFET.forEach(t => {
+    const sel = mes==='todos'?t.jan+t.fev+t.mar:t[mes]||0;
+    totJan+=t.jan; totFev+=t.fev; totMar+=t.mar;
+    html+=`<tr>
+      <td class="desc">${t.nome}</td>
+      <td><span class="badge b-buffet">${t.tipo}</span></td>
+      ${showCols?`<td class="val neutro">${brl(t.jan)}</td><td class="val neutro">${brl(t.fev)}</td><td class="val neutro">${brl(t.mar)}</td>`:''}
+      <td class="val neg" style="text-align:right">${brl(sel)}</td>
+      <td style="color:var(--text3);font-size:11px">${t.obs}</td>
+    </tr>`;
+  });
+  const totSel = mes==='todos'?totJan+totFev+totMar:mes==='jan'?totJan:mes==='fev'?totFev:totMar;
+  html+=`<tr class="subtotal"><td colspan="${showCols?6:3}">Total SaaS Pro Buffet</td><td class="val neg" style="text-align:right">${brl(totSel)}</td><td></td></tr>`;
+  document.getElementById('tabelaSaasBuffet').innerHTML = html+'</tbody>';
+}
+
+function renderSaasAgenciaTable(mes) {
+  const showCols = mes==='todos';
+  let html = `<thead><tr><th>Ferramenta</th><th>Tipo</th>${showCols?'<th>Jan</th><th>Fev</th><th>Mar*</th>':''}<th style="text-align:right">Total/Mês</th><th>Observação</th></tr></thead><tbody>`;
+  let totJan=0,totFev=0,totMar=0;
+  SAAS_AGENCIA.forEach(t => {
+    const sel = mes==='todos'?t.jan+t.fev+t.mar:t[mes]||0;
+    if(sel===0) return;
+    totJan+=t.jan; totFev+=t.fev; totMar+=t.mar;
+    html+=`<tr>
+      <td class="desc">${t.nome}</td>
+      <td><span class="badge b-agencia">${t.tipo}</span></td>
+      ${showCols?`<td class="val neutro">${brl(t.jan)}</td><td class="val neutro">${brl(t.fev)}</td><td class="val neutro">${brl(t.mar)}</td>`:''}
+      <td class="val neg" style="text-align:right">${brl(sel)}</td>
+      <td style="color:var(--text3);font-size:11px">${t.obs}</td>
+    </tr>`;
+  });
+  const totSel = mes==='todos'?totJan+totFev+totMar:mes==='jan'?totJan:mes==='fev'?totFev:totMar;
+  html+=`<tr class="subtotal"><td colspan="${showCols?6:3}">Total SaaS Agência</td><td class="val neg" style="text-align:right">${brl(totSel)}</td><td></td></tr>`;
+  document.getElementById('tabelaSaasAgencia').innerHTML = html+'</tbody>';
+}
+
+// ─── CASTELO ──────────────────────────────────────────────────────
+function renderCasteloKPI(mes) {
+  const crt = {jan:427,fev:427,mar:427};
+  const ext = {jan:8660,fev:6398,mar:2776};
+  const c = mes==='todos'?crt.jan+crt.fev+crt.mar:crt[mes];
+  const e = mes==='todos'?ext.jan+ext.fev+ext.mar:ext[mes];
+  document.getElementById('kpi-castelo').innerHTML=`
+    <div class="kpi featured"><div class="kpi-label">Total Castelo</div><div class="kpi-value">${brl(c+e)}</div><div class="kpi-sub">Cartão + Extrato</div></div>
+    <div class="kpi"><div class="kpi-label">Astronpay (cartão)</div><div class="kpi-value" style="font-size:18px;color:var(--castelo)">${brl(c)}</div><div class="kpi-sub">R$ 427/mês fixo</div></div>
+    <div class="kpi"><div class="kpi-label">Repasses operacionais (ext.)</div><div class="kpi-value" style="font-size:18px;color:var(--castelo)">${brl(e)}</div><div class="kpi-sub">Pix direto ao Castelo</div></div>`;
+}
+
+function renderCasteloTabela(mes) {
+  const showCols = mes==='todos';
+  let html = `<thead><tr><th>Item</th><th>Fonte</th>${showCols?'<th>Jan</th><th>Fev</th><th>Mar*</th>':''}<th style="text-align:right">Total</th></tr></thead><tbody>`;
+  const rows=[
+    {name:'PG *ASTRONPAY ASTRON (cartão 4338)', src:'<span class="src-tag src-c">CARTÃO</span>', jan:427, fev:427, mar:427},
+    {name:'PIX — Frete (07/jan)', src:'<span class="src-tag src-e">EXTRATO</span>', jan:4500, fev:0, mar:0},
+    {name:'PIX — Fibra fachada RP (07/jan)', src:'<span class="src-tag src-e">EXTRATO</span>', jan:1500, fev:0, mar:0},
+    {name:'Transferência CASTELO DOS SONHOS (12/jan)', src:'<span class="src-tag src-e">EXTRATO</span>', jan:300, fev:0, mar:0},
+    {name:'Transferência CASTELO DOS SONHOS (12/jan)', src:'<span class="src-tag src-e">EXTRATO</span>', jan:6900, fev:0, mar:0},
+    {name:'Transferência CASTELO DOS SONHOS (23/jan)', src:'<span class="src-tag src-e">EXTRATO</span>', jan:1460, fev:0, mar:0},
+    {name:'Transferência CASTELO DOS SONHOS (04/fev)', src:'<span class="src-tag src-e">EXTRATO</span>', jan:0, fev:2050, mar:0},
+    {name:'Transferência CASTELO DOS SONHOS (20/fev)', src:'<span class="src-tag src-e">EXTRATO</span>', jan:0, fev:4347.83, mar:0},
+    {name:'Transferência CASTELO DOS SONHOS (27/fev)', src:'<span class="src-tag src-e">EXTRATO</span>', jan:0, fev:354, mar:0},
+    {name:'Transferência CASTELO DOS SONHOS (02/mar)', src:'<span class="src-tag src-e">EXTRATO</span>', jan:0, fev:0, mar:576},
+    {name:'Transferência CASTELO DOS SONHOS (11/mar)', src:'<span class="src-tag src-e">EXTRATO</span>', jan:0, fev:0, mar:2200},
+  ];
+  let totJ=0,totF=0,totM=0;
+  rows.forEach(r=>{
+    const sel=mes==='todos'?r.jan+r.fev+r.mar:mes==='jan'?r.jan:mes==='fev'?r.fev:r.mar;
+    if(sel===0) return;
+    totJ+=r.jan; totF+=r.fev; totM+=r.mar;
+    html+=`<tr><td class="desc">${r.name}</td><td>${r.src}</td>
+      ${showCols?`<td class="val neutro">${brl(r.jan)}</td><td class="val neutro">${brl(r.fev)}</td><td class="val neutro">${brl(r.mar)}</td>`:''}
+      <td class="val neg" style="text-align:right">${brl(sel)}</td></tr>`;
+  });
+  const totSel=mes==='todos'?totJ+totF+totM:mes==='jan'?totJ:mes==='fev'?totF:totM;
+  html+=`<tr class="subtotal"><td colspan="${showCols?5:3}">Total Castelo dos Sonhos</td><td class="val neg" style="text-align:right">${brl(totSel)}</td></tr>`;
+  document.getElementById('tabelaCastelo').innerHTML=html+'</tbody>';
+}
+
+// ─── PESSOAL ──────────────────────────────────────────────────────
+function renderPessoalKPI(mes) {
+  const mkt = {jan:MKT_JAN.filter(x=>x.desc!=='PG *ASTRONPAY ASTRON').reduce((s,x)=>s+x.v,0),
+                fev:MKT_FEV.filter(x=>x.desc!=='PG *ASTRONPAY ASTRON').reduce((s,x)=>s+x.v,0),
+                mar:MKT_MAR.filter(x=>x.desc!=='PG *ASTRONPAY ASTRON').reduce((s,x)=>s+x.v,0)};
+  const jq = {jan:totalCartaoJaque('jan'),fev:totalCartaoJaque('fev'),mar:totalCartaoJaque('mar')};
+  const fr = {jan:totalCartaoFernando('jan'),fev:totalCartaoFernando('fev'),mar:totalCartaoFernando('mar')};
+  const nu = {jan:2341+2586,fev:2685+2119,mar:0};
+  const sm = k=>mes==='todos'?k.jan+k.fev+k.mar:k[mes];
+  const tot = sm(mkt)+sm(jq)+sm(fr)+sm(nu);
+  document.getElementById('kpi-pessoal').innerHTML=`
+    <div class="kpi featured"><div class="kpi-label">Total Pessoal + Família</div><div class="kpi-value">${brl(tot)}</div><div class="kpi-sub">Cartão + Ext.</div></div>
+    <div class="kpi"><div class="kpi-label">Micael (MKT+outros)</div><div class="kpi-value" style="font-size:18px;color:var(--pessoal)">${brl(sm(mkt))}</div><div class="kpi-sub">Cartão 4338</div></div>
+    <div class="kpi"><div class="kpi-label">Jaqueline+Fernando</div><div class="kpi-value" style="font-size:18px;color:var(--pessoal)">${brl(sm(jq)+sm(fr))}</div><div class="kpi-sub">Cartões 4861+5881</div></div>
+    <div class="kpi"><div class="kpi-label">Nubank+Inter (extrato)</div><div class="kpi-value" style="font-size:18px;color:var(--pessoal)">${brl(sm(nu))}</div><div class="kpi-sub">Faturas pagas via Pix</div></div>`;
+}
+
+function renderCartaoMicaelTabela(mes) {
+  // MKT + Outros pessoal Micael
+  const arrMkt = mes==='jan'?MKT_JAN:mes==='fev'?MKT_FEV:mes==='mar'?MKT_MAR:[...MKT_JAN,...MKT_FEV,...MKT_MAR];
+  const arrOth = mes==='jan'?OUTROS_MICAEL_JAN:mes==='fev'?OUTROS_MICAEL_FEV:mes==='mar'?OUTROS_MICAEL_MAR:[...OUTROS_MICAEL_JAN,...OUTROS_MICAEL_FEV,...OUTROS_MICAEL_MAR];
+
+  let html=`<thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th style="text-align:right">Valor</th></tr></thead><tbody>`;
+  html+=`<tr class="group-header"><td colspan="4" style="color:var(--pessoal)">Marketplace (MercadoLivre/Pago, Vindi, etc.)</td></tr>`;
+  let totMkt=0;
+  arrMkt.filter(x=>x.desc!=='PG *ASTRONPAY ASTRON').forEach(r=>{
+    html+=`<tr><td class="dat">${r.dt||''}</td><td class="desc" style="font-size:11px">${r.desc}</td><td><span class="badge b-pessoal">Marketplace</span></td><td class="val neg" style="text-align:right">${brl(r.v)}</td></tr>`;
+    totMkt+=r.v;
+  });
+  html+=`<tr class="subtotal"><td colspan="3">Subtotal Marketplace</td><td class="val neg" style="text-align:right">${brl(totMkt)}</td></tr>`;
+
+  html+=`<tr class="group-header"><td colspan="4" style="color:var(--pessoal)">Assinaturas, ferramentas e outros pessoal</td></tr>`;
+  let totOth=0;
+  // Filtrar apenas itens NÃO relacionados a negócios (castelo já separado)
+  const otherFiltered = arrOth.filter(x=>x.cat!=='Castelo');
+  otherFiltered.forEach(r=>{
+    const badge = r.cat==='Assinatura'?'b-fixo':r.cat==='IA'||r.cat==='Automação'||r.cat==='No-code'||r.cat==='Email'||r.cat==='CRM'||r.cat==='Relatórios'||r.cat==='Gestão'||r.cat==='Cloud'||r.cat==='Produtiv.'||r.cat==='Comunic.'?'b-agencia':'b-pessoal';
+    html+=`<tr><td class="dat">${r.dt||''}</td><td class="desc" style="font-size:11px">${r.desc}</td><td><span class="badge ${badge}">${r.cat}</span></td><td class="val neg" style="text-align:right">${brl(r.v)}</td></tr>`;
+    totOth+=r.v;
+  });
+  html+=`<tr class="subtotal"><td colspan="3">Subtotal Outros/Ferramentas</td><td class="val neg" style="text-align:right">${brl(totOth)}</td></tr>`;
+
+  const totGeral = totMkt+totOth;
+  html+=`<tr class="subtotal" style="background:#F0EAF0"><td colspan="3" style="color:var(--pessoal)">TOTAL Cartão Micael (pessoal)</td><td class="val neg" style="text-align:right;color:var(--pessoal)">${brl(totGeral)}</td></tr>`;
+  document.getElementById('tabelaCartaoMicael').innerHTML=html+'</tbody>';
+}
+
+function renderCartaoJaqueTabela(mes) {
+  const arr = mes==='jan'?CART_JAQUE_JAN:mes==='fev'?CART_JAQUE_FEV:mes==='mar'?CART_JAQUE_MAR:[...CART_JAQUE_JAN,...CART_JAQUE_FEV,...CART_JAQUE_MAR];
+  let html=`<thead><tr><th>Data</th><th>Descrição</th><th>Cidade</th><th style="text-align:right">Valor</th></tr></thead><tbody>`;
+  let total=0;
+  arr.forEach(r=>{
+    html+=`<tr><td class="dat">${r.dt||''}</td><td class="desc" style="font-size:11px">${r.desc}</td><td style="color:var(--text3);font-size:11px">Viradouro</td><td class="val neg" style="text-align:right">${brl(r.v)}</td></tr>`;
+    total+=r.v;
+  });
+  html+=`<tr class="subtotal"><td colspan="3">Total Jaqueline</td><td class="val neg" style="text-align:right">${brl(total)}</td></tr>`;
+  document.getElementById('tabelaCartaoJaque').innerHTML=html+'</tbody>';
+}
+
+function renderCartaoFernandoTabela(mes) {
+  const arr = mes==='jan'?CART_FERN_JAN:mes==='fev'?CART_FERN_FEV:mes==='mar'?CART_FERN_MAR:[...CART_FERN_JAN,...CART_FERN_FEV,...CART_FERN_MAR];
+  let html=`<thead><tr><th>Data</th><th>Descrição</th><th style="text-align:right">Valor</th></tr></thead><tbody>`;
+  let total=0;
+  arr.forEach(r=>{
+    html+=`<tr><td class="dat">${r.dt||''}</td><td class="desc" style="font-size:11px">${r.desc}</td><td class="val neg" style="text-align:right">${brl(r.v)}</td></tr>`;
+    total+=r.v;
+  });
+  html+=`<tr class="subtotal"><td colspan="2">Total Fernando</td><td class="val neg" style="text-align:right">${brl(total)}</td></tr>`;
+  document.getElementById('tabelaCartaoFernando').innerHTML=html+'</tbody>';
+}
+
+function renderFaturasExternoTabela(mes) {
+  const rows=[
+    {dt:'14/jan',h:'PIX Cartão Nubank Micael',mes:'jan',v:2585.77,cat:'Nubank Micael'},
+    {dt:'19/jan',h:'PIX Cartão Nubank Micael (compl.)',mes:'jan',v:2340.54,cat:'Nubank Micael'},
+    {dt:'26/jan',h:'PIX cartão (parcial)',mes:'jan',v:350.00,cat:'Nubank Micael'},
+    {dt:'25/fev',h:'PIX Cartão Nubank Jaqueline',mes:'fev',v:2685.11,cat:'Nubank Jaqueline'},
+    {dt:'24/fev',h:'PIX Cartão Inter Jaqueline',mes:'fev',v:2119.29,cat:'Inter Jaqueline'},
+  ];
+  const filtrados = mes==='todos'?rows:rows.filter(r=>r.mes===mes);
+  let html=`<thead><tr><th>Data</th><th>Descrição</th><th>Cartão</th><th style="text-align:right">Valor</th></tr></thead><tbody>`;
+  let total=0;
+  filtrados.forEach(r=>{
+    html+=`<tr><td class="dat">${r.dt}</td><td class="desc">${r.h}</td><td><span class="badge b-pessoal">${r.cat}</span></td><td class="val neg" style="text-align:right">${brl(r.v)}</td></tr>`;
+    total+=r.v;
+  });
+  html+=`<tr class="subtotal"><td colspan="3">Total faturas externas pagas</td><td class="val neg" style="text-align:right">${brl(total)}</td></tr>`;
+  document.getElementById('tabelaFaturasExterno').innerHTML=html+'</tbody>';
+}
+
+// ─── FIXOS ────────────────────────────────────────────────────────
+function renderFixosKPI(mes) {
+  const fixos = [
+    {name:'Consórcio',jan:1278,fev:1262,mar:1304},
+    {name:'Colégio Izabela',jan:0,fev:874,mar:874},
+    {name:'Energia rancho+barracão',jan:1951,fev:364,mar:0},
+    {name:'Imposto/DAS/INSS',jan:1393,fev:1393,mar:0},
+    {name:'Tarifa bancária',jan:9.90,fev:9.90,mar:9.90},
+    {name:'Seguro prestamista',jan:2.64,fev:0,mar:0},
+    {name:'Fatura Mastercard (débito)',jan:22675,fev:27995,mar:0},
+    {name:'Água (barracão+Gibran+igreja)',jan:0,fev:171.79,mar:180.56},
+  ];
+  const tot = fixos.reduce((s,r)=>s+(mes==='todos'?r.jan+r.fev+r.mar:r[mes]||0),0);
+  document.getElementById('kpi-fixos').innerHTML=`
+    <div class="kpi featured"><div class="kpi-label">Total Fixos+Obrig.</div><div class="kpi-value">${brl(tot)}</div><div class="kpi-sub">Todos os débitos fixos</div></div>
+    <div class="kpi"><div class="kpi-label">Sem fatura cartão</div><div class="kpi-value" style="font-size:18px">${brl(tot-(mes==='todos'?22675+27995:mes==='jan'?22675:mes==='fev'?27995:0))}</div><div class="kpi-sub">Obrigações líquidas</div></div>`;
+}
+
+function renderFixosTabela(mes) {
+  const rows=[
+    {dt:'22/jan|23/fev|—',h:'Fatura Mastercard (débito automático)',jan:22675,fev:27995,mar:0,cat:'Cartão'},
+    {dt:'05/jan|05/fev|05/mar',h:'DÉB.CONV.DEM.EMPRES — CONSÓRCIOS',jan:1278.43,fev:1261.91,mar:1303.72,cat:'Consórcio'},
+    {dt:'—|05/fev|05/mar',h:'DÉB.PGTO.BOLETO — Colégio Izabela',jan:0,fev:874.00,mar:874.00,cat:'Escola'},
+    {dt:'16/jan',h:'DÉB.CNV.EN.ELET.GAS — Energia rancho',jan:1950.74,fev:0,mar:0,cat:'Energia'},
+    {dt:'—|03/fev',h:'DÉB.CNV.EN.ELET.GAS — Energia barracão',jan:0,fev:96.54,mar:0,cat:'Energia'},
+    {dt:'14/jan|20/fev|—',h:'DÉB.CONV.ORGÃOS GOV — DAS/INSS',jan:1393.35,fev:1393.35,mar:0,cat:'Impostos'},
+    {dt:'20/jan|—|—',h:'DÉB.SEG.PRESTAMISTA',jan:2.64,fev:0,mar:0,cat:'Seguro'},
+    {dt:'02/jan|02/fev|02/mar',h:'DEB PACOTE SERVIÇOS (tarifa bancária)',jan:9.90,fev:9.90,mar:9.90,cat:'Bancário'},
+    {dt:'—|13/fev',h:'PIX — Água barracão',jan:0,fev:25.92+48.11,mar:0,cat:'Água'},
+    {dt:'—|13/fev',h:'PIX — Água João Gibran',jan:0,fev:97.68,mar:0,cat:'Água'},
+    {dt:'10/mar',h:'SANEAMENTO — Água igreja',jan:0,fev:0,mar:48.75,cat:'Água'},
+    {dt:'10/mar',h:'SANEAMENTO — Água João Gibran',jan:0,fev:0,mar:105.55,cat:'Água'},
+    {dt:'10/mar',h:'SANEAMENTO — Água barracão',jan:0,fev:0,mar:26.26,cat:'Água'},
+  ];
+  const showCols=mes==='todos';
+  let html=`<thead><tr><th>Data(s)</th><th>Descrição</th><th>Tipo</th>${showCols?'<th>Jan</th><th>Fev</th><th>Mar*</th>':''}<th style="text-align:right">Total</th></tr></thead><tbody>`;
+  let totJ=0,totF=0,totM=0;
+  rows.forEach(r=>{
+    const sel=mes==='todos'?r.jan+r.fev+r.mar:mes==='jan'?r.jan:mes==='fev'?r.fev:r.mar;
+    if(sel===0) return;
+    totJ+=r.jan;totF+=r.fev;totM+=r.mar;
+    html+=`<tr><td class="dat" style="font-size:10px">${r.dt}</td><td class="desc">${r.h}</td>
+      <td><span class="badge b-fixo">${r.cat}</span></td>
+      ${showCols?`<td class="val neutro">${brl(r.jan)}</td><td class="val neutro">${brl(r.fev)}</td><td class="val neutro">${brl(r.mar)}</td>`:''}
+      <td class="val neg" style="text-align:right">${brl(sel)}</td></tr>`;
+  });
+  const totSel=mes==='todos'?totJ+totF+totM:mes==='jan'?totJ:mes==='fev'?totF:totM;
+  html+=`<tr class="subtotal"><td colspan="${showCols?6:4}">Total Fixos + Obrigações</td><td class="val neg" style="text-align:right">${brl(totSel)}</td></tr>`;
+  document.getElementById('tabelaFixos').innerHTML=html+'</tbody>';
+}
+
+// ─── EXTRATO COMPLETO ─────────────────────────────────────────────
+function renderExtratoTabelas(mes) {
+  const renderOne = (arr, elId) => {
+    let html=`<thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th style="text-align:right">Valor</th><th>Obs</th></tr></thead><tbody>`;
+    let totEnt=0, totSai=0;
+    arr.forEach(r=>{
+      const cor = r.v>0?'pos':'neg';
+      const catCor = {
+        'Receita Mentoria':'#1A7A4A','Receita Agência':'#2E5FA8','Receita ProBuffet':'#2E8B57',
+        'Receita Castelo':'#A85F2E','Receita Família':'#8B2E8B','Receita Outros':'#888',
+        'Fixos':'#666','Pessoal':'#8B2E8B','Castelo':'#A85F2E','Agência':'#2E5FA8',
+        'Buffet/Agência':'#2E8B57','Outros':'#AAA'
+      };
+      const c = catCor[r.cat]||'#AAA';
+      html+=`<tr>
+        <td class="dat">${r.dt}</td>
+        <td class="desc" style="font-size:11px">${r.h}</td>
+        <td><span class="badge" style="background:${c}22;color:${c};font-size:9px">${r.cat||''}</span></td>
+        <td class="val ${cor}" style="text-align:right">${r.v>0?'+':''}<span style="color:${r.v>0?'var(--receita)':'#C03030'}">${brl(Math.abs(r.v))}</span></td>
+        <td style="color:var(--text3);font-size:10px">${r.obs||''}</td>
+      </tr>`;
+      if(r.v>0) totEnt+=r.v; else totSai+=Math.abs(r.v);
+    });
+    html+=`<tr class="subtotal">
+      <td colspan="3" style="display:flex;gap:16px;flex-wrap:wrap">
+        <span style="color:var(--receita)">Entradas: ${brl(totEnt)}</span>
+        <span style="color:#C03030">Saídas: ${brl(totSai)}</span>
+      </td>
+      <td class="val ${totEnt-totSai>=0?'pos':'neg'}" style="text-align:right">${totEnt-totSai>=0?'+':''}<span style="color:${totEnt-totSai>=0?'var(--receita)':'#C03030'}">${brl(Math.abs(totEnt-totSai))}</span></td>
+      <td></td>
+    </tr>`;
+    document.getElementById(elId).innerHTML=html+'</tbody>';
+  };
+
+  if(mes==='todos') {
+    renderOne(EXTRATO_JAN,'tabelaExtratoJan');
+    renderOne(EXTRATO_FEV,'tabelaExtratoFev');
+    renderOne(EXTRATO_MAR,'tabelaExtratoMar');
+    document.querySelectorAll('#tab-extrato .section-title').forEach(s=>s.style.display='');
+  } else {
+    const maps = {jan:['tabelaExtratoJan',EXTRATO_JAN],fev:['tabelaExtratoFev',EXTRATO_FEV],mar:['tabelaExtratoMar',EXTRATO_MAR]};
+    ['jan','fev','mar'].forEach(m=>{
+      const [id,arr]=maps[m];
+      if(m===mes) renderOne(arr,id); else document.getElementById(id).innerHTML='';
+    });
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  CHARTS
+// ═══════════════════════════════════════════════════════════════════
+let fluxoChart, pizzaChart;
+const gc='#EEEEEA', tc='#AAAAAA', mf={family:'Montserrat',size:11};
+
+function calcTotals(mes) {
+  const ext = getExtratoMes(mes);
+  return {
+    ent: ext.filter(x=>x.v>0).reduce((s,x)=>s+x.v,0),
+    saiExt: ext.filter(x=>x.v<0).reduce((s,x)=>s+Math.abs(x.v),0),
+    saiCrt: totalAds(mes)+totalSaasBuffet(mes)+totalSaasAgencia(mes)+totalCartaoJaque(mes)+totalCartaoFernando(mes)
+  };
+}
+
+function buildCharts() {
+  const j=calcTotals('jan'), f=calcTotals('fev'), m=calcTotals('mar');
+  fluxoChart = new Chart(document.getElementById('chartFluxo'),{
+    type:'bar',
+    data:{labels:['Jan','Fev','Mar'],datasets:[
+      {label:'Entradas',data:[j.ent,f.ent,m.ent],backgroundColor:'#1A7A4A',borderRadius:3},
+      {label:'Saídas extrato',data:[j.saiExt,f.saiExt,m.saiExt],backgroundColor:'#C03030',borderRadius:3},
+      {label:'Saídas cartão',data:[j.saiCrt,f.saiCrt,m.saiCrt],backgroundColor:'#2E5FA8',borderRadius:3},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      scales:{x:{ticks:{color:tc,font:mf},grid:{color:gc}},y:{ticks:{color:tc,font:mf,callback:v=>'R$'+(v/1000).toFixed(0)+'k'},grid:{color:gc}}},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${brl(ctx.parsed.y)}`}}}}
+  });
+
+  const totAds3 = totalAds('jan')+totalAds('fev')+totalAds('mar');
+  const totSaasBuf3 = totalSaasBuffet('jan')+totalSaasBuffet('fev')+totalSaasBuffet('mar');
+  const totSaasAg3 = totalSaasAgencia('jan')+totalSaasAgencia('fev')+totalSaasAgencia('mar');
+  const totCast3 = (427+8660)+(427+6398)+(427+2776);
+  const totPes3 = (MKT_JAN.reduce((s,x)=>s+x.v,0)+MKT_FEV.reduce((s,x)=>s+x.v,0)+MKT_MAR.reduce((s,x)=>s+x.v,0))+totalCartaoJaque('todos')+totalCartaoFernando('todos');
+  const totFix3 = (1278+1262+1304)+(0+874+874)+(1951+364+0)+(1393+1393+0);
+  const totJoao = 1500+3000+1500;
+  const totTotal = totAds3+totSaasBuf3+totSaasAg3+totCast3+totPes3+totFix3+totJoao;
+
+  pizzaChart = new Chart(document.getElementById('chartPizza'),{
+    type:'doughnut',
+    data:{labels:['Meta Ads','SaaS Buffet','SaaS Agência','Castelo','Pessoal+Família','Fixos+Obrig.','João Victor'],
+      datasets:[{data:[
+        Math.round(totAds3/totTotal*1000)/10,
+        Math.round(totSaasBuf3/totTotal*1000)/10,
+        Math.round(totSaasAg3/totTotal*1000)/10,
+        Math.round(totCast3/totTotal*1000)/10,
+        Math.round(totPes3/totTotal*1000)/10,
+        Math.round(totFix3/totTotal*1000)/10,
+        Math.round(totJoao/totTotal*1000)/10,
+      ],backgroundColor:['#E65100','#2E8B57','#2E5FA8','#A85F2E','#8B2E8B','#666','#444'],
+      borderColor:'#FFF',borderWidth:3,hoverOffset:6}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'60%',
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${ctx.parsed}%`}}}}
+  });
+}
+
+function updateCharts(mes) {
+  if(mes==='todos') {
+    const j=calcTotals('jan'),f=calcTotals('fev'),m=calcTotals('mar');
+    fluxoChart.data.labels=['Jan','Fev','Mar'];
+    fluxoChart.data.datasets[0].data=[j.ent,f.ent,m.ent];
+    fluxoChart.data.datasets[1].data=[j.saiExt,f.saiExt,m.saiExt];
+    fluxoChart.data.datasets[2].data=[j.saiCrt,f.saiCrt,m.saiCrt];
+  } else {
+    const t=calcTotals(mes);
+    fluxoChart.data.labels=['Entradas','Saídas Ext.','Saídas Crt.'];
+    fluxoChart.data.datasets[0].data=[t.ent,0,0];
+    fluxoChart.data.datasets[1].data=[0,t.saiExt,0];
+    fluxoChart.data.datasets[2].data=[0,0,t.saiCrt];
+  }
+  fluxoChart.update();
 }
 
 buildCharts();
