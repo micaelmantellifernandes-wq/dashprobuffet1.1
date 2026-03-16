@@ -226,9 +226,9 @@ tr:hover td{background:rgba(0,198,255,0.03);}
     <div class="login-logo">PRO BUFFET</div>
     <div class="login-sub">Portal de Comissões 2026</div>
     <label class="login-label">Usuário</label>
-    <input class="login-input" id="login-user" type="text" placeholder="seu nome" autocomplete="off">
+    <input class="login-input" id="login-user" type="text" placeholder="seu nome" autocomplete="off" onkeydown="if(event.key==='Enter') doLogin()">
     <label class="login-label">Senha</label>
-    <input class="login-input" id="login-pass" type="password" placeholder="••••••">
+    <input class="login-input" id="login-pass" type="password" placeholder="••••••" onkeydown="if(event.key==='Enter') doLogin()">
     <button class="login-btn" onclick="doLogin()">ENTRAR</button>
     <div class="login-err" id="login-err"></div>
   </div>
@@ -519,11 +519,13 @@ async function doLogin(){
   btn.textContent = 'ENTRAR';
 }
 
-document.getElementById('login-user').addEventListener('keydown', e => {
-  if(e.key === 'Enter') doLogin();
-});
-document.getElementById('login-pass').addEventListener('keydown', e => {
-  if(e.key === 'Enter') doLogin();
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('login-user').addEventListener('keydown', e => {
+    if(e.key === 'Enter') doLogin();
+  });
+  document.getElementById('login-pass').addEventListener('keydown', e => {
+    if(e.key === 'Enter') doLogin();
+  });
 });
 
 function doLogout(){
