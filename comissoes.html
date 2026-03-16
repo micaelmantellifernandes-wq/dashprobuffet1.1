@@ -655,7 +655,6 @@ async function renderResumo(){
     ? (COMISSOES[currentMesResumo]||[])
     : vendasDoVendedor(currentMesResumo, nome);
 
-  const isAdmin = currentUser.role==='admin';
   const n = norm(nome);
   document.getElementById('tbody-resumo').innerHTML = vendas.length
     ? vendas.map(v => {
