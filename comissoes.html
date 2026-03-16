@@ -454,8 +454,13 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbyZpncxgdcgckI39e8gMYLr
 
 async function apiGet(params){
   const qs = new URLSearchParams(params).toString();
-  const res = await fetch(`${API_URL}?${qs}`);
-  return res.json();
+  const res = await fetch(`${API_URL}?${qs}`, {
+    method: 'GET',
+    redirect: 'follow',
+  });
+  const text = await res.text();
+  try { return JSON.parse(text); }
+  catch(e) { throw new Error('Resposta inválida: ' + text.substring(0,100)); }
 }
 
 /* ═══════════════════════════════════════════
@@ -478,11 +483,16 @@ async function doLogin(){
   const err = document.getElementById('login-err');
   const btn = document.querySelector('.login-btn');
 
-  if(!u || !p){ err.textContent='Preencha usuário e senha.'; return; }
+  if(!u || !p){ 
+    err.style.color = 'var(--red)';
+    err.textContent = 'Preencha usuário e senha.'; 
+    return; 
+  }
 
   err.style.color = 'var(--text2)';
-  err.textContent = 'Verificando...';
+  err.textContent = '⏳ Verificando...';
   btn.disabled = true;
+  btn.textContent = 'AGUARDE...';
 
   try {
     const res = await apiGet({ action:'login', nome:u, senha:p });
@@ -499,15 +509,19 @@ async function doLogin(){
       initApp();
     } else {
       err.style.color = 'var(--red)';
-      err.textContent = res.erro || 'Usuário ou senha incorretos.';
+      err.textContent = '✗ ' + (res.erro || 'Usuário ou senha incorretos.');
     }
   } catch(e) {
     err.style.color = 'var(--red)';
-    err.textContent = 'Erro de conexão. Tente novamente.';
+    err.textContent = '✗ Erro de conexão: ' + e.message;
   }
   btn.disabled = false;
+  btn.textContent = 'ENTRAR';
 }
 
+document.getElementById('login-user').addEventListener('keydown', e => {
+  if(e.key === 'Enter') doLogin();
+});
 document.getElementById('login-pass').addEventListener('keydown', e => {
   if(e.key === 'Enter') doLogin();
 });
