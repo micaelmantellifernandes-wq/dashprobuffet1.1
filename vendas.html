@@ -418,17 +418,21 @@ function mkChart(id,type,data,extra={}){
   }});
 }
 
-async function fetchSheet(id,sheet){
+async function fetchSheet(id,sheet,timeout=15000){
   const url=`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheet)}`;
   const controller=new AbortController();
-  const timer=setTimeout(()=>controller.abort(),10000);
+  const timer=setTimeout(()=>controller.abort(),timeout);
   try{
     const res=await fetch(url,{signal:controller.signal});
     clearTimeout(timer);
     const text=await res.text();
-    const json=JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/)[1]);
+    if(text.includes('"errors"')&&(text.includes('not_found')||text.includes('Invalid sheet'))) return null;
+    const match=text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/);
+    if(!match) return null;
+    const json=JSON.parse(match[1]);
+    if(!json.table||!json.table.rows) return null;
     return json.table.rows.map(r=>(r.c||[]).map(c=>(!c||c.v===null)?null:c.v));
-  }catch(e){clearTimeout(timer);throw e;}
+  }catch(e){clearTimeout(timer);return 'TIMEOUT';}
 }
 
 function parseDate(v){
@@ -463,24 +467,32 @@ function parseMonth(cfg, rows){
 }
 
 async function tryFetchMonth(sheetId, cfg){
-  try{
-    const rows=await fetchSheet(sheetId,cfg.key);
-    // Aba existe mas pode ser vazia ou de controle — valida se tem ao menos 1 linha de dado
-    const dataRows=rows.slice(2).filter(r=>r&&r[cfg.off?2:1]&&String(r[cfg.off?2:1]).trim());
-    if(dataRows.length===0) return null; // aba existe mas sem dados ainda
-    return {cfg, rows};
-  }catch(e){
-    return null; // aba não existe na planilha
-  }
+  let rows = await fetchSheet(sheetId, cfg.key);
+  // Retry uma vez se der timeout
+  if(rows==='TIMEOUT') rows = await fetchSheet(sheetId, cfg.key, 20000);
+  if(!rows||rows==='TIMEOUT') return null; // aba não existe ou falhou
+  const dataRows=rows.slice(2).filter(r=>r&&r[cfg.off?2:1]&&String(r[cfg.off?2:1]).trim());
+  if(dataRows.length===0) return null;
+  return {cfg, rows};
 }
 
 async function loadAll(){
   document.getElementById('loading-msg').textContent='Detectando abas disponíveis...';
 
-  // Tenta todos os meses em paralelo para 2026 e 2025
+  // Carrega em lotes de 4 para não sobrecarregar o Google Sheets
+  async function fetchInBatches(sheetId, months, batchSize=4){
+    const results=[];
+    for(let i=0;i<months.length;i+=batchSize){
+      const batch=months.slice(i,i+batchSize);
+      const batchResults=await Promise.all(batch.map(cfg=>tryFetchMonth(sheetId,cfg)));
+      results.push(...batchResults);
+    }
+    return results;
+  }
+
   const [results26, results25] = await Promise.all([
-    Promise.all(ALL_MONTHS26.map(cfg=>tryFetchMonth(ID26,cfg))),
-    Promise.all(ALL_MONTHS25.map(cfg=>tryFetchMonth(ID25,cfg))),
+    fetchInBatches(ID26, ALL_MONTHS26),
+    fetchInBatches(ID25, ALL_MONTHS25),
   ]);
 
   // Filtra só os que existem e têm dados
@@ -488,8 +500,8 @@ async function loadAll(){
   MONTHS25 = ALL_MONTHS25.filter((_,i)=>results25[i]!==null);
 
   // Monta os dados
-  results26.forEach((r,i)=>{ if(r) d26[r.cfg.key]=parseMonth(r.cfg,r.rows); });
-  results25.forEach((r,i)=>{ if(r) d25[r.cfg.key]=parseMonth(r.cfg,r.rows); });
+  results26.forEach((r)=>{ if(r) d26[r.cfg.key]=parseMonth(r.cfg,r.rows); });
+  results25.forEach((r)=>{ if(r) d25[r.cfg.key]=parseMonth(r.cfg,r.rows); });
 
   // Define mês ativo como o último mês disponível
   if(MONTHS26.length>0) activeMon=MONTHS26[MONTHS26.length-1].key;
