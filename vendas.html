@@ -350,25 +350,40 @@ tr:hover td{background:var(--surface2)}
 <script>
 const ID26='1dDXLQx_MTlB9V7T12G_RZa3Z8QjKjG7FGsp8Fp9GiKk';
 const ID25='1UYnpBz2vnZxEmN2CIpsnl98jN4vTk6yn0beL8oFK3qo';
-const MONTHS26=[
+// Meses candidatos — o dashboard tenta todos e só exibe os que existirem na planilha
+const ALL_MONTHS26=[
   {key:'JANEIRO/26',  label:'Janeiro',  off:true},
   {key:'FEVEREIRO/26',label:'Fevereiro',off:false},
   {key:'MARÇO/26',    label:'Março',    off:false},
+  {key:'ABRIL/26',    label:'Abril',    off:false},
+  {key:'MAIO/26',     label:'Maio',     off:false},
+  {key:'JUNHO/26',    label:'Junho',    off:false},
+  {key:'JULHO/26',    label:'Julho',    off:false},
+  {key:'AGOSTO/26',   label:'Agosto',   off:false},
+  {key:'SETEMBRO/26', label:'Setembro', off:false},
+  {key:'OUTUBRO/26',  label:'Outubro',  off:false},
+  {key:'NOVEMBRO/26', label:'Novembro', off:false},
+  {key:'DEZEMBRO/26', label:'Dezembro', off:false},
 ];
-const MONTHS25=[
-  {key:'MAIO',      label:'Maio',      off:false},
-  {key:'JUNHO',     label:'Junho',     off:false},
-  {key:'JULHO',     label:'Julho',     off:false},
-  {key:'AGOSTO',    label:'Agosto',    off:false},
-  {key:'SETEMBRO',  label:'Setembro',  off:false},
-  {key:'OUTUBRO',   label:'Outubro',   off:false},
-  {key:'NOVEMBRO',  label:'Novembro',  off:false},
-  {key:'DEZEMBRO',  label:'Dezembro',  off:false},
+const ALL_MONTHS25=[
+  {key:'JANEIRO',   label:'Janeiro',  off:false},
+  {key:'FEVEREIRO', label:'Fevereiro',off:false},
+  {key:'MARÇO',     label:'Março',    off:false},
+  {key:'ABRIL',     label:'Abril',    off:false},
+  {key:'MAIO',      label:'Maio',     off:false},
+  {key:'JUNHO',     label:'Junho',    off:false},
+  {key:'JULHO',     label:'Julho',    off:false},
+  {key:'AGOSTO',    label:'Agosto',   off:false},
+  {key:'SETEMBRO',  label:'Setembro', off:false},
+  {key:'OUTUBRO',   label:'Outubro',  off:false},
+  {key:'NOVEMBRO',  label:'Novembro', off:false},
+  {key:'DEZEMBRO',  label:'Dezembro', off:false},
 ];
+let MONTHS26=[], MONTHS25=[];
 const AC='#00b4dc',GD='#00d4a8',WN='#f0b429',BD='#ff5c7a',GL='#ffd166';
 const PAL=[AC,'#0090ff',GD,GL,WN,BD,'#a78bfa','#60a5fa'];
 
-let d26={},d25={},activeMon='JANEIRO/26',activeMon25='MAIO',charts={};
+let d26={},d25={},activeMon='',activeMon25='',charts={};
 
 const brl=v=>(v===null||v===undefined||isNaN(Number(v)))
   ?'—':'R$ '+Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -422,67 +437,63 @@ function parseDate(v){
   return m?new Date(+m[1],+m[2],+m[3]):null;
 }
 
+function parseMonth(cfg, rows){
+  const dataRows=rows.slice(2).filter(r=>r&&r[cfg.off?2:1]&&String(r[cfg.off?2:1]).trim());
+  const parsed=dataRows.map(r=>({
+    nome:   String(r[cfg.off?2:1]||'').trim(),
+    data:   parseDate(r[cfg.off?1:0]),
+    colet:  num(r[cfg.off?3:2]),
+    mens:   num(r[cfg.off?4:3]),
+    impl:   num(r[cfg.off?5:4]),
+    fonte:  String(r[cfg.off?6:5]||'').trim(),
+    meses:  num(r[cfg.off?7:6]),
+    ltv:    num(r[cfg.off?8:7]),
+    sdr:    String(r[cfg.off?9:8]||'').trim(),
+    closer: String(r[cfg.off?10:9]||'').trim(),
+    inadimplente: num(r[cfg.off?14:13]),
+    retorno:       parseDate(r[cfg.off?15:14]),
+  }));
+  const ltv=parsed.reduce((s,r)=>s+r.ltv,0);
+  const mens=parsed.reduce((s,r)=>s+r.mens,0);
+  const impl=parsed.reduce((s,r)=>s+r.impl,0);
+  const colet=parsed.reduce((s,r)=>s+r.colet,0);
+  const src={},cls={};
+  parsed.forEach(r=>{if(r.fonte)src[r.fonte]=(src[r.fonte]||0)+1;if(r.closer)cls[r.closer]=(cls[r.closer]||0)+1;});
+  return {rows:parsed,count:parsed.length,ltv,mens,impl,colet,src,cls,label:cfg.label};
+}
+
+async function tryFetchMonth(sheetId, cfg){
+  try{
+    const rows=await fetchSheet(sheetId,cfg.key);
+    // Aba existe mas pode ser vazia ou de controle — valida se tem ao menos 1 linha de dado
+    const dataRows=rows.slice(2).filter(r=>r&&r[cfg.off?2:1]&&String(r[cfg.off?2:1]).trim());
+    if(dataRows.length===0) return null; // aba existe mas sem dados ainda
+    return {cfg, rows};
+  }catch(e){
+    return null; // aba não existe na planilha
+  }
+}
+
 async function loadAll(){
-  // 2026
-  for(const cfg of MONTHS26){
-    try{
-      const rows=await fetchSheet(ID26,cfg.key);
-      const dataRows=rows.slice(2).filter(r=>r&&r[cfg.off?2:1]&&String(r[cfg.off?2:1]).trim());
-      const parsed=dataRows.map(r=>({
-        nome:   String(r[cfg.off?2:1]||'').trim(),
-        data:   parseDate(r[cfg.off?1:0]),
-        colet:  num(r[cfg.off?3:2]),
-        mens:   num(r[cfg.off?4:3]),
-        impl:   num(r[cfg.off?5:4]),
-        fonte:  String(r[cfg.off?6:5]||'').trim(),
-        meses:  num(r[cfg.off?7:6]),
-        ltv:    num(r[cfg.off?8:7]),
-        sdr:    String(r[cfg.off?9:8]||'').trim(),
-        closer: String(r[cfg.off?10:9]||'').trim(),
-        inadimplente: num(r[cfg.off?14:13]),
-        retorno:       parseDate(r[cfg.off?15:14]),
-      }));
-      const ltv=parsed.reduce((s,r)=>s+r.ltv,0);
-      const mens=parsed.reduce((s,r)=>s+r.mens,0);
-      const impl=parsed.reduce((s,r)=>s+r.impl,0);
-      const colet=parsed.reduce((s,r)=>s+r.colet,0);
-      const src={},cls={};
-      parsed.forEach(r=>{if(r.fonte)src[r.fonte]=(src[r.fonte]||0)+1;if(r.closer)cls[r.closer]=(cls[r.closer]||0)+1;});
-      d26[cfg.key]={rows:parsed,count:parsed.length,ltv,mens,impl,colet,src,cls,label:cfg.label};
-    }catch(e){
-      d26[cfg.key]={rows:[],count:0,ltv:0,mens:0,impl:0,colet:0,src:{},cls:{},label:cfg.label};
-    }
-  }
-  // 2025
-  for(const cfg of MONTHS25){
-    try{
-      const rows=await fetchSheet(ID25,cfg.key);
-      const dataRows=rows.slice(2).filter(r=>r&&r[cfg.off?2:1]&&String(r[cfg.off?2:1]).trim());
-      const parsed=dataRows.map(r=>({
-        nome:   String(r[cfg.off?2:1]||'').trim(),
-        data:   parseDate(r[cfg.off?1:0]),
-        colet:  num(r[cfg.off?3:2]),
-        mens:   num(r[cfg.off?4:3]),
-        impl:   num(r[cfg.off?5:4]),
-        fonte:  String(r[cfg.off?6:5]||'').trim(),
-        meses:  num(r[cfg.off?7:6]),
-        ltv:    num(r[cfg.off?8:7]),
-        sdr:    String(r[cfg.off?9:8]||'').trim(),
-        closer: String(r[cfg.off?10:9]||'').trim(),
-        inadimplente: num(r[cfg.off?14:13]),
-        retorno:       parseDate(r[cfg.off?15:14]),
-      }));
-      const ltv=parsed.reduce((s,r)=>s+r.ltv,0);
-      const mens=parsed.reduce((s,r)=>s+r.mens,0);
-      const impl=parsed.reduce((s,r)=>s+r.impl,0);
-      const colet=parsed.reduce((s,r)=>s+r.colet,0);
-      const src={},cls={};
-      parsed.forEach(r=>{if(r.fonte)src[r.fonte]=(src[r.fonte]||0)+1;if(r.closer)cls[r.closer]=(cls[r.closer]||0)+1;});
-      d25[cfg.key]={rows:parsed,count:parsed.length,ltv,mens,impl,colet,src,cls,label:cfg.label};
-    }catch(e){
-      d25[cfg.key]={rows:[],count:0,ltv:0,mens:0,impl:0,colet:0,src:{},cls:{},label:cfg.label};
-    }
-  }
+  document.getElementById('loading-msg').textContent='Detectando abas disponíveis...';
+
+  // Tenta todos os meses em paralelo para 2026 e 2025
+  const [results26, results25] = await Promise.all([
+    Promise.all(ALL_MONTHS26.map(cfg=>tryFetchMonth(ID26,cfg))),
+    Promise.all(ALL_MONTHS25.map(cfg=>tryFetchMonth(ID25,cfg))),
+  ]);
+
+  // Filtra só os que existem e têm dados
+  MONTHS26 = ALL_MONTHS26.filter((_,i)=>results26[i]!==null);
+  MONTHS25 = ALL_MONTHS25.filter((_,i)=>results25[i]!==null);
+
+  // Monta os dados
+  results26.forEach((r,i)=>{ if(r) d26[r.cfg.key]=parseMonth(r.cfg,r.rows); });
+  results25.forEach((r,i)=>{ if(r) d25[r.cfg.key]=parseMonth(r.cfg,r.rows); });
+
+  // Define mês ativo como o último mês disponível
+  if(MONTHS26.length>0) activeMon=MONTHS26[MONTHS26.length-1].key;
+  if(MONTHS25.length>0) activeMon25=MONTHS25[MONTHS25.length-1].key;
 
   const totalRows=Object.values(d26).reduce((s,v)=>s+v.count,0)+Object.values(d25).reduce((s,v)=>s+v.count,0);
   if(totalRows===0){
